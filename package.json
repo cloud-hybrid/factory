@@ -1,0 +1,15 @@
+{
+    "name": "@cloud-vault/factory",
+    "public": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "build": "npm run build --workspace ./source",
+        "compile": "npm run synth --workspace ./source",
+        "deploy": "npm run deploy --workspace ./source",
+        "destroy": "npm run destroy --workspace ./source"
+    },
+    "workspaces": [
+        "./source"
+    ]
+}

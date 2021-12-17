@@ -1,0 +1,63 @@
+{
+    "name": "factory",
+    "license": "BSD-3-Clause",
+    "readme": "README.md",
+    "version": "0.1.77",
+    "types": "main.ts",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "get": "cdktf get",
+        "build": "tsc --pretty",
+        "synth": "cdktf synth",
+        "start": "tsc --pretty --watch",
+        "deploy": "npm run get && cdktf deploy",
+        "destroy": "cdktf destroy",
+        "setup": "cd ci && make synth",
+        "upgrade": "npm i cdktf@latest cdktf-cli@latest",
+        "upgrade:next": "npm i cdktf@next cdktf-cli@next"
+    },
+    "dependencies": {
+        "@cdktf/provider-aws": "^3.0.1",
+        "cdktf": "^0.8.3",
+        "cdktf-cli": "^0.8.3",
+        "constructs": "^10.0.12"
+    },
+    "devDependencies": {
+        "@types/aws-lambda": "^8.10.76",
+        "@types/node": "^15.14.9",
+        "@typescript-eslint/eslint-plugin": "^5.7.0",
+        "@typescript-eslint/eslint-plugin-tslint": "^5.7.0",
+        "@typescript-eslint/experimental-utils": "^5.7.0",
+        "@typescript-eslint/parser": "^5.7.0",
+        "@typescript-eslint/scope-manager": "^5.7.0",
+        "@typescript-eslint/typescript-estree": "^5.7.0",
+        "typescript": "^4.3.2"
+    },
+    "eslintConfig": {
+        "parser": "@typescript-eslint/parser",
+        "plugins": [
+            "@typescript-eslint"
+        ],
+        "extends": [
+            "eslint:recommended",
+            "plugin:@typescript-eslint/eslint-recommended",
+            "plugin:@typescript-eslint/recommended"
+        ],
+        "rules": {
+            "@typescript-eslint/no-explicit-any": 0,
+            "@typescript-eslint/explicit-function-return-type": 0,
+            "@typescript-eslint/no-use-before-define": 0,
+            "@typescript-eslint/no-empty-interface": 0,
+            "@typescript-eslint/explicit-module-boundary-types": 0,
+            "no-sequences": "error"
+        },
+        "ignorePatterns": [
+            "ci",
+            "dist",
+            "coverage",
+            "distribution",
+            "node_modules"
+        ]
+    }
+}

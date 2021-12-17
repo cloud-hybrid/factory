@@ -1,0 +1,12 @@
+{
+    "TF": true,
+    "CDK": true,
+    "CFN": false,
+    "Cloud": {
+        "Provider": "AWS",
+        "Region": "us-east-2"
+    },
+    "Source": "src",
+    "Environment": "Development",
+    "Organization": "Cloud-Vault"
+}

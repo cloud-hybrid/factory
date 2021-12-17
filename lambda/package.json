@@ -1,0 +1,14 @@
+{
+    "name": "@cloud-vault/lambda",
+    "priviate": true,
+    "version": "0.0.1",
+    "scripts": {
+        "compile": "tsc"
+    },
+    "devDependencies": {
+        "@types/aws-lambda": "^8.10.76"
+    },
+    "dependencies": {
+        "typescript": "^4.3.2"
+    }
+}

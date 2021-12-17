@@ -1,0 +1,27 @@
+{
+    "name": "@cloud-vault/ci",
+    "version": "0.1.84",
+    "private": true,
+    "description": "...",
+    "type": "module",
+    "scripts": {
+        "validate": "node Validate.js",
+        "test": "node src/index.js"
+    },
+    "dependencies": {
+        "ajv": "^8.8.2"
+    },
+    "devDependencies": {
+        "@types/node": "^16.11.11",
+        "dotenv": "^10.0.0",
+        "dotenv-expand": "^5.1.0",
+        "fs-extra": "^10.0.0"
+    },
+    "eslintConfig": {
+        "root": true,
+        "parser": "@typescript-eslint/parser",
+        "plugins": [
+            "@typescript-eslint"
+        ]
+    }
+}

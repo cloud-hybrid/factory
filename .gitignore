@@ -1,0 +1,17 @@
+**/.terraform/*
+
+*.tfstate
+*.tfstate.*
+
+*.d.ts
+*.js
+
+node_modules
+
+cdktf.out
+
+.gen
+
+.idea
+
+.DS_Store

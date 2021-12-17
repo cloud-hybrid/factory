@@ -1,0 +1,50 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "alwaysStrict": false,
+        "charset": "utf8",
+        "experimentalDecorators": true,
+        "incremental": true,
+        "inlineSourceMap": true,
+        "noEmitOnError": false,
+        "listEmittedFiles": true,
+        "noFallthroughCasesInSwitch": true,
+        "declaration": true,
+        "emitDeclarationOnly": false,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": false,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "resolveJsonModule": true,
+        "declarationMap": false,
+        "strictFunctionTypes": false,
+        "baseUrl": ".",
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": false,
+        "lib": [
+            "dom",
+            "esnext",
+            "es2019"
+        ],
+        "module": "esnext",
+        "moduleResolution": "node",
+        "preserveConstEnums": true,
+        "pretty": true,
+        "removeComments": false,
+        "skipLibCheck": true,
+        "strict": false,
+        "target": "ES2021"
+    },
+    "include": [
+        "**/*.ts"
+    ],
+    "exclude": [
+        "**/*.d.ts",
+        "*/**/node_modules",
+        "*/**/unit-testing",
+        "*/**/__tests__",
+        "*/**/@Types"
+    ]
+}

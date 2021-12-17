@@ -1,0 +1,12 @@
+{
+    "private": true,
+    "type": "module",
+    "version": "0.1.76",
+    "eslintConfig": {
+        "root": true,
+        "parser": "@typescript-eslint/parser",
+        "plugins": [
+            "@typescript-eslint"
+        ]
+    }
+}
