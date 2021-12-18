@@ -18,6 +18,8 @@ import AWS, {iam as IAM} from "@cdktf/provider-aws";
 
 import {App, TerraformStack, TerraformAsset, AssetType, TerraformOutput} from "cdktf";
 
+import {Subprocess} from "./ci/utilities/Compile.js";
+
 type Policy = IAM.IamPolicy;
 
 const CWD: string = Path.dirname(import.meta.url.replace("file" + ":" + "/", ""));
@@ -28,13 +30,14 @@ const Import: NodeRequire = Module.createRequire(import.meta.url);
 const Generic = new Set();
 
 /***
- *  **Note**: Ensure to keep Import's Path to a relative URI in order to keep Type-Hinting
+ * JSON Configuration
+ * ==================
  *
- *  @typedef {await import("./configuration/settings.json")} Settings
+ *  @type {await import("./configuration/settings.json")}
  *
  */
 
-export const Settings = Import("./configuration/settings.json");
+const Settings = Import("./configuration/settings.json");
 
 function UUID() {
     let source = new Date().getTime(); // Timestamp
@@ -55,6 +58,10 @@ function UUID() {
     });
 }
 
+/***
+ * Base Composition of `Settings`
+ */
+
 class Default {
     public configuration: typeof Settings;
 
@@ -64,6 +71,14 @@ class Default {
         this.configuration.Functions
     }
 }
+
+/***
+ * JSON Settings
+ * =============
+ *
+ * @externs {{@link Default}, {@link Settings}}
+ *
+ */
 
 class Configuration {
     public tf: boolean;
@@ -80,6 +95,7 @@ class Configuration {
     protected readonly functions: typeof Settings.Functions = Settings.Functions;
     protected readonly deployment: typeof Settings.Deployment = Settings.Deployment;
 
+    public settings: typeof Settings;
     private defaults: typeof Settings;
 
     constructor(settings = {
@@ -90,8 +106,11 @@ class Configuration {
         environment: Settings.Environment,
         organization: Settings.Organization,
         functions: Settings.Functions,
-        deployment: Settings.Deployment
+        deployment: Settings.Deployment,
+        settings: Settings
     }) {
+        this.settings = settings || Settings;
+
         this.defaults = (new Default()).configuration;
 
         this.tf = settings.tf || this.defaults.TF;
@@ -108,8 +127,11 @@ class Configuration {
     }
 }
 
+/*** The {@link Lambda} Construct */
+
 class Lambda extends Configuration {
     public name: string;
+    public service: string = Settings.Service;
 
     public readonly ID: string;
 
@@ -122,6 +144,8 @@ class Lambda extends Configuration {
 
     protected readonly functions: string[] = Settings.Functions;
     protected readonly deployment: string[] = Settings.Deployment;
+
+    public readonly settings: typeof Settings = Settings;
 
     public readonly policy: Policy | JSON | string = JSON.stringify({
         Version: "2012-10-17",
@@ -150,24 +174,46 @@ class Lambda extends Configuration {
      *
      */
 
-    constructor(name: string, service: string) {
+    constructor(name: string, service: string = Settings.Service, sam: boolean = false) {
         super();
 
         this.name = name;
+        this.service = service;
 
-        const Artifact = Path.join(PKG, "packages", name, this.distribution);
-        const Package = Path.join(Path.dirname(Artifact), "package.json");
-        const Version = Import(Package)?.version || null;
-        const Source = Path.join(PKG, name, this.source);
+        Assertion.notStrictEqual(this.name, undefined);
+        Assertion.notStrictEqual(this.service, undefined);
 
-        Assertion.strictEqual(FS.existsSync(Package), true, Lambda.Throw("Package"));
-        Assertion.strictEqual(typeof Version, "string", Lambda.Throw("Version"));
+        if (sam === true) {
+            const Artifact = Path.join(PKG, "packages", this.settings?.SAM, this.name, this.distribution);
+            const Package = Path.join(Path.dirname(Artifact), "package.json");
+            const Version = Import(Package)?.version || null;
+            const Source = Path.join(PKG, "packages", this.settings?.SAM, this.name, this.source);
 
-        this.version = Version;
-        this.directory = Artifact;
-        this.source = Source;
+            (!FS?.existsSync(Source)) && console.warn("[Warning] Source Not Found" + ":", Source);
 
-        this.ID = [this.organization, this.environment, "Lambda", service].join("-");
+            Assertion.strictEqual(FS?.existsSync(Package), true, Lambda.Throw("Package"));
+            Assertion.strictEqual(typeof Version, "string", Lambda.Throw("Version"));
+
+            this.version = Version;
+            this.directory = Artifact;
+            this.source = Source;
+        } else {
+            const Artifact = Path.join(PKG, "packages", this.name, this.distribution);
+            const Package = Path.join(Path.dirname(Artifact), "package.json");
+            const Version = Import(Package)?.version || null;
+            const Source = Path.join(PKG, "packages", this.name, this.source);
+
+            (!FS?.existsSync(Source)) && console.warn("[Warning] Source Not Found" + ":", Source);
+
+            Assertion.strictEqual(FS?.existsSync(Package), true, Lambda.Throw("Package"));
+            Assertion.strictEqual(typeof Version, "string", Lambda.Throw("Version"));
+
+            this.version = Version;
+            this.directory = Artifact;
+            this.source = Source;
+        }
+
+        this.ID = [this.organization, this.environment, "Lambda", this.service, this.name.split("_")].join("-");
     }
 
     /***
@@ -189,7 +235,7 @@ class Lambda extends Configuration {
 
         switch (type) {
             case "Artifact":
-                Data.Type = "[Error]";
+                Data.Type = "[Error] Artifact";
                 Data.Name = "Distributable Artifact(s) Not Found Exception";
                 Data.Message = "Lambda Source Distribution Doesn't Exist";
 
@@ -198,7 +244,7 @@ class Lambda extends Configuration {
 
                 return Data.error;
             case "Package":
-                Data.Type = "[Error]";
+                Data.Type = "[Error] Package";
                 Data.Name = "Lambda Function Package Not Found Exception";
                 Data.Message = "Lambda Source package.json Doesn't Exist";
 
@@ -207,7 +253,7 @@ class Lambda extends Configuration {
 
                 return Data.error;
             case "Version":
-                Data.Type = "[Error]";
+                Data.Type = "[Error] Version";
                 Data.Name = "Lambda Function Package Version := nil Exception";
                 Data.Message = "Lambda Version Not Found";
 
@@ -216,7 +262,211 @@ class Lambda extends Configuration {
 
                 return Data.error;
             default:
-                Data.Type = "[Error]";
+                Data.Type = "[Error] Unknown";
+                Data.Name = "Unhandled Exception";
+                Data.Message = "An Unknown Error has Occurred";
+
+                Data.error = Error([Data.Type, Data.Message].join(" "));
+                Data.error.name = Data.Name;
+
+                return Data.error;
+        }
+    }
+}
+
+/***
+ * **Serverless Application Model - Construct**
+ * ============================================
+ *
+ * *The following class shall not get confused with the SAM-CLI Cloudformation Transformation(s).*
+ *
+ *      Overview
+ *      --------
+ *      SAM is a class that represents, rather, a well-formed ***Serverless Application Model***.
+ *
+ * @task Rename Class to API-Gateway + SAM Specific Name
+ */
+
+class SAM {
+    /***  Constructed Resource Name Derived from `Organization` + `Environment` + `Service` ? `Name` */
+    public readonly ID: string;
+
+    /*** SAM Reference to Encapsulating Folder-Name */
+    public name: string = Settings.SAM;
+
+    /*** Common-Name - Constructs Unique SAM Alias or Cloud Resource Name */
+    public readonly service: string = Settings.Service;
+
+    /*** Opinionated API Gateway-V2 Resource Name */
+    public readonly gateway: string = "API-Gateway";
+
+    /*** Auto-Generated Bucket Property - Requires Instantation */
+    public readonly bucket: string;
+
+    /*** Configuration, Read-Only Bucket Property - Requires Instantation for Access */
+    public readonly directory: string;
+
+    /*** Configuration Setting Specifiying List of Folder(s) that Contain Lambda(s) */
+    public readonly functions: string[] = Settings.Functions;
+
+    /*** AWS Cloud Provider, Derived from Configuration (Settings) File */
+    public readonly cloud: typeof Settings.Cloud = Settings.Cloud;
+    /*** Cloud Environment Common-Name, Derived from Configuration (Settings) File */
+    public readonly environment: typeof Settings.Environment = Settings.Environment;
+    /*** Cloud Organization Alias, Derived from Configuration (Settings) File */
+    public readonly organization: typeof Settings.Organization = Settings.Organization;
+
+    /*** Deployment Type - *Under Development* */
+    protected readonly deployment: string[] = Settings.Deployment;
+
+    /***
+     * Construct Initializer
+     * =====================
+     *
+     * @param name {String}
+     * @param service {String}
+     *
+     * @returns {Instantiation}
+     *
+     */
+
+    constructor(name: string = Settings.SAM, service: string = Settings.Service) {
+        this.name = name;
+        this.service = service;
+
+        const Source = Path.join(PKG, "packages", this.name);
+
+        (!FS?.existsSync(Source)) && console.warn("[Warning] Source Not Found" + ":", Source);
+
+        Assertion.strictEqual(FS?.existsSync(Source), true, SAM.Throw("Directory"));
+
+        this.bucket = ["SAM", this.service, this.name].join("-").toLowerCase();
+
+        this.ID = [this.organization, this.environment, "SAM", this.service].join("-");
+    }
+
+    /***
+     *
+     * {@link SAM.getAPIGatewayLoggingLevel|API Gateway-V2 Logging-Level}
+     * ==================================================================
+     *
+     * References {@link https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_stage#logging_level|CFN & TF Logging-Level}
+     *
+     *      Whitepapers
+     *     ------------
+     *          - {@link https://docs.aws.amazon.com/whitepapers/latest/serverless-multi-tier-architectures-api-gateway-lambda/serverless-multi-tier-architectures-api-gateway-lambda.pdf#document-revisions|AWS Serverless Multi-Tier Architectures with Amazon API Gateway and AWS Lambda}
+     *          - {@link https://docs.aws.amazon.com/whitepapers/latest/security-overview-aws-lambda/security-overview-aws-lambda.pdf#security-overview-aws-lambda|Security Overview of AWS Lambda}
+     *
+     * @see {@link https://docs.aws.amazon.com/whitepapers/latest/serverless-multi-tier-architectures-api-gateway-lambda/serverless-multi-tier-architectures-api-gateway-lambda.pdf#document-revisions|AWS Serverless Multi-Tier Architectures with Amazon API Gateway and AWS Lambda}
+     * @see {@link https://docs.aws.amazon.com/whitepapers/latest/security-overview-aws-lambda/security-overview-aws-lambda.pdf#security-overview-aws-lambda|Security Overview of AWS Lambda}
+     *
+     * @returns {"ERROR", "INFO", "OFF"}
+     *
+     */
+
+    getAPIGatewayLoggingLevel() {
+        const $ = {value: "INFO"};
+
+        /// --> No Break(s) Non-Pure Returns
+        switch (this.environment.toUpperCase()) {
+            case "PRODUCTION":
+                /*** Forceful, Hard-Coded Overwrites for Production */
+
+                $.value = "ERROR";
+
+                return $.value;
+            default:
+                return $.value;
+        }
+    }
+
+    /***
+     * {@link SAM.getAPIGatewayStageMetricsEnabled|API Gateway-V2 Metrics Enablement}
+     * ==============================================================================
+     *
+     * References
+     *      - {@link https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_stage#detailed_metrics_enabled|Detailed Metrics & Logging}
+     *
+     * @see {@link https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_stage#detailed_metrics_enabled|Terraform Configuration}}
+     *
+     * @returns {true | false}
+     *
+     */
+
+    getAPIGatewayStageMetricsEnabled() {
+        const $ = {value: true};
+
+        /// --> No Break(s) Non-Pure Returns
+        switch (this.environment.toUpperCase()) {
+            case "PRODUCTION":
+                /*** Forceful, Hard-Coded Overwrites for Production */
+
+                $.value = true
+
+                return $.value;
+            default:
+                return $.value;
+        }
+    }
+
+    /***
+     * {@link SAM.generateAPIGatewayCloudWatchAccessLog|API Gateway-V2 Access Logging Generator}
+     * =========================================================================================
+     * References
+     *      - {@link https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-monitor.html|Monitoring HTTP-V2 APIs}
+     *
+     *      Documentation
+     *      -------------
+     *      - {@link https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-metrics.html|Metrics}
+     *      - {@link https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-logging.html|Logging}
+     *           - {@link https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-logging-variables.html|Variables}
+     *
+     * @param stream {AWS.cloudwatch.CloudwatchLogStream}
+     *
+     * @returns {{
+     *     destinationArn: {String},
+     *     format: {String}
+     * }|null}
+     *
+     */
+
+    public static generateAPIGatewayCloudWatchAccessLog(stream: AWS.cloudwatch.CloudwatchLogStream | null = null, format: AWS.apigatewayv2.Apigatewayv2StageAccessLogSettings | null = null) {
+        return (stream === null || format === null) ? null : {
+            destinationArn: String(stream.arn),
+            format: String(format)
+        };
+    };
+
+    /***
+     * Private Error Constructor
+     * =========================
+     *
+     * @param type {"Artifact" | "Package" | "Version"}
+     *
+     * @constructor
+     *
+     */
+
+    private static Throw = (type: string) => {
+        const Data = {
+            Type: "",
+            Name: "",
+            Message: "",
+            error: Object.create({})
+        };
+
+        switch (type) {
+            case "Directory":
+                Data.Type = "[Error] Directory";
+                Data.Name = "Service Directory Not Found";
+                Data.Message = "SAM Application Source Directory Doesn't Exist";
+
+                Data.error = Error([Data.Type, Data.Message].join(" "));
+                Data.error.name = Data.Name;
+
+                return Data.error;
+            default:
+                Data.Type = "[Error] Unknown";
                 Data.Name = "Unhandled Exception";
                 Data.Message = "An Unknown Error has Occurred";
 
@@ -278,19 +528,131 @@ class Stack extends TerraformStack {
         });
 
         /// API Gateway
-        const api = new AWS.apigatewayv2.Apigatewayv2Api(this, [ID, "Gateway"].join(" "), {
+        const api = new AWS.apigatewayv2.Apigatewayv2Api(this, [ID, "Gateway"].join("-"), {
             name: [ID, "Gateway"].join("-"),
             protocolType: "HTTP",
             target: lambda.arn
         })
 
         /// Inline API Gateway ==> Lambda Invocation
-        new AWS.lambdafunction.LambdaPermission(this, [ID, "Gateway-Invoke-Permission"].join(" "), {
+        new AWS.lambdafunction.LambdaPermission(this, [ID, "Gateway-Invoke-Permission"].join("-"), {
             functionName: lambda.functionName,
             action: "lambda:InvokeFunction",
             principal: "apigateway.amazonaws.com",
             sourceArn: [api.executionArn, "*", "*"].join("/")
         })
+
+        /// URI to API-Gateway-Lambda Invocation URL
+        new TerraformOutput(this, "url", {
+            value: api.apiEndpoint.trim()
+        });
+    }
+}
+
+class Service extends TerraformStack {
+    constructor($: Construct, ID: string, settings: SAM) {
+        super($, ID);
+
+        /// Cloud Provider (AWS)
+        new AWS.AwsProvider(this, [ID, "AWS-Provider"].join("-").toLowerCase(), {
+            region: settings.cloud["Region"]
+        });
+
+        /// Unique S3 Bucket Containing Lambda Artifact(s)
+        const bucket = new AWS.s3.S3Bucket(this, [ID, "S3-Bucket"].join("-").toLowerCase(), {
+            bucketPrefix: settings.bucket
+        });
+
+        /// API Gateway
+        const api = new AWS.apigatewayv2.Apigatewayv2Api(this, [ID, "Gateway"].join("-").toLowerCase(), {
+            name: [ID, settings.gateway].join("-"),
+            protocolType: "HTTP"
+        });
+
+        new AWS.apigatewayv2.Apigatewayv2Stage(this, [ID, "Environment-Stage"].join("-").toLowerCase(), {
+            apiId: api.id,
+            name: settings.environment,
+            autoDeploy: true
+        })
+
+        const Lambdas = [];
+        settings.functions.forEach(($: string, count) => {
+            console.debug("[Debug] Function Initialization" + ":", $, count);
+
+            const Function = new Lambda($, settings.service, true);
+
+            const ID = Function.name;
+
+            console.debug("[Debug] Successfully Instantiated Function Configuration" + ":", JSON.stringify(Function, null, 4));
+
+            const Target = Path.dirname(Function.source);
+
+            console.debug("[Debug] Compiling Distribution(s) ...");
+            console.debug("[Debug] Target Directory" + ":", Target);
+
+            Subprocess("npm run compile", Target);
+
+            Assertion.strictEqual(FS.existsSync(Function.directory), true);
+
+            console.debug("[Debug] Successfully Compiled Directory" + ":", Function.directory);
+
+            /// Lambda Artifact(s) (Executable)
+            const asset = new TerraformAsset(this, [ID, "Asset"].join("-").toLowerCase(), {
+                type: AssetType.ARCHIVE,
+                path: Function.directory
+            });
+
+            /// Upload Lambda Artifact(s) --> S3
+            const archive = new AWS.s3.S3BucketObject(this, [ID, "Archive"].join("-").toLowerCase(), {
+                source: asset.path,
+                bucket: bucket.bucket,
+                key: asset.fileName
+            });
+
+            /// Lambda Execution Role
+            const role = new AWS.iam.IamRole(this, [ID, "Execution-Role"].join("-").toLowerCase(), {
+                name: [ID, "Execution-Role"].join("-"),
+                assumeRolePolicy: String(Function.policy), lifecycle: {
+                    createBeforeDestroy: false
+                }
+            });
+
+            /// Lambda Function
+            const lambda = new AWS.lambdafunction.LambdaFunction(this, ID, {
+                functionName: Function.ID,
+                handler: Function.handler,
+                runtime: Function.runtime,
+                s3Bucket: bucket.bucket,
+                s3Key: archive.key,
+                role: role.arn
+            });
+
+            /// Inline API Gateway ==> Lambda Invocation
+            new AWS.lambdafunction.LambdaPermission(this, [ID, "Gateway-Invoke-Permission"].join("-").toLowerCase(), {
+                functionName: lambda.functionName,
+                action: "lambda:InvokeFunction",
+                principal: "apigateway.amazonaws.com",
+                sourceArn: [api.executionArn, "*", "*"].join("/")
+            });
+
+            /// Managed Policy Permitting Lambda Write Access to CloudWatch
+            new AWS.iam.IamRolePolicyAttachment(this, [ID, "Managed-Policy"].join("-").toLowerCase(), {
+                policyArn: Lambda.Attachment,
+                role: role.name
+            });
+
+            console.debug("[Debug] Target Integration API Endpoint" + ":", [api.apiEndpoint, Function.name].join("/"));
+
+            const integration = new AWS.apigatewayv2.Apigatewayv2Integration(this, [ID, "Gateway-Integration"].join("-").toLowerCase(), {
+                apiId: api.id,
+                integrationType: "HTTP_PROXY",
+                connectionType: "INTERNET",
+                description: [ID, "Gateway-Integration"].join(" "),
+                integrationMethod: "ANY",
+                integrationUri: [api.apiEndpoint, Function.name].join("/"),
+                passthroughBehavior: "WHEN_NO_MATCH"
+            });
+        });
 
         /// URI to API-Gateway-Lambda Invocation URL
         new TerraformOutput(this, "url", {
@@ -317,6 +679,23 @@ const Single = async () => {
     await Promise.all(Awaitables);
 };
 
-await Single()
+const Nest = async () => {
+    const Awaitable = () => {
+        return new Promise((resolve) => {
+            const Stack = new SAM();
+            const Instance = new Service(Application, Stack.ID, Stack);
+
+            resolve(Instance);
+        });
+    }
+
+    await Awaitable();
+};
+
+/// Type := Single == await Single()
+
+/// Type := Service == await Nest()
+
+await Nest();
 
 Application.synth();

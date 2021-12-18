@@ -11,13 +11,10 @@
     "Environment": "Development",
     "Organization": "Cloud-Vault",
     "Deployment": {
-        "Type": "Service",
-        "Method": "Single"
+        "Type": "Single",
+        "Method": "Iterative"
     },
-    "SAM": "service",
     "Functions": [
-        "lambda-1",
-        "lambda-2",
-        "lambda-3"
+        "lambda"
     ]
 }

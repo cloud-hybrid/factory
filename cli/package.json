@@ -14,9 +14,14 @@
         "chalk": "^5.0.0",
         "yargs": "^17.3.0"
     },
-    "exports": {
-        "default": "./index.js"
-    },
+    "exports": [
+        [
+            "./index.js",
+            "./src",
+            "./src/utilities",
+            "./src/commands"
+        ]
+    ],
     "devDependencies": {
         "@types/node": "^16.11.14",
         "@types/yargs": "^17.0.7",
