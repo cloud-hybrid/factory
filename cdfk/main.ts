@@ -155,7 +155,7 @@ class Lambda extends Configuration {
 
         this.name = name;
 
-        const Artifact = Path.join(PKG, name, this.distribution);
+        const Artifact = Path.join(PKG, "packages", name, this.distribution);
         const Package = Path.join(Path.dirname(Artifact), "package.json");
         const Version = Import(Package)?.version || null;
         const Source = Path.join(PKG, name, this.source);
