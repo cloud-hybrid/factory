@@ -11,7 +11,7 @@
     "Environment": "Development",
     "Organization": "Cloud-Vault",
     "Deployment": {
-        "Type": "Single"
+        "Type": "Iterative"
     },
     "SAM": false,
     "Functions": [

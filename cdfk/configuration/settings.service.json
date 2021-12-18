@@ -12,7 +12,6 @@
     "Organization": "Cloud-Vault",
     "Deployment": {
         "Type": "Service",
-        "Method": "Single"
     },
     "SAM": "service",
     "Functions": [

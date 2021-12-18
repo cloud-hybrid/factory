@@ -575,7 +575,7 @@ class Service extends TerraformStack {
         super($, ID);
 
         /// Cloud Provider (AWS)
-        new AWS.AwsProvider(this, [ID, "AWS-Provider"].join("-").toLowerCase(), {
+        const provider = new AWS.AwsProvider(this, [ID, "AWS-Provider"].join("-").toLowerCase(), {
             region: settings.cloud["Region"]
         });
 
@@ -596,7 +596,7 @@ class Service extends TerraformStack {
             autoDeploy: true
         })
 
-        const Lambdas = [];
+        /// const Lambdas = [];
         settings.functions.forEach(($: string, count) => {
             console.debug("[Debug] Lambda Function Initialization" + ":", $);
 
@@ -649,7 +649,7 @@ class Service extends TerraformStack {
             });
 
             /// Inline API Gateway ==> Lambda Invocation
-            new AWS.lambdafunction.LambdaPermission(this, [ID, "Gateway-Invoke-Permission"].join("-").toLowerCase(), {
+            const invokation = new AWS.lambdafunction.LambdaPermission(this, [ID, "Gateway-Invoke-Permission"].join("-").toLowerCase(), {
                 functionName: lambda.functionName,
                 action: "lambda:InvokeFunction",
                 principal: "apigateway.amazonaws.com",
@@ -657,7 +657,7 @@ class Service extends TerraformStack {
             });
 
             /// Managed Policy Permitting Lambda Write Access to CloudWatch
-            new AWS.iam.IamRolePolicyAttachment(this, [ID, "Managed-Policy"].join("-").toLowerCase(), {
+            const policy = new AWS.iam.IamRolePolicyAttachment(this, [ID, "Managed-Policy"].join("-").toLowerCase(), {
                 policyArn: Lambda.Attachment,
                 role: role.name
             });
@@ -685,6 +685,27 @@ class Service extends TerraformStack {
 const Application = new App();
 
 const Single = async () => {
+    Assertion.strictEqual(Settings.Functions.length, 1);
+    console.debug("[Debug] Initializing Singleton Deployment Configuration(s) ...");
+
+    const Awaitables: Promise<unknown>[] = [];
+    Settings.Functions.forEach(async ($: string) => {
+        const Awaitable = new Promise((resolve) => {
+            const Function = new Lambda($, Settings.Service);
+            const Instance = new Stack(Application, Function.ID, Function);
+
+            resolve(Instance);
+        });
+
+        Awaitables.push(Awaitable);
+    });
+
+    await Promise.all(Awaitables);
+}
+
+const Iterative = async () => {
+    console.debug("[Debug] Initializing Iterative Deployment Configuration(s) ...");
+
     const Awaitables: Promise<unknown>[] = [];
     Settings.Functions.forEach(async ($: string) => {
         const Awaitable = new Promise((resolve) => {
@@ -700,7 +721,8 @@ const Single = async () => {
     await Promise.all(Awaitables);
 };
 
-const Nest = async () => {
+const System = async () => {
+    console.debug("[Debug] Initializing Service Deployment Configuration(s) ...");
     const Awaitable = () => {
         return new Promise((resolve) => {
             const Stack = new SAM();
@@ -713,10 +735,8 @@ const Nest = async () => {
     await Awaitable();
 };
 
-/// Type := Single == await Single()
-
-/// Type := Service == await Nest()
-
-await Nest();
+(Settings.Deployment.Type === "Single") && await Single();
+(Settings.Deployment.Type === "Service") && await System();
+(Settings.Deployment.Type === "Iterative") && await Iterative();
 
 Application.synth();
