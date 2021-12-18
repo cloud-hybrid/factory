@@ -18,16 +18,21 @@ import AWS, {iam as IAM} from "@cdktf/provider-aws";
 
 import {App, TerraformStack, TerraformAsset, AssetType, TerraformOutput} from "cdktf";
 
-import {Subprocess} from "./ci/utilities/Compile.js";
+import {Subprocess} from "./subprocess.js";
+import {AwsProvider} from ".gen/providers/aws";
 
 type Policy = IAM.IamPolicy;
 
+/*** ESM Resolver for *Current-Working-Directory* */
 const CWD: string = Path.dirname(import.meta.url.replace("file" + ":" + "/", ""));
+/*** ESM Resolve for Package Directory relative to Current Working Directory */
 const PKG: string = Path.dirname(CWD);
 
+/*** ESM Compatability & JSON Importer */
 const Import: NodeRequire = Module.createRequire(import.meta.url);
 
-const Generic = new Set();
+/*** Generic Type Symbol */
+const Generic: Symbol = Symbol();
 
 /***
  * JSON Configuration
@@ -96,9 +101,19 @@ class Configuration {
     protected readonly deployment: typeof Settings.Deployment = Settings.Deployment;
 
     public settings: typeof Settings;
-    private defaults: typeof Settings;
 
-    constructor(settings = {
+    private readonly defaults: typeof Settings = Settings;
+
+
+    /***
+     *
+     * @param settings {{ TF: boolean, CDK: boolean, CFN: boolean, Cloud: { Provider: string, Region: string }, Source: string, Service: string, Environment: string, Organization: string, Deployment: { Type: string, Method: string }, SAM: string, Functions: {} }; tf: boolean; environment: string; functions: {}; organization: string; cfn: boolean; cdk: boolean; source: string; deployment: { Type: string, Method: string }}
+     *
+     * @constructor
+     *
+     */
+
+    constructor(settings: { settings: { TF: boolean, CDK: boolean, CFN: boolean, Cloud: { Provider: string, Region: string }, Source: string, Service: string, Environment: string, Organization: string, Deployment: { Type: string, Method: string }, SAM: string, Functions: {} }; tf: boolean; environment: string; functions: {}; organization: string; cfn: boolean; cdk: boolean; source: string; deployment: { Type: string, Method: string } } = {
         tf: Settings.TF,
         cfn: Settings.CFN,
         cdk: Settings.CDK,
@@ -128,7 +143,6 @@ class Configuration {
 }
 
 /*** The {@link Lambda} Construct */
-
 class Lambda extends Configuration {
     public name: string;
     public service: string = Settings.Service;
@@ -479,11 +493,18 @@ class SAM {
 }
 
 class Stack extends TerraformStack {
+    public readonly provider: AwsProvider;
+    public readonly asset: TerraformAsset;
+    public readonly bucket: AWS.s3.S3Bucket;
+    public readonly archive: AWS.s3.S3BucketObject;
+    public readonly role: AWS.iam.IamRole;
+    public readonly policy: AWS.iam.IamPolicy;
+
     constructor($: Construct, ID: string, settings: Lambda) {
         super($, ID);
 
         /// Cloud Provider (AWS)
-        new AWS.AwsProvider(this, [ID, "AWS-Provider"].join("-"), {
+        const provider = new AWS.AwsProvider(this, [ID, "AWS-Provider"].join("-"), {
             region: settings.cloud["Region"]
         });
 
@@ -577,13 +598,12 @@ class Service extends TerraformStack {
 
         const Lambdas = [];
         settings.functions.forEach(($: string, count) => {
-            console.debug("[Debug] Function Initialization" + ":", $, count);
+            console.debug("[Debug] Lambda Function Initialization" + ":", $);
 
             const Function = new Lambda($, settings.service, true);
-
             const ID = Function.name;
 
-            console.debug("[Debug] Successfully Instantiated Function Configuration" + ":", JSON.stringify(Function, null, 4));
+            console.debug("[Debug] Successfully Instantiated Function Configuration" + ":", ID);
 
             const Target = Path.dirname(Function.source);
 
@@ -612,7 +632,8 @@ class Service extends TerraformStack {
             /// Lambda Execution Role
             const role = new AWS.iam.IamRole(this, [ID, "Execution-Role"].join("-").toLowerCase(), {
                 name: [ID, "Execution-Role"].join("-"),
-                assumeRolePolicy: String(Function.policy), lifecycle: {
+                assumeRolePolicy: String(Function.policy),
+                lifecycle: {
                     createBeforeDestroy: false
                 }
             });
