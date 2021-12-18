@@ -5,7 +5,7 @@
  *
  * @license     BSD 3-Clause License
  * @copyright   Cloud-Technology LLC. & Affiliates
- */
+*/
 
 import FS from "fs";
 import Path from "path";
@@ -25,8 +25,6 @@ const PKG: string = Path.dirname(CWD);
 
 const Import: NodeRequire = Module.createRequire(import.meta.url);
 
-const Generic = new Set();
-
 /***
  *  **Note**: Ensure to keep Import's Path to a relative URI in order to keep Type-Hinting
  *
@@ -34,7 +32,7 @@ const Generic = new Set();
  *
  */
 
-export const Settings = Import("./configuration/settings.json");
+export const Settings = Import("./../configuration/settings.json");
 
 function UUID() {
     let source = new Date().getTime(); // Timestamp
@@ -301,22 +299,30 @@ class Stack extends TerraformStack {
 
 const Application = new App();
 
-const Single = async () => {
-    const Awaitables: Promise<unknown>[] = [];
-    Settings.Functions.forEach(async ($: string) => {
-        const Awaitable = new Promise((resolve) => {
-            const Function = new Lambda($, Settings.Service);
-            const Instance = new Stack(Application, Function.ID, Function);
+const Main = async () => {
+    const Awaitable = () => new Promise((resolve) => {
+        try {
+            const Application = new App();
+            const Function = new Lambda("lambda", "POC-Service");
 
-            resolve(Instance);
-        });
+            new Stack(Application, Function.ID, Function);
 
-        Awaitables.push(Awaitable);
+            Application.synth();
+        } catch (error) {
+            console.error(error);
+
+            throw error;
+        } finally {
+            resolve(true);
+        }
     });
 
-    await Promise.all(Awaitables);
+    await Awaitable();
 };
 
-await Single()
+Settings.Functions.forEach(($: string) => {
+    const Function = new Lambda($, Settings.Service);
+    new Stack(Application, Function.ID, Function);
+});
 
 Application.synth();

@@ -10,6 +10,7 @@
         "cli": "node ./../cli/index.js",
         "get": "cdktf get",
         "build": "tsc --pretty",
+        "compile": "tsc --pretty --watch",
         "synth": "cdktf synth",
         "start": "tsc --pretty --watch",
         "deploy": "npm run get && cdktf deploy",

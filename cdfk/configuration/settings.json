@@ -7,6 +7,14 @@
         "Region": "us-east-2"
     },
     "Source": "src",
+    "Service": "Proof-of-Concept",
     "Environment": "Development",
-    "Organization": "Cloud-Vault"
+    "Organization": "Cloud-Vault",
+    "Deployment": {
+        "Type": "Single",
+        "Method": "Iterative"
+    },
+    "Functions": [
+        "lambda"
+    ]
 }
