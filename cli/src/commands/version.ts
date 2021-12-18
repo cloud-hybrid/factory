@@ -18,13 +18,16 @@ const PKG: string = Path.dirname(CWD);
  *
  */
 
-const Import = Module.createRequire(CWD);
+const Import = Module.createRequire(PKG);
 
-/*** @typedef {import("./../package.json")} Package */
-const Package = Import("./../package.json");
+const Package = {
+    Package: Import("./../package.json").version,
+    Factory: Import("./../cdfk/package.json").version,
+    CLI: Import("./package.json").version
+}
 
 // Package Version
-const Version: [string, string] = ["version", Package.version];
+const Version: [string, string] = ["version", JSON.stringify(Package, null, 4) + "\n"];
 
 export { Version };
 

@@ -1,11 +1,11 @@
 {
     "name": "@cloud-vault/factory",
     "private": false,
-    "version": "0.0.0",
+    "version": "0.0.1",
     "type": "module",
     "bin": "./cli/src/index.js",
     "scripts": {
-        "cli": "node cli/src/index.js",
+        "cli": "node cli/index.js",
         "build": "npm run build --workspace ./cdfk",
         "compile": "npm run synth --workspace ./cdfk",
         "deploy": "npm run deploy --workspace ./cdfk",

@@ -5,7 +5,8 @@
     "type": "module",
     "scripts": {
         "compile": "tsc --pretty --watch",
-        "start": "node index.js"
+        "start": "node index.js",
+        "cli": "node index.js"
     },
     "dependencies": {
         "@cloud-vault/cli": "file:index.js",
