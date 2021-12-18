@@ -1,0 +1,10 @@
+*.d.ts
+*.js
+
+node_modules
+
+distribution
+
+tsconfig.tsbuildinfo
+
+!./**/.gitignore

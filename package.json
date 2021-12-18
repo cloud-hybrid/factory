@@ -3,13 +3,16 @@
     "private": false,
     "version": "0.0.0",
     "type": "module",
+    "bin": "./cli/src/index.js",
     "scripts": {
-        "build": "npm run build --workspace ./source",
-        "compile": "npm run synth --workspace ./source",
-        "deploy": "npm run deploy --workspace ./source",
-        "destroy": "npm run destroy --workspace ./source"
+        "cli": "node cli/src/index.js",
+        "build": "npm run build --workspace ./cdfk",
+        "compile": "npm run synth --workspace ./cdfk",
+        "deploy": "npm run deploy --workspace ./cdfk",
+        "destroy": "npm run destroy --workspace ./cdfk"
     },
     "workspaces": [
-        "./source"
+        "./cdfk",
+        "./cli"
     ]
 }
