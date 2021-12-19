@@ -11,7 +11,7 @@
 | 3rd                | `.env.development`       | Development          | **`false`**              | Shared environment-specific settings                         |
 | 3rd                | `.env.test`              | Test                 | **`false`**              | Shared environment-specific settings                         |
 | 3rd                | `.env.production`        | Production           | **`false`**              | Shared environment-specific settings                         |
-| Last               | `.env`                   | All Environments     | ([Depends](#committing)) | N/A                                                |
+| Last               | `.env`                   | All Environments     | ([Depends](#committing)) | N/A                                                          |
 
 #### Committing ####
 
