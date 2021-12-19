@@ -1,9 +1,5 @@
-import FS from "fs";
 import Path from "path";
 import Module from "module";
-
-import CLI from "./../exports.js";
-import Process from "process";
 
 /*** *Current Working Directory* */
 const CWD: string = Path.dirname(import.meta.url.replace("file" + ":" + "/", ""));

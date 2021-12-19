@@ -1,0 +1,41 @@
+{
+    "$id": "https://example.com/schama.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "Schema Definition for Schema-CLI Provider(s)",
+    "required": [
+        "configuration"
+    ],
+    "type": "object",
+    "allOf": [
+        {
+            "$ref": "https://json.schemastore.org/package.json"
+        }
+    ],
+    "properties": {
+        "config": {
+            "$ref": "#/properties/configuration"
+        },
+        "configuration": {
+            "description": "Package Configuration Settings",
+            "type": "object",
+            "$ref": "#/$defs/Configuration",
+            "additionalProperties": false
+        }
+    },
+    "$defs": {
+        "format": {
+            "type": "string"
+        },
+        "Array.unique": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 1,
+            "items": {
+                "type": "string"
+            }
+        },
+        "Configuration": {
+            "type": "object"
+        }
+    }
+}

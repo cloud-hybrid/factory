@@ -1,1 +1,3 @@
-export * from "./module.js";
+export * from "./index.js";
+export * from "./example.js";
+export * from "./version.js";

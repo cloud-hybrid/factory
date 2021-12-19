@@ -3,8 +3,9 @@ import Path from "path";
 import Process from "process";
 import Assertion from "assert";
 
-import {Local} from "./../utilities/environment.js";
-import {Argv} from "./../exports.js";
+import { Argv } from "yargs";
+
+import {Local} from "../../utilities/index.js";
 
 /*** Debug Console Utility String Generator */
 const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().toUpperCase() + ")";
@@ -12,7 +13,7 @@ const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + 
 /***
  * Command Configuration, Composition
  *
- * Aquires and configures settings specific to the module's Command Function-Constant.
+ * Aquires and configures settings specific to the module's {@link `Command`} Function-Constant.
  *
  * @param Arguments {Argv} CLI Input Arguments for Derivative Command
  *
@@ -46,7 +47,7 @@ function Configuration(Arguments: Argv) {
         "  >>> npm run cli -- cwd --debug",
         "  >>> npm run cli -- cwd --file \"Settings.json\""
     ].join("\n"));
-};
+}
 
 /***
  * Command Extension, Composition
@@ -75,7 +76,7 @@ function Write(data: string, target: string, debug: boolean = false) {
     Assertion.strictEqual(CWD, Local);
 
     FS.writeFileSync(Target, data);
-};
+}
 
 /***
  * Command Extension, Composition
@@ -99,7 +100,7 @@ function Output(data: any, serialize: boolean = true, debug: boolean = false) {
 
     (serialize) && Process.stdout.write(JSON.stringify(data, null, 4) + "\n" + "\n");
     (serialize) || Process.stdout.write(data + "\n" + "\n");
-};
+}
 
 const Command = async ($: Argv) => {
     const Arguments: Argv = $;

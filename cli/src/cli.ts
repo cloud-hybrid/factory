@@ -5,26 +5,37 @@ import Binary from "./utilities/binary.js";
 
 const Main = async () => {
     Process.stdout.write(Header + "\n");
+
     const Arguments = async () => {
-        const Commands = await import("./commands/index.js");
+        const Commands = {
+            cwd: async (input: Argv) => (await import("./commands/environment/cwd.js")).Command(input),
+            version: (await import("./commands/version.js")).Version
+        };
+
+        // const Commands = await import("./commands/index.js");
         return await CLI.Arguments(Process.argv.splice(2))
             .wrap(CLI.Columns())
 
             /*** Version */
-            .version(...Commands.Version)
+            .version(...Commands.version)
             .alias("version", "v")
             .describe("version", "Show Version Number")
 
-            /*** Global Help + Usage */
+            /*** Global Usage Text */
             .usage("Usage: npm run start [...]")
-            .help("help").alias("help", "h").describe("help", "Display Additional Information & Usage Command(s)")
+
+            /*** Global Help Command */
+            .help("help")
+            .alias("help", "h")
+            .describe("help", "Display Additional Information & Usage Command(s)")
+
             .showHelpOnFail(true, "[Error]: Invalid Input")
 
-            .command("cwd", "Current Working Directory", (($: Argv) => {
-                return Commands.CWD($)
+            .command("cwd", "Current Working Directory", (
+                async ($: Argv) => {
+                    return await Commands.cwd($);
             }))
 
-            /*** Runtime */
             .parseAsync();
 
         /// Example) >>> .command(
@@ -42,6 +53,8 @@ const Main = async () => {
     }
 
     const Input = await Arguments();
+
+    /// console.dir(Input);
 
     if (!Binary("cdktf")) {
         Process.stdout.write(["Terraform CDK - Not Installed", "\n", "\n"].join(""));

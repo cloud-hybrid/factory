@@ -3,16 +3,19 @@
     "private": false,
     "version": "0.0.1",
     "type": "module",
-    "bin": "./cli/src/index.js",
+    "bin": "./cli/index.js",
     "scripts": {
         "cli": "node cli/index.js",
+        "help": "node cli/index --help",
         "build": "npm run build --workspace ./cdfk",
         "compile": "npm run synth --workspace ./cdfk",
         "deploy": "npm run deploy --workspace ./cdfk",
         "destroy": "npm run destroy --workspace ./cdfk"
     },
     "workspaces": [
+        "./cli",
         "./cdfk",
-        "./cli"
+        "./packages",
+        "./templates"
     ]
 }

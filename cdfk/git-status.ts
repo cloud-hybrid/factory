@@ -1,17 +1,10 @@
+import Process from "process";
 import Subprocess from "child_process";
 
-/***
- *
- * @param linefeed {[{String}]}
- *
- * @constructor
- *
- */
-
-const Transform = (linefeed) => {
+const Transform = (linefeed: string[]) => {
     const Output = {
-        Lines: [],
-        Modified: null,
+        Lines: [ {Modify: false, Add: false, Delete: false, Rename: false }],
+        Modified: false,
         Total: 0
     };
 
@@ -27,10 +20,10 @@ const Transform = (linefeed) => {
             Rename: (Enumeration.search("R") !== -1)
         };
 
-        if ( Modifications.Modify !== -1 ) Output.Modified = true;
+        if ( Modifications.Modify ) Output.Modified = true;
 
         (Target && Target !== "") && Output.Lines.push({
-            Target, Modifications
+            ... Modifications
         });
     });
 
@@ -39,7 +32,7 @@ const Transform = (linefeed) => {
     return Output;
 };
 
-const Status = (directory = process.cwd()) => {
+const Status = (directory: string = Process.cwd()) => {
     const Output = Subprocess.execSync("git status --porcelain", {
         cwd: directory, stdio: "pipe"
     }).toString().split("\n");

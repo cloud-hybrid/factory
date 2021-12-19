@@ -15,7 +15,6 @@
         "start": "tsc --pretty --watch",
         "deploy": "npm run get && cdktf deploy",
         "destroy": "cdktf destroy",
-        "setup": "cd ci && make synth",
         "upgrade": "npm i cdktf@latest cdktf-cli@latest"
     },
     "dependencies": {
@@ -52,6 +51,9 @@
             "@typescript-eslint/no-empty-interface": 0,
             "@typescript-eslint/explicit-module-boundary-types": 0,
             "@typescript-eslint/no-empty-function": 0,
+            "@typescript-eslint/no-unused-vars": 0,
+            "@typescript-eslint/no-inferrable-types": 0,
+            "@typescript-eslint/ban-types": 0,
             "no-sequences": "error"
         },
         "ignorePatterns": [

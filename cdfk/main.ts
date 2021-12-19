@@ -19,7 +19,8 @@ import AWS, {iam as IAM} from "@cdktf/provider-aws";
 import {App, TerraformStack, TerraformAsset, AssetType, TerraformOutput} from "cdktf";
 
 import {Subprocess} from "./subprocess.js";
-import {AwsProvider} from ".gen/providers/aws";
+
+import {Apigatewayv2StageDefaultRouteSettings} from ".gen/providers/aws/apigatewayv2";
 
 type Policy = IAM.IamPolicy;
 
@@ -72,8 +73,6 @@ class Default {
 
     constructor() {
         this.configuration = Settings;
-        this.configuration.Deployment
-        this.configuration.Functions
     }
 }
 
@@ -106,6 +105,8 @@ class Configuration {
 
 
     /***
+     * JSON Configuration Constructor
+     * ==============================
      *
      * @param settings {{ TF: boolean, CDK: boolean, CFN: boolean, Cloud: { Provider: string, Region: string }, Source: string, Service: string, Environment: string, Organization: string, Deployment: { Type: string, Method: string }, SAM: string, Functions: {} }; tf: boolean; environment: string; functions: {}; organization: string; cfn: boolean; cdk: boolean; source: string; deployment: { Type: string, Method: string }}
      *
@@ -186,6 +187,7 @@ class Lambda extends Configuration {
      *
      * @param service {String} Common-Name or Service Extension to be used when constructing the Lambda Function Name
      *
+     * @param sam
      */
 
     constructor(name: string, service: string = Settings.Service, sam: boolean = false) {
@@ -394,6 +396,7 @@ class SAM {
         }
     }
 
+
     /***
      * {@link SAM.getAPIGatewayStageMetricsEnabled|API Gateway-V2 Metrics Enablement}
      * ==============================================================================
@@ -437,6 +440,7 @@ class SAM {
      *
      * @param stream {AWS.cloudwatch.CloudwatchLogStream}
      *
+     * @param format
      * @returns {{
      *     destinationArn: {String},
      *     format: {String}
@@ -444,12 +448,12 @@ class SAM {
      *
      */
 
-    public static generateAPIGatewayCloudWatchAccessLog(stream: AWS.cloudwatch.CloudwatchLogStream | null = null, format: AWS.apigatewayv2.Apigatewayv2StageAccessLogSettings | null = null) {
+    public static generateAPIGatewayCloudWatchAccessLog(stream: AWS.cloudwatch.CloudwatchLogStream | null = null, format: string | null = null) {
         return (stream === null || format === null) ? null : {
-            destinationArn: String(stream.arn),
+            destinationArn: String(stream.name),
             format: String(format)
         };
-    };
+    }
 
     /***
      * Private Error Constructor
@@ -492,13 +496,44 @@ class SAM {
     }
 }
 
+class Staging implements Apigatewayv2StageDefaultRouteSettings {
+    /**
+     * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/aws/r/apigatewayv2_stage.html#logging_level Apigatewayv2Stage#logging_level}
+     */
+    public loggingLevel?: string;
+
+    /**
+     * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/aws/r/apigatewayv2_stage.html#data_trace_enabled Apigatewayv2Stage#data_trace_enabled}
+     */
+    public readonly dataTraceEnabled?: boolean = true;
+
+    /**
+     * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/aws/r/apigatewayv2_stage.html#detailed_metrics_enabled Apigatewayv2Stage#detailed_metrics_enabled}
+     */
+    public readonly detailedMetricsEnabled?: boolean = true;
+
+    /**
+     * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/aws/r/apigatewayv2_stage.html#throttling_burst_limit Apigatewayv2Stage#throttling_burst_limit}
+     */
+    readonly throttlingBurstLimit?: number = null;
+
+    /**
+     * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/aws/r/apigatewayv2_stage.html#throttling_rate_limit Apigatewayv2Stage#throttling_rate_limit}
+     */
+    readonly throttlingRateLimit?: number = null;
+
+    constructor(model: SAM) {
+        this.loggingLevel = model.getAPIGatewayLoggingLevel()
+    }
+}
+
 class Stack extends TerraformStack {
-    public readonly provider: AwsProvider;
-    public readonly asset: TerraformAsset;
-    public readonly bucket: AWS.s3.S3Bucket;
-    public readonly archive: AWS.s3.S3BucketObject;
-    public readonly role: AWS.iam.IamRole;
-    public readonly policy: AWS.iam.IamPolicy;
+    // public readonly provider: AwsProvider;
+    // public readonly asset: TerraformAsset;
+    // public readonly bucket: AWS.s3.S3Bucket;
+    // public readonly archive: AWS.s3.S3BucketObject;
+    // public readonly role: AWS.iam.IamRole;
+    // public readonly policy: AWS.iam.IamPolicy;
 
     constructor($: Construct, ID: string, settings: Lambda) {
         super($, ID);
@@ -584,17 +619,47 @@ class Service extends TerraformStack {
             bucketPrefix: settings.bucket
         });
 
+        /// Logging Group
+        const group = new AWS.cloudwatch.CloudwatchLogGroup(this, [ID, "Log-Group"].join("-").toLowerCase(), {
+            name: [settings.ID, "Log-Group"].join("-")
+        });
+
+        /// Logging Stream(s)
+        const stream = new AWS.cloudwatch.CloudwatchLogStream(this, [ID, "Log-Stream"].join("-").toLowerCase(), {
+            name: [settings.ID, "Log-Stream"].join("-"),
+            logGroupName: group.name
+        });
+
         /// API Gateway
         const api = new AWS.apigatewayv2.Apigatewayv2Api(this, [ID, "Gateway"].join("-").toLowerCase(), {
             name: [ID, settings.gateway].join("-"),
             protocolType: "HTTP"
         });
 
-        new AWS.apigatewayv2.Apigatewayv2Stage(this, [ID, "Environment-Stage"].join("-").toLowerCase(), {
+        /// @todo Update Variable and Class Name to something more Descriptive (and accurate)
+        // const staging = new Staging(settings);
+
+        /// API Gateway-V2 Stage Configuration
+        const stage = new AWS.apigatewayv2.Apigatewayv2Stage(this, [ID, "Environment-Stage"].join("-").toLowerCase(), {
             apiId: api.id,
-            name: settings.environment,
-            autoDeploy: true
-        })
+            name: settings.environment.toLowerCase(),
+            autoDeploy: true,
+            description: "Gateway-V2 Deployment Stage Environment"
+            // accessLogSettings: SAM.generateAPIGatewayCloudWatchAccessLog(
+            //     stream,
+            //     JSON.stringify({
+            //         "requestId": "$context.requestId",
+            //         "ip": "$context.identity.sourceIp",
+            //         "requestTime": "$context.requestTime",
+            //         "httpMethod": "$context.httpMethod",
+            //         "routeKey": "$context.routeKey",
+            //         "status": "$context.status",
+            //         "protocol": "$context.protocol",
+            //         "responseLength": "$context.responseLength"
+            //     }, null, 4)
+            // ), description: "HTTP Gateway-V2 Route-Integration Deployment Stage Environment",
+            // defaultRouteSettings: staging
+        });
 
         /// const Lambdas = [];
         settings.functions.forEach(($: string, count) => {
@@ -649,7 +714,7 @@ class Service extends TerraformStack {
             });
 
             /// Inline API Gateway ==> Lambda Invocation
-            const invokation = new AWS.lambdafunction.LambdaPermission(this, [ID, "Gateway-Invoke-Permission"].join("-").toLowerCase(), {
+            const invocation = new AWS.lambdafunction.LambdaPermission(this, [ID, "Gateway-Invoke-Permission"].join("-").toLowerCase(), {
                 functionName: lambda.functionName,
                 action: "lambda:InvokeFunction",
                 principal: "apigateway.amazonaws.com",
@@ -662,22 +727,41 @@ class Service extends TerraformStack {
                 role: role.name
             });
 
-            console.debug("[Debug] Target Integration API Endpoint" + ":", [api.apiEndpoint, Function.name].join("/"));
+            // console.debug("[Debug] Target Integration API Endpoint" + ":", [api.apiEndpoint, Function.name].join("/"));
+
+            /***
+             * The following list summarizes the supported integration types:
+             * - AWS: This type of integration lets an API expose AWS service actions. In AWS integration, you must configure both the integration request and integration response and set up necessary data mappings from the method request to the integration request, and from the integration response to the method response.
+             * - AWS_PROXY: This type of integration lets an API method be integrated with the Lambda function invocation action with a flexible, versatile, and streamlined integration setup. This integration relies on direct interactions between the client and the integrated Lambda function.
+             *      - With this type of integration, also known as the Lambda proxy integration, you do not set the integration request or the integration response. API Gateway passes the incoming request from the client as the input to the backend Lambda function. The integrated Lambda function takes the input of this format and parses the input from all available sources, including request headers, URL path variables, query string parameters, and applicable body. The function returns the result following this output format.
+             *      - This is the preferred integration type to call a Lambda function through API Gateway and is not applicable to any other AWS service actions, including Lambda actions other than the function-invoking action.
+             * - HTTP: This type of integration lets an API expose HTTP endpoints in the backend. With the HTTP integration, also known as the HTTP custom integration, you must configure both the integration request and integration response. You must set up necessary data mappings from the method request to the integration request, and from the integration response to the method response.
+             * - HTTP_PROXY: The HTTP proxy integration allows a client to access the backend HTTP endpoints with a streamlined integration setup on single API method. You do not set the integration request or the integration response. API Gateway passes the incoming request from the client to the HTTP endpoint and passes the outgoing response from the HTTP endpoint to the client.
+             * - MOCK: This type of integration lets API Gateway return a response without sending the request further to the backend. This is useful for API testing because it can be used to test the integration set up without incurring charges for using the backend and to enable collaborative development of an API.
+             *      - In collaborative development, a team can isolate their development effort by setting up simulations of API components owned by other teams by using the MOCK integrations. It is also used to return CORS-related headers to ensure that the API method permits CORS access. In fact, the API Gateway console integrates the OPTIONS method to support CORS with a mock integration. Gateway responses are other examples of mock integrations.
+             *
+             * - passthroughBehavior: "WHEN_NO_MATCH" (Websocket APIs Only)
+             */
 
             const integration = new AWS.apigatewayv2.Apigatewayv2Integration(this, [ID, "Gateway-Integration"].join("-").toLowerCase(), {
                 apiId: api.id,
-                integrationType: "HTTP_PROXY",
+                integrationType: "AWS_PROXY",
                 connectionType: "INTERNET",
                 description: [ID, "Gateway-Integration"].join(" "),
-                integrationMethod: "ANY",
-                integrationUri: [api.apiEndpoint, Function.name].join("/"),
-                passthroughBehavior: "WHEN_NO_MATCH"
+                integrationUri: lambda.arn
+            });
+
+            const route = new AWS.apigatewayv2.Apigatewayv2Route(this, [ID, "Gateway-Route"].join("-").toLowerCase(), {
+                apiId: api.id,
+                target: ["integrations", integration.id].join("/"),
+                routeKey: "GET" + " " + "/" + Function.name.toLowerCase(),
+                dependsOn: [integration]
             });
         });
 
         /// URI to API-Gateway-Lambda Invocation URL
         new TerraformOutput(this, "url", {
-            value: api.apiEndpoint.trim()
+            value: api.apiEndpoint.trim() + "\n"
         });
     }
 }
@@ -687,20 +771,16 @@ const Application = new App();
 const Single = async () => {
     Assertion.strictEqual(Settings.Functions.length, 1);
     console.debug("[Debug] Initializing Singleton Deployment Configuration(s) ...");
+    const Function = Settings.Functions.pop();
 
-    const Awaitables: Promise<unknown>[] = [];
-    Settings.Functions.forEach(async ($: string) => {
-        const Awaitable = new Promise((resolve) => {
-            const Function = new Lambda($, Settings.Service);
-            const Instance = new Stack(Application, Function.ID, Function);
+    const Awaitable = new Promise((resolve) => {
+        const Instance = new Lambda(Function, Settings.Service);
+        const Deployment = new Stack(Application, Function.ID, Function);
 
-            resolve(Instance);
-        });
-
-        Awaitables.push(Awaitable);
+        resolve(Deployment);
     });
 
-    await Promise.all(Awaitables);
+    await Awaitable;
 }
 
 const Iterative = async () => {
