@@ -9,11 +9,10 @@
     "scripts": {
         "cli": "node cli.js",
         "get": "cdktf get",
-        "build": "tsc --pretty",
-        "compile": "tsc --pretty --watch",
+        "build": "npm run get && tsc --pretty",
+        "compile": "npm run get && tsc --pretty --watch",
         "synth": "cdktf synth",
-        "start": "tsc --pretty --watch",
-        "deploy": "node ./../cli/index.js --help && npm run get && cdktf deploy",
+        "deploy": "node cli.js && npm run get && cdktf deploy",
         "destroy": "cdktf destroy",
         "upgrade": "npm i cdktf@latest cdktf-cli@latest"
     },
