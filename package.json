@@ -3,6 +3,10 @@
     "private": false,
     "version": "0.0.0",
     "type": "module",
+    "main": "Entry-Point.js",
+    "bin": {
+        "factory": "Entry-Point.js"
+    },
     "scripts": {
         "cli": "node cli/index.js",
         "help": "node cli/index --help",
@@ -10,7 +14,8 @@
         "compile": "npm run synth --workspace ./cdfk",
         "deploy": "npm run deploy --workspace ./cdfk",
         "destroy": "npm run destroy --workspace ./cdfk",
-        "setup": "npm install"
+        "setup": "npm install",
+        "start": "node Entry-Point.js"
     },
     "workspaces": [
         "./cli",

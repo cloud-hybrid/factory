@@ -34,8 +34,11 @@
         "pretty": true,
         "removeComments": false,
         "skipLibCheck": true,
-        "strict": true,
-        "target": "ES2021"
+        "strict": false,
+        "target": "ES2021",
+        "paths": {
+            "@/*": ["src/*"]
+        }
     },
     "include": [
         "**/*.ts"

@@ -21,7 +21,7 @@ npm run setup
 
 #### Committing ####
 
-Credentials should only be accessible on the machines that need access to them. Never commit sensitive information to a repository that is not needed by every development machine ***and*** otherwise production-based server(s).
+Credentials should only be accessible on the machines that need access to them. Never commit sensitive information to a repository.
 
 You can use the `-t` or `--template` flag on the dotenv cli to create a template of your `.env` file.
 

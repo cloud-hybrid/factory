@@ -1,11 +1,25 @@
 import FS from "fs";
 import Path from "path";
+import Module from "module";
 import Process from "process";
 import Assertion from "assert";
 
-import {Argv} from "@cloud-vault/cli/arguments";
+/*** *Current Working Directory* */
+const CWD: string = Path.dirname(import.meta.url.replace("file" + ":" + "/", ""));
 
-import { Prompt } from "@cloud-vault/cli/utilities/prompt";
+/*** *Package Directory* */
+const PKG: string = Path.dirname(CWD);
+
+/***
+ *  JSON Capable Importer
+ *
+ *  @type {NodeRequire}
+ *
+ */
+
+const Import = Module.createRequire(PKG);
+
+import {Argv} from "@cloud-vault/cli/arguments";
 
 /*** Debug Console Utility String Generator */
 const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";
@@ -22,7 +36,7 @@ const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + 
  */
 
 function Configuration(Arguments: Argv) {
-    const Syntax = (command: string) => [command, "? [--debug]"].join(" ");
+    const Syntax = (command: string) => [command, "? [--debug] ? [--help]"].join(" ");
 
     Arguments.hide("version");
     Arguments.help("help", "Display Usage Guide").default("help", false);
@@ -30,15 +44,15 @@ function Configuration(Arguments: Argv) {
     Arguments.option("debug", {type: "boolean"}).alias("debug", "d").default("debug", true);
     Arguments.describe("debug", "Enable Debug Logging");
 
-    Arguments.example("Global", Syntax("npx cli test-input"));
-    Arguments.example("Node", Syntax("node cli test-input"));
-    Arguments.example("NPM", Syntax("npm run cli -- test-input"));
+    Arguments.example("Global", Syntax("npx cli factory main"));
+    Arguments.example("Node", Syntax("node cli factory main"));
+    Arguments.example("NPM", Syntax("npm run cli -- factory main"));
 
     Arguments.usage([
         "Usage" + ":",
-        "  >>> npm run cli -- test-input",
-        "  >>> npm run cli -- test-input --debug",
-        "  >>> npm run cli -- test-input --help",
+        "  >>> npm run cli -- factory main",
+        "  >>> npm run cli -- factory main --help",
+        "  >>> npm run cli -- factory main --debug"
     ].join("\n"));
 }
 
@@ -57,16 +71,13 @@ const Command = async ($: Argv) => {
 
     Configuration(Arguments);
 
-    const Query = await Prompt("Arbitrary User-Input" + ":" + " ");
-
-    Arguments.check(($: any) => {
+    Arguments.check(($) => {
         ($?.debug) && console.log(Input($._), JSON.stringify($, null, 4), "\n");
-        ($?.debug) && console.log("[Debug] User-Input" + ":", Query);
 
         return true;
     }).strict();
 };
 
-export {Command as Input};
+export {Command as Main};
 
 export default {Command};

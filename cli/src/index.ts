@@ -1,9 +1,12 @@
-// export * from "@cloud-vault/cli";
+export * from "./arguments.js";
+export * from "./header.js";
 
-export * from "@cloud-vault/cli/commands";
-export * from "@cloud-vault/cli/utilities";
-export * from "@cloud-vault/cli/arguments";
-export * from "@cloud-vault/cli/header";
+export * from "./utilities/index.js";
+
+export * from "./commands/index.js"
+export * from "./commands/environment/index.js";
+export * from "./commands/environment/variables/index.js";
+export * from "./commands/cdfk/index.js";
 
 interface CLI {
     Main: typeof import("./cli.js").Main

@@ -15,3 +15,5 @@ cdktf.out
 .idea
 
 .DS_Store
+
+!Entry-Point.js
