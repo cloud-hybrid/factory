@@ -10,7 +10,7 @@
         "compile": "npm run synth --workspace ./cdfk",
         "deploy": "npm run deploy --workspace ./cdfk",
         "destroy": "npm run destroy --workspace ./cdfk",
-        "setup": "npm install --workspaces || true"
+        "setup": "npm install"
     },
     "workspaces": [
         "./cli",
