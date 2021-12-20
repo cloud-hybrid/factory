@@ -1,11 +1,11 @@
 import Process from "process";
 
-import { Header } from "@cloud-vault/cli/header";
-import { Columns } from "@cloud-vault/cli/utilities/tty";
-import { Subprocess } from "@cloud-vault/cli/utilities/subprocess";
-import { Arguments as CLI, Argv } from "@cloud-vault/cli/arguments";
-import { Prompt } from "@cloud-vault/cli/utilities/prompt";
-import { Binary } from "@cloud-vault/cli/utilities/binary";
+import {Header} from "@cloud-vault/cli/header";
+import {Columns} from "@cloud-vault/cli/utilities/tty";
+import {Subprocess} from "@cloud-vault/cli/utilities/subprocess";
+import {Arguments as CLI, Argv} from "@cloud-vault/cli/arguments";
+import {Prompt} from "@cloud-vault/cli/utilities/prompt";
+import {Binary} from "@cloud-vault/cli/utilities/binary";
 
 const Main = async () => {
     Process.stdout.write(Header + "\n");
@@ -13,6 +13,7 @@ const Main = async () => {
     const Arguments = async () => {
         const Commands = {
             cwd: async (input: Argv) => (await import("@cloud-vault/cli/commands/environment/cwd")).Command(input),
+            input: async (input: Argv) => (await import("@cloud-vault/cli/commands/test-input")).Command(input),
             version: (await import("@cloud-vault/cli/commands/version")).Version
         };
 
@@ -35,10 +36,17 @@ const Main = async () => {
 
             .showHelpOnFail(true, "[Error]: Invalid Input")
 
+            /*** Current Working Directory */
             .command("cwd", "Current Working Directory", (
                 async ($: Argv) => {
                     return await Commands.cwd($);
-            }))
+                }))
+
+            /*** Test-Input */
+            .command("test-input", "(WIP) Test User-Input", (
+                async ($: Argv) => {
+                    return await Commands.input($);
+                }))
 
             .parseAsync();
 
@@ -70,6 +78,6 @@ const Main = async () => {
     }
 };
 
-export { Main };
+export {Main};
 
 export default Main;
