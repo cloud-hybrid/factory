@@ -21,6 +21,7 @@ import {App, TerraformStack, TerraformAsset, AssetType, TerraformOutput} from "c
 import {Subprocess} from "./subprocess.js";
 
 import {Apigatewayv2StageDefaultRouteSettings} from ".gen/providers/aws/apigatewayv2";
+import {Settings} from "http2";
 
 type Policy = IAM.IamPolicy;
 
@@ -102,6 +103,8 @@ class Configuration {
     public settings: typeof Settings;
 
     private readonly defaults: typeof Settings = Settings;
+
+    public static Settings: typeof Settings = Settings;
 
 
     /***
@@ -203,7 +206,7 @@ class Lambda extends Configuration {
             const Artifact = Path.join(PKG, "packages", this.settings?.SAM, this.name, this.distribution);
             const Package = Path.join(Path.dirname(Artifact), "package.json");
             const Version = Import(Package)?.version || null;
-            const Source = Path.join(PKG, "packages", this.settings?.SAM, this.name, this.source);
+            const Source = Path.join(PKG, "packages", this.settings?.SAM, this.name, Configuration.Settings.Source);
 
             (!FS?.existsSync(Source)) && console.warn("[Warning] Source Not Found" + ":", Source);
 
@@ -217,7 +220,7 @@ class Lambda extends Configuration {
             const Artifact = Path.join(PKG, "packages", this.name, this.distribution);
             const Package = Path.join(Path.dirname(Artifact), "package.json");
             const Version = Import(Package)?.version || null;
-            const Source = Path.join(PKG, "packages", this.name, this.source);
+            const Source = Path.join(PKG, "packages", this.name, Configuration.Settings.Source);
 
             (!FS?.existsSync(Source)) && console.warn("[Warning] Source Not Found" + ":", Source);
 
@@ -320,7 +323,7 @@ class SAM {
     public readonly bucket: string;
 
     /*** Configuration, Read-Only Bucket Property - Requires Instantation for Access */
-    public readonly directory: string;
+    public readonly directory?: string | undefined = undefined;
 
     /*** Configuration Setting Specifiying List of Folder(s) that Contain Lambda(s) */
     public readonly functions: string[] = Settings.Functions;
@@ -510,17 +513,17 @@ class Staging implements Apigatewayv2StageDefaultRouteSettings {
     /**
      * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/aws/r/apigatewayv2_stage.html#detailed_metrics_enabled Apigatewayv2Stage#detailed_metrics_enabled}
      */
-    public readonly detailedMetricsEnabled?: boolean = true;
+    public readonly detailedMetricsEnabled?: boolean | undefined = true;
 
     /**
      * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/aws/r/apigatewayv2_stage.html#throttling_burst_limit Apigatewayv2Stage#throttling_burst_limit}
      */
-    readonly throttlingBurstLimit?: number = null;
+    readonly throttlingBurstLimit?: number | undefined = undefined
 
     /**
      * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/aws/r/apigatewayv2_stage.html#throttling_rate_limit Apigatewayv2Stage#throttling_rate_limit}
      */
-    readonly throttlingRateLimit?: number = null;
+    readonly throttlingRateLimit?: number | undefined = undefined;
 
     constructor(model: SAM) {
         this.loggingLevel = model.getAPIGatewayLoggingLevel()
