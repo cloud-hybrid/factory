@@ -27,7 +27,7 @@ function Configuration(Arguments: Argv) {
     Arguments.hide("version");
     Arguments.help("help", "Display Usage Guide").default("help", false);
 
-    Arguments.option("debug", {type: "boolean"}).alias("debug", "d").default("debug", false);
+    Arguments.option("debug", {type: "boolean"}).alias("debug", "d").default("debug", true);
     Arguments.describe("debug", "Enable Debug Logging");
 
     Arguments.example("Global", Syntax("npx cli test-input"));

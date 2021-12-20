@@ -1,0 +1,150 @@
+import FS from "fs";
+import Path from "path";
+import Module from "module";
+import Process from "process";
+import Assertion from "assert";
+
+/*** *Current Working Directory* */
+const CWD: string = Path.dirname(import.meta.url.replace("file" + ":" + "/", ""));
+
+/*** *Package Directory* */
+const PKG: string = Path.dirname(CWD);
+
+/***
+ *  JSON Capable Importer
+ *
+ *  @type {NodeRequire}
+ *
+ */
+
+const Import = Module.createRequire(PKG);
+
+import {Argv} from "@cloud-vault/cli/arguments";
+
+/*** Debug Console Utility String Generator */
+const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().toUpperCase() + ")";
+
+/***
+ * Command Configuration, Composition
+ *
+ * Aquires and configures settings specific to the module's {@link `Command`} Function-Constant.
+ *
+ * @param Arguments {Argv} CLI Input Arguments for Derivative Command
+ *
+ * @constructor
+ *
+ */
+
+function Configuration(Arguments: Argv) {
+    const Syntax = (command: string) => [command, "? [--json] ? [--file \"FILE\"] ? [--debug] ? [--help]"].join(" ");
+
+    Arguments.hide("version");
+    Arguments.help("help", "Display Usage Guide").default("help", false);
+
+    Arguments.option("debug", {type: "boolean"}).alias("debug", "d").default("debug", false);
+    Arguments.describe("debug", "Enable Debug Logging");
+
+    Arguments.option("json", {type: "boolean"}).alias("json", "j").default("json", true);
+    Arguments.describe("json", "Print to Stream as JSON Serialized Object");
+
+    Arguments.option("file", {type: "string"}).alias("file", "f").default("file", null);
+    Arguments.describe("file", "Write Current-Working-Directory to [FILE]");
+
+    Arguments.example("Global", Syntax("npx cli cwd"));
+    Arguments.example("Node", Syntax("node cli cwd"));
+    Arguments.example("NPM", Syntax("npm run cli -- cwd"));
+
+    Arguments.usage([
+        "Usage" + ":",
+        "  >>> npm run cli -- cwd",
+        "  >>> npm run cli -- cwd --help",
+        "  >>> npm run cli -- cwd --json",
+        "  >>> npm run cli -- cwd --debug",
+        "  >>> npm run cli -- cwd --file \"Settings.json\""
+    ].join("\n"));
+}
+
+/***
+ * Command Extension, Composition
+ *
+ * Writes data output to a user-provided local file.
+ *
+ * @param data {string | FS.PathLike} File Content(s)
+ * @param target {string | FS.PathLike} Target File-Name
+ * @param debug {Boolean | false} Enable Debug Logging
+ *
+ * @constructor
+ *
+ */
+
+function Write(data: string, target: string, debug = false) {
+    (debug) && console.debug("[Debug] (Serialize) Input", JSON.stringify({
+        Data: JSON.parse(data),
+        Target: target,
+        Debug: debug
+    }, null, 4), "\n");
+
+    const CWD = Process.cwd();
+    const Target = Path.relative(CWD, target);
+
+    Assertion.notStrictEqual(target, "");
+    Assertion.strictEqual(CWD, Local);
+
+    FS.writeFileSync(Target, data);
+
+    return {Target, data, debug};
+}
+
+/***
+ * Command Extension, Composition
+ *
+ * Writes data output to TTY Stream
+ *
+ * @param data {Object | String | Any} Output Data
+ * @param serialize {Boolean | true}
+ * @param debug {Boolean | false} Enable Debug Logging
+ *
+ * @constructor
+ *
+ */
+
+function Output(data: any, serialize = true, debug = false) {
+    (debug) && console.debug("[Debug] (Output) Input", JSON.stringify({
+        Data: data,
+        Serialize: serialize,
+        Debug: debug
+    }, null, 4), "\n");
+
+    (serialize) && Process.stdout.write(JSON.stringify(data, null, 4) + "\n" + "\n");
+    (serialize) || Process.stdout.write(data + "\n" + "\n");
+
+    return { data, serialize, debug };
+}
+
+const Command = async ($: Argv) => {
+    const Arguments: Argv = $;
+
+    Configuration(Arguments);
+
+    const Data = {"CWD": Local};
+    const Serial = JSON.stringify(Data, null, 4);
+
+    Arguments.check(($) => {
+        ($?.debug) && console.log(Input($._), JSON.stringify($, null, 4), "\n");
+
+        const Mapping = {
+            file: ($?.file) ? Write(Serial, String($?.file), Boolean($?.debug)) : null,
+            json: ($?.json) ? Output(Data, true, Boolean($?.debug)) : ($?.json === false)
+                ? Output(Local, false, Boolean($?.debug))
+                : null
+        };
+
+        ($?.debug) && console.dir(Mapping);
+
+        return true;
+    }).strict();
+};
+
+export {Command, Configuration};
+
+export default {Command};
