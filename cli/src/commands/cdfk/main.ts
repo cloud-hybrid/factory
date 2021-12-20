@@ -86,13 +86,13 @@ const Command = async ($: Argv) => {
 
         Assertion.strictEqual(FS.existsSync(Target), true);
 
-        const Trigger = async () => await Prompt("Continue? (Y/N)" + ":" + " ");
+        const Continue = async () => await Prompt("Continue? (Y/N)" + ":" + " ");
 
-        let _: string = await Trigger().then(($) => $.toUpperCase());
+        let trigger: string = await Continue().then(($) => $.toUpperCase());
 
-        while (_ !== "Y" && _ !== "N") _ = await Trigger().then(($) => $.toUpperCase());
+        while (trigger !== "Y" && trigger !== "N") trigger = await Continue().then(($) => $.toUpperCase());
 
-        (Trigger) && await Subprocess("npm run ci-cd", Target);
+        (trigger === "Y") && await Subprocess("npm run ci-cd", Target);
 
         return true;
     }).strict();
