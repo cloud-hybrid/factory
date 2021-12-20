@@ -12,17 +12,19 @@
 
 #### Dependencies ####
 
-```bash
+```shell
 npm install .
 ```
 
 #### Auto-Compilation ####
 
-```bash
+```shell
 # Runs Type-Script Compiler: tsc --pretty --watch
 npm run compile
+```
 
-# In another separate TTY or Terminal Session:
+```shell
+# In another separate TTY or Terminal Session ...
 npm run start || npm run cli
 ```
 
@@ -31,7 +33,7 @@ npm run start || npm run cli
 In order to integrate `@cloud-vault/cli` with a given package, establish any
 named file -- `cli.ts` as an example -- with the following content:
 
-```js
+```javascript
 import { default as CLI } from "@cloud-vault/cli";
 
 const Main = async () => await CLI;
@@ -44,6 +46,6 @@ module compliant.
 
 Optionally, the CLI package can also be interfaced via:
 
-```js
+```javascript
 await import("@cloud-vault/cli");
 ```

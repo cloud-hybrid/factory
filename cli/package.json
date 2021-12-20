@@ -23,6 +23,12 @@
         "./arguments": "./src/arguments.js",
         "./commands": "./src/commands/index.js",
         "./commands/*": "./src/commands/*.js",
+        "./commands/environment": "./src/commands/environemnt/index.js",
+        "./commands/environment/*": "./src/commands/environemnt/*.js",
+        "./commands/environment/variables": "./src/commands/environemnt/variables/index.js",
+        "./commands/environment/variables/*": "./src/commands/environemnt/variables/*.js",
+        "./commands/cdfk": "./src/commands/cdfk/index.js",
+        "./commands/cdfk/*": "./src/commands/cdfk/*.js",
         "./utilities": "./src/utilities/index.js",
         "./utilities/*": "./src/utilities/*.js",
         "./package.json": "./package.json"

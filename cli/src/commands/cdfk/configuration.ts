@@ -1,11 +1,14 @@
-import FS from "fs";
+import FS, {Dirent} from "fs";
 import Path from "path";
 import Module from "module";
 import Process from "process";
 import Assertion from "assert";
 
+/*** *Current Module Path* */
+const File: string = import.meta.url.replace("file" + ":" + "//", "");
+
 /*** *Current Working Directory* */
-const CWD: string = Path.dirname(import.meta.url.replace("file" + ":" + "/", ""));
+const CWD: string = Path.dirname(File);
 
 /*** *Package Directory* */
 const PKG: string = Path.dirname(CWD);
@@ -22,12 +25,12 @@ const Import = Module.createRequire(PKG);
 import {Argv} from "@cloud-vault/cli/arguments";
 
 /*** Debug Console Utility String Generator */
-const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().toUpperCase() + ")";
+const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";
 
 /***
  * Command Configuration, Composition
  *
- * Aquires and configures settings specific to the module's {@link `Command`} Function-Constant.
+ * Acquires and configures settings specific to the module's {@link Command} Function-Constant.
  *
  * @param Arguments {Argv} CLI Input Arguments for Derivative Command
  *
@@ -36,7 +39,7 @@ const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + 
  */
 
 function Configuration(Arguments: Argv) {
-    const Syntax = (command: string) => [command, "? [--json] ? [--file \"FILE\"] ? [--debug] ? [--help]"].join(" ");
+    const Syntax = (command: string) => [command, "? [--debug] ? [--help]"].join(" ");
 
     Arguments.hide("version");
     Arguments.help("help", "Display Usage Guide").default("help", false);
@@ -44,107 +47,90 @@ function Configuration(Arguments: Argv) {
     Arguments.option("debug", {type: "boolean"}).alias("debug", "d").default("debug", false);
     Arguments.describe("debug", "Enable Debug Logging");
 
-    Arguments.option("json", {type: "boolean"}).alias("json", "j").default("json", true);
-    Arguments.describe("json", "Print to Stream as JSON Serialized Object");
-
-    Arguments.option("file", {type: "string"}).alias("file", "f").default("file", null);
-    Arguments.describe("file", "Write Current-Working-Directory to [FILE]");
-
-    Arguments.example("Global", Syntax("npx cli cwd"));
-    Arguments.example("Node", Syntax("node cli cwd"));
-    Arguments.example("NPM", Syntax("npm run cli -- cwd"));
+    Arguments.example("Global", Syntax("npx cli factory configuration"));
+    Arguments.example("Node", Syntax("node cli factory configuration"));
+    Arguments.example("NPM", Syntax("npm run cli -- factory configuration"));
 
     Arguments.usage([
         "Usage" + ":",
-        "  >>> npm run cli -- cwd",
-        "  >>> npm run cli -- cwd --help",
-        "  >>> npm run cli -- cwd --json",
-        "  >>> npm run cli -- cwd --debug",
-        "  >>> npm run cli -- cwd --file \"Settings.json\""
+        "  >>> npm run cli -- factory configuration",
+        "  >>> npm run cli -- factory configuration --help",
+        "  >>> npm run cli -- factory configuration --debug"
     ].join("\n"));
 }
 
+
 /***
- * Command Extension, Composition
+ * File System Path Resolution Factory
  *
- * Writes data output to a user-provided local file.
- *
- * @param data {string | FS.PathLike} File Content(s)
- * @param target {string | FS.PathLike} Target File-Name
- * @param debug {Boolean | false} Enable Debug Logging
+ * @param file {FS.Dirent}
+ * @param directory {string | FS.PathLike}
  *
  * @constructor
  *
  */
 
-function Write(data: string, target: string, debug = false) {
-    (debug) && console.debug("[Debug] (Serialize) Input", JSON.stringify({
-        Data: JSON.parse(data),
-        Target: target,
-        Debug: debug
-    }, null, 4), "\n");
-
-    const CWD = Process.cwd();
-    const Target = Path.relative(CWD, target);
-
-    Assertion.notStrictEqual(target, "");
-    Assertion.strictEqual(CWD, Local);
-
-    FS.writeFileSync(Target, data);
-
-    return {Target, data, debug};
+function Mapper(file: FS.Dirent, directory: string) {
+    return {
+        Name: file.name,
+        System: Path.join(directory, file.name),
+        Directory: {
+            System: Path.resolve(directory),
+            Name: Path.basename(directory)
+        }
+    };
 }
 
 /***
- * Command Extension, Composition
+ * Module Entry-Point Command
+ * ==========================
  *
- * Writes data output to TTY Stream
- *
- * @param data {Object | String | Any} Output Data
- * @param serialize {Boolean | true}
- * @param debug {Boolean | false} Enable Debug Logging
+ * @param $ {Argv} Commandline Arguments (Implicitly passed from cli.ts).
  *
  * @constructor
  *
  */
-
-function Output(data: any, serialize = true, debug = false) {
-    (debug) && console.debug("[Debug] (Output) Input", JSON.stringify({
-        Data: data,
-        Serialize: serialize,
-        Debug: debug
-    }, null, 4), "\n");
-
-    (serialize) && Process.stdout.write(JSON.stringify(data, null, 4) + "\n" + "\n");
-    (serialize) || Process.stdout.write(data + "\n" + "\n");
-
-    return { data, serialize, debug };
-}
 
 const Command = async ($: Argv) => {
     const Arguments: Argv = $;
 
     Configuration(Arguments);
 
-    const Data = {"CWD": Local};
-    const Serial = JSON.stringify(Data, null, 4);
-
     Arguments.check(($) => {
-        ($?.debug) && console.log(Input($._), JSON.stringify($, null, 4), "\n");
+        ($?.debug) && console.debug(Input($._), JSON.stringify($, null, 4), "\n");
 
-        const Mapping = {
-            file: ($?.file) ? Write(Serial, String($?.file), Boolean($?.debug)) : null,
-            json: ($?.json) ? Output(Data, true, Boolean($?.debug)) : ($?.json === false)
-                ? Output(Local, false, Boolean($?.debug))
-                : null
+        ($?.debug) && console.debug("[Debug] User CWD" + ":", Process.cwd(), "\n");
+        ($?.debug) && console.debug("[Debug] Relative Runtime Path(s)" + ":", JSON.stringify({
+            Paths: {
+                Runtime: File,
+                Directory: CWD
+            }
+        }, null, 4), "\n");
+
+        const Directory = Path.resolve(Process.cwd());
+        const Target = Path.join(Directory, "settings.json");
+
+        /// FS.statSync(Directory, {throwIfNoEntry: false});
+
+        /// const Directories = FS.readdirSync(Directory, {withFileTypes: true}).filter(($) => $.isDirectory()).map(($) => $.name);
+        const Files = {
+            /*** Abstract File Information Type */
+            $: FS.readdirSync(Directory, {withFileTypes: true}).filter(($) => $.isFile()).map(($) => Mapper($, Directory)),
+            /*** List of Simple File-Names */
+            List: FS.readdirSync(Directory, {withFileTypes: true}).filter(($) => $.isFile()).map(($) => $.name),
+            /*** Full System Path(s) to User's Current Working Directory's File(s) */
+            Paths: FS.readdirSync(Directory, {withFileTypes: true}).filter(($) => $.isFile()).map(($) => Path.join(Directory, $.name))
         };
 
-        ($?.debug) && console.dir(Mapping);
+        /*** Trigger Configuration Prompt(s) if settings.json isn't found relative to User's current-working-directory */
+        const Trigger = (!Files.Paths.includes(Target));
+
+        ($?.debug) && console.debug("[Debug] Configuration Prompt(s) Trigger" + ":", Trigger, "\n");
 
         return true;
     }).strict();
 };
 
-export {Command, Configuration};
+export {Command as Configuration};
 
 export default {Command};

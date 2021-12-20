@@ -8,12 +8,12 @@ import {Argv} from "@cloud-vault/cli/arguments";
 import {Local} from "@cloud-vault/cli/utilities/index";
 
 /*** Debug Console Utility String Generator */
-const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().toUpperCase() + ")";
+const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";
 
 /***
  * Command Configuration, Composition
  *
- * Aquires and configures settings specific to the module's {@link `Command`} Function-Constant.
+ * Acquires and configures settings specific to the module's {@link Command} Function-Constant.
  *
  * @param Arguments {Argv} CLI Input Arguments for Derivative Command
  *
@@ -107,6 +107,16 @@ function Output(data: any, serialize = true, debug = false) {
     return { data, serialize, debug };
 }
 
+/***
+ * Module Entry-Point Command
+ * ==========================
+ *
+ * @param $ {Argv} Commandline Arguments (Implicitly passed from cli.ts).
+ *
+ * @constructor
+ *
+ */
+
 const Command = async ($: Argv) => {
     const Arguments: Argv = $;
 
@@ -131,6 +141,6 @@ const Command = async ($: Argv) => {
     }).strict();
 };
 
-export {Command, Configuration};
+export {Command as CWD};
 
 export default {Command};

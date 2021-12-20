@@ -12,14 +12,19 @@ const Main = async () => {
 
     const Arguments = async () => {
         const Commands = {
-            cwd: async (input: Argv) => (await import("@cloud-vault/cli/commands/environment/cwd")).Command(input),
-            input: async (input: Argv) => (await import("@cloud-vault/cli/commands/test-input")).Command(input),
-            version: (await import("@cloud-vault/cli/commands/version")).Version
+            cwd: async (input: Argv) => (await import("@cloud-vault/cli/commands/environment/cwd")).CWD(input),
+            input: async (input: Argv) => (await import("@cloud-vault/cli/commands/test-input")).Input(input),
+            version: (await import("@cloud-vault/cli/commands/version")).Version,
+
+            cdfk: {
+                main: async (input: Argv) => (await import("@cloud-vault/cli/commands/cdfk/main")).Main(input),
+                configuration: async (input: Argv) => (await import("@cloud-vault/cli/commands/cdfk/configuration")).Configuration(input)
+            }
         };
 
         // const Commands = await import("./commands/index.js");
         return await CLI(Process.argv.splice(2))
-            .wrap(Columns())
+            .scriptName("").wrap(Columns())
 
             /*** Version */
             .version(...Commands.version)
@@ -43,9 +48,25 @@ const Main = async () => {
                 }))
 
             /*** Test-Input */
-            .command("test-input", "(WIP) Test User-Input", (
+            .command("test-input", "Arbitrary User-Input (Testing Purposes Only)", (
                 async ($: Argv) => {
                     return await Commands.input($);
+                }))
+
+            /*** CDFK Configuration */
+            .command("cdfk", "(WIP) Construct Development Factory Kit", (
+                async ($: Argv) => {
+                    $.command("main", "(WIP) Construct Factory Entry-Point", (
+                        async ($: Argv) => {
+                            return await Commands.cdfk.configuration($);
+                        }
+                    ));
+
+                    $.command("configuration", "(WIP) Construct Factory Configuration", (
+                        async ($: Argv) => {
+                            return await Commands.cdfk.configuration($);
+                        }
+                    ));
                 }))
 
             .parseAsync();
