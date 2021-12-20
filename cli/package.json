@@ -23,10 +23,10 @@
         "./arguments": "./src/arguments.js",
         "./commands": "./src/commands/index.js",
         "./commands/*": "./src/commands/*.js",
-        "./commands/environment": "./src/commands/environemnt/index.js",
-        "./commands/environment/*": "./src/commands/environemnt/*.js",
-        "./commands/environment/variables": "./src/commands/environemnt/variables/index.js",
-        "./commands/environment/variables/*": "./src/commands/environemnt/variables/*.js",
+        "./commands/environment": "./src/commands/environment/index.js",
+        "./commands/environment/*": "./src/commands/environment/*.js",
+        "./commands/environment/variables": "./src/commands/environment/variables/index.js",
+        "./commands/environment/variables/*": "./src/commands/environment/variables/*.js",
         "./commands/cdfk": "./src/commands/cdfk/index.js",
         "./commands/cdfk/*": "./src/commands/cdfk/*.js",
         "./utilities": "./src/utilities/index.js",
@@ -54,6 +54,8 @@
             "plugin:@typescript-eslint/recommended"
         ],
         "rules": {
+             "no-case-declarations": 0,
+            "@typescript-eslint/ban-types": 0,
             "@typescript-eslint/no-explicit-any": 0,
             "@typescript-eslint/explicit-function-return-type": 0,
             "@typescript-eslint/no-use-before-define": 0,

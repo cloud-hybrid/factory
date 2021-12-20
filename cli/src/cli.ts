@@ -12,17 +12,16 @@ const Main = async () => {
 
     const Arguments = async () => {
         const Commands = {
-            cwd: async (input: Argv) => (await import("@cloud-vault/cli/commands/environment/cwd")).CWD(input),
-            input: async (input: Argv) => (await import("@cloud-vault/cli/commands/test-input")).Input(input),
-            version: (await import("@cloud-vault/cli/commands/version")).Version,
+            cwd: async (input: Argv) => (await import("@cloud-vault/cli")).CWD(input),
+            input: async (input: Argv) => (await import("@cloud-vault/cli")).Input(input),
+            version: (await import("@cloud-vault/cli")).Version,
 
             cdfk: {
-                main: async (input: Argv) => (await import("@cloud-vault/cli/commands/cdfk/main")).Main(input),
-                configuration: async (input: Argv) => (await import("@cloud-vault/cli/commands/cdfk/configuration")).Configuration(input)
+                main: async (input: Argv) => (await import("@cloud-vault/cli")).Main(input),
+                configuration: async (input: Argv) => (await import("@cloud-vault/cli")).Configuration(input)
             }
         };
 
-        // const Commands = await import("./commands/index.js");
         return await CLI(Process.argv.splice(2))
             .scriptName("").wrap(Columns())
 
@@ -58,7 +57,7 @@ const Main = async () => {
                 async ($: Argv) => {
                     $.command("main", "(WIP) Construct Factory Entry-Point", (
                         async ($: Argv) => {
-                            return await Commands.cdfk.configuration($);
+                            return await Commands.cdfk.main($);
                         }
                     ));
 
@@ -70,19 +69,6 @@ const Main = async () => {
                 }))
 
             .parseAsync();
-
-        /// Example) >>> .command(
-        /// Example) >>>     "math",
-        /// Example) >>>     "math description",
-        /// Example) >>>     Commands.Example
-        /// Example) >>> )
-
-        /// Example) >>> .string(["username", "token"])
-        /// Example) >>> .implies("username", "token")
-
-        /// Example) >>> .example("Global", "npx @cloud-vault/cli --quiet")
-        /// Example) >>> .example("Package", "npm run start -- --quiet")
-        /// Example) >>> .example("Local", "node index --quiet")
     }
 
     const Input = await Arguments();

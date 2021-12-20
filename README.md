@@ -1,7 +1,7 @@
 ## Setup ##
 
 ```bash
-npm run setup
+npm install && npm run setup
 ```
 
 ### Applicable Types of Environment Configuration File(s) ###
