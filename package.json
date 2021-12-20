@@ -9,8 +9,7 @@
         "build": "npm run build --workspace ./cdfk",
         "compile": "npm run synth --workspace ./cdfk",
         "deploy": "npm run deploy --workspace ./cdfk",
-        "destroy": "npm run destroy --workspace ./cdfk",
-        "install": "npm i --workspaces"
+        "destroy": "npm run destroy --workspace ./cdfk"
     },
     "workspaces": [
         "./cli",
