@@ -22,7 +22,7 @@ const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + 
  */
 
 function Configuration(Arguments: Argv) {
-    const Syntax = (command: string) => [command, "? [--json] ? [--file \"FILE\"] ? [--debug]"].join(" ");
+    const Syntax = (command: string) => [command, "? [--json] ? [--file \"FILE\"] ? [--debug] ? [--help]"].join(" ");
 
     Arguments.hide("version");
     Arguments.help("help", "Display Usage Guide").default("help", false);
@@ -43,6 +43,7 @@ function Configuration(Arguments: Argv) {
     Arguments.usage([
         "Usage" + ":",
         "  >>> npm run cli -- cwd",
+        "  >>> npm run cli -- cwd --help",
         "  >>> npm run cli -- cwd --json",
         "  >>> npm run cli -- cwd --debug",
         "  >>> npm run cli -- cwd --file \"Settings.json\""
