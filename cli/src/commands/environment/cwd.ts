@@ -130,8 +130,6 @@ const Command = async ($: Argv) => {
     }).strict();
 };
 
-Command.bind(Configuration, Command);
-
 export {Command, Configuration};
 
 export default {Command};

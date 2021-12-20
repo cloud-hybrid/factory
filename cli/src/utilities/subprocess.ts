@@ -5,11 +5,11 @@ const Subprocess = async (command: string, directory: string = Process.cwd()) =>
     const Binary = command.split(" ")[0];
     const Arguments = command.split(" ").splice(1);
 
-    const Awaitable = new Promise((resolve) => {
+    const Awaitable = new Promise((resolve, reject) => {
         const Stream = {
             PID: 0,
             Status: "",
-            Signal: {}
+            Signal: ""
         };
 
         const Command = Spawn.spawn(Binary, [...Arguments], {
@@ -53,33 +53,33 @@ const Subprocess = async (command: string, directory: string = Process.cwd()) =>
         });
 
         Command.on("error", ($) => {
-            Stream.PID = Command.pid;
+            Stream.PID = Command.pid || 0;
             Stream.Status = String($);
-            Stream.Signal = Command.signalCode;
+            Stream.Signal = Command.signalCode || "";
 
-            resolve(Command);
+            reject({$, Command});
         });
 
         Command.on("exit", ($) => {
-            Stream.PID = Command.pid;
+            Stream.PID = Command.pid || 0;
             Stream.Status = String($);
-            Stream.Signal = Command.signalCode;
+            Stream.Signal = Command.signalCode || "";
 
             resolve(Command);
         });
 
         Command.on("disconnect", () => {
-            Stream.PID = Command.pid;
+            Stream.PID = Command.pid || 0;
             Stream.Status = "-1";
-            Stream.Signal = Command.signalCode;
+            Stream.Signal = Command.signalCode || "";
 
             resolve(Command);
         });
 
         Command.on("close", ($) => {
-            Stream.PID = Command.pid;
+            Stream.PID = Command.pid || 0;
             Stream.Status = String($);
-            Stream.Signal = Command.signalCode;
+            Stream.Signal = Command.signalCode || "";
 
             resolve(Command);
         });
