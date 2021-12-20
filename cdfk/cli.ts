@@ -4,6 +4,7 @@
 //
 // export default await Main();
 
+// @ts-ignore
 import { CLI } from "@cloud-vault/cli";
 
 await CLI();
