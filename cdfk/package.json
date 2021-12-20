@@ -29,7 +29,6 @@
         "@types/aws-lambda": "^8.10.88",
         "@types/node": "^16.11.14",
         "@typescript-eslint/eslint-plugin": "^5.7.0",
-        "@typescript-eslint/eslint-plugin-tslint": "^5.7.0",
         "@typescript-eslint/experimental-utils": "^5.7.0",
         "@typescript-eslint/parser": "^5.7.0",
         "@typescript-eslint/scope-manager": "^5.7.0",
