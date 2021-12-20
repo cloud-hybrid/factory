@@ -19,9 +19,9 @@
         ".": "./src/index.js",
         "./header": "./src/header.js",
         "./arguments": "./src/arguments.js",
-        "./index": "./src/index.js",
+        "./commands": "./src/commands/index.js",
         "./commands/*": "./src/commands/*.js",
-        "./utilities": "./src/utilities",
+        "./utilities": "./src/utilities/index.js",
         "./utilities/*": "./src/utilities/*.js",
         "./package.json": "./package.json"
     },

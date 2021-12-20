@@ -1,11 +1,12 @@
-export * from "./cli.js";
+export * from "@cloud-vault/cli";
 
-export * from "./index.js";
-export * from "./header.js";
-export * from "./arguments.js";
+export * from "@cloud-vault/cli/commands";
+export * from "@cloud-vault/cli/utilities";
+export * from "@cloud-vault/cli/arguments";
+export * from "@cloud-vault/cli/header";
 
-const CLI = async () => await (await import("@cloud-vault/cli")).Main();
+const CLI = await import("./cli.js");
 
 export { CLI };
 
-export default CLI;
+export default CLI.Main();
