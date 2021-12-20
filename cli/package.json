@@ -5,6 +5,7 @@
     "type": "module",
     "types": "src/index.js",
     "scripts": {
+        "install": "tsc --pretty",
         "compile": "tsc --pretty --watch",
         "start": "node src/index.js",
         "cli": "node src/index.js"
