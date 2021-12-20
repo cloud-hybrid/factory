@@ -7,7 +7,7 @@
     "type": "module",
     "private": true,
     "scripts": {
-        "cli": "node ../cli/index.js",
+        "cli": "node cli.js",
         "get": "cdktf get",
         "build": "tsc --pretty",
         "compile": "tsc --pretty --watch",
@@ -18,6 +18,7 @@
         "upgrade": "npm i cdktf@latest cdktf-cli@latest"
     },
     "dependencies": {
+        "@cloud-vault/cli": "../cli",
         "@cdktf/provider-aws": "^3.0.1",
         "cdktf": "^0.8.3",
         "cdktf-cli": "^0.8.3",
