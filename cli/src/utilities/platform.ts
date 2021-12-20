@@ -1,5 +1,4 @@
 import OS from "os";
-import Process from "process";
 
 const $ = OS.platform();
 

@@ -19,7 +19,7 @@ const Import = Module.createRequire(PKG);
 const Package = {
     Package: Import("./../package.json").version,
     Factory: Import("./../cdfk/package.json").version,
-    CLI: Import("./package.json").version
+    CLI: Import("@cloud-vault/cli/package.json").version
 }
 
 // Package Version

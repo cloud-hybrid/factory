@@ -1,16 +1,9 @@
 import Process from "process";
 import Spawn from "child_process";
-import Runtime from "process";
 
-const Subprocess = (command: string, directory: string = Process.cwd()) => {
+const Subprocess = async (command: string, directory: string = Process.cwd()) => {
     const Binary = command.split(" ")[0];
     const Arguments = command.split(" ").splice(1);
-    const Options = {
-        argv0: Process.argv0,
-        cwd: directory,
-        env: Process.env,
-        stdio: "pipe"
-    };
 
     const Awaitable = new Promise((resolve) => {
         const Stream = {
@@ -92,7 +85,7 @@ const Subprocess = (command: string, directory: string = Process.cwd()) => {
         });
     });
 
-    return Awaitable;
+    return await Awaitable;
 };
 
 export {Subprocess};

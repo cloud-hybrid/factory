@@ -1,4 +1,4 @@
-import { Colors } from "./exports.js";
+import Colors from "chalk";
 
 const Year = new Date().getFullYear();
 

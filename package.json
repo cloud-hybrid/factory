@@ -3,7 +3,6 @@
     "private": false,
     "version": "0.0.1",
     "type": "module",
-    "bin": "./cli/index.js",
     "scripts": {
         "cli": "node cli/index.js",
         "help": "node cli/index --help",

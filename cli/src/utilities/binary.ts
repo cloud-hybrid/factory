@@ -12,7 +12,7 @@ function $(bin: string | FS.PathLike) {
     });
 }
 
-const Validate = (bin: string | FS.PathLike) => {
+const Binary = (bin: string | FS.PathLike) => {
     const Data = {Valid: false, Path: ""};
     const Target = $(bin);
     const Iterator = Target.length;
@@ -34,6 +34,6 @@ const Validate = (bin: string | FS.PathLike) => {
     return Data.Valid;
 }
 
-export {Validate};
+export {Binary};
 
-export default Validate;
+export default Binary;

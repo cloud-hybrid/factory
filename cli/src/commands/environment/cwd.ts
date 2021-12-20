@@ -3,9 +3,9 @@ import Path from "path";
 import Process from "process";
 import Assertion from "assert";
 
-import { Argv } from "yargs";
+import {Argv} from "@cloud-vault/cli/arguments";
 
-import {Local} from "../../utilities/index.js";
+import {Local} from "@cloud-vault/cli/utilities/index";
 
 /*** Debug Console Utility String Generator */
 const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().toUpperCase() + ")";
@@ -62,7 +62,7 @@ function Configuration(Arguments: Argv) {
  *
  */
 
-function Write(data: string, target: string, debug: boolean = false) {
+function Write(data: string, target: string, debug = false) {
     (debug) && console.debug("[Debug] (Serialize) Input", JSON.stringify({
         Data: JSON.parse(data),
         Target: target,
@@ -76,6 +76,8 @@ function Write(data: string, target: string, debug: boolean = false) {
     Assertion.strictEqual(CWD, Local);
 
     FS.writeFileSync(Target, data);
+
+    return {Target, data, debug};
 }
 
 /***
@@ -91,7 +93,7 @@ function Write(data: string, target: string, debug: boolean = false) {
  *
  */
 
-function Output(data: any, serialize: boolean = true, debug: boolean = false) {
+function Output(data: any, serialize = true, debug = false) {
     (debug) && console.debug("[Debug] (Output) Input", JSON.stringify({
         Data: data,
         Serialize: serialize,
@@ -100,6 +102,8 @@ function Output(data: any, serialize: boolean = true, debug: boolean = false) {
 
     (serialize) && Process.stdout.write(JSON.stringify(data, null, 4) + "\n" + "\n");
     (serialize) || Process.stdout.write(data + "\n" + "\n");
+
+    return { data, serialize, debug };
 }
 
 const Command = async ($: Argv) => {
@@ -119,6 +123,8 @@ const Command = async ($: Argv) => {
                 ? Output(Local, false, Boolean($?.debug))
                 : null
         };
+
+        ($?.debug) && console.dir(Mapping);
 
         return true;
     }).strict();

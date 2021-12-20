@@ -1,20 +1,24 @@
 import Process from "process";
 
-import CLI, {Platform, Prompt, Subprocess, Hide, Header, Argv} from "./exports.js";
-import Binary from "./utilities/binary.js";
+import { Header } from "@cloud-vault/cli/header";
+import { Columns } from "@cloud-vault/cli/utilities/tty";
+import { Subprocess } from "@cloud-vault/cli/utilities/subprocess";
+import { Arguments as CLI, Argv } from "@cloud-vault/cli/arguments";
+import { Prompt } from "@cloud-vault/cli/utilities/prompt";
+import { Binary } from "@cloud-vault/cli/utilities/binary";
 
 const Main = async () => {
     Process.stdout.write(Header + "\n");
 
     const Arguments = async () => {
         const Commands = {
-            cwd: async (input: Argv) => (await import("./commands/environment/cwd.js")).Command(input),
-            version: (await import("./commands/version.js")).Version
+            cwd: async (input: Argv) => (await import("@cloud-vault/cli/commands/environment/cwd")).Command(input),
+            version: (await import("@cloud-vault/cli/commands/version")).Version
         };
 
         // const Commands = await import("./commands/index.js");
-        return await CLI.Arguments(Process.argv.splice(2))
-            .wrap(CLI.Columns())
+        return await CLI(Process.argv.splice(2))
+            .wrap(Columns())
 
             /*** Version */
             .version(...Commands.version)
