@@ -1,6 +1,6 @@
 {
     "language": "typescript",
-    "app": "npm run --silent build && node main.js",
+    "app": "npm run --silent build && node src/main.js",
     "terraformProviders": [
         "hashicorp/aws@~> 3.0"
     ],

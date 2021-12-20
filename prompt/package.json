@@ -1,35 +1,30 @@
 {
-    "name": "@cloud-vault/cdfk",
-    "description": "Construct Development Factory Kit - Cloud Configuration & Management",
-    "license": "BSD-3-Clause",
-    "readme": "README.md",
-    "version": "0.0.0",
-    "type": "module",
+    "name": "@cloud-vault/prompt",
     "private": true,
+    "version": "0.0.0",
+    "description": "ESM CLI-Prompt Package",
+    "license": "BSD-3-Clause",
+    "main": "index.js",
+    "type": "module",
     "scripts": {
-        "cli": "node src/index.js",
-        "get": "cdktf get",
-        "build": "npm run get && tsc --pretty",
-        "compile": "npm run get && tsc --pretty --watch",
-        "install": "npm run get && tsc --pretty",
-        "synth": "cdktf synth",
-        "deploy": "node cli.js && npm run get && cdktf deploy",
-        "destroy": "cdktf destroy",
-        "upgrade": "npm i cdktf@latest cdktf-cli@latest"
+        "start": "node index.js",
+        "install": "tsc --pretty",
+        "compile": "tsc --pretty --watch",
+        "package": "npm pack",
+        "upload": "npm publish --access public",
+        "example": "node examples/CLI-Form.js"
     },
     "dependencies": {
-        "@cloud-vault/factory": "..",
-        "@cloud-vault/cli": "../cli",
-        "@cdktf/provider-aws": "^3.0.1",
-        "cdktf": "^0.8.3",
-        "cdktf-cli": "^0.8.3",
-        "constructs": "^10.0.12"
+        "@cloud-vault/prompt": "."
+
+    },
+    "exports": {
+        ".": "./index.js"
     },
     "devDependencies": {
-        "@types/aws-lambda": "^8.10.88",
         "@types/node": "^16.11.14",
+        "@types/yargs": "^17.0.7",
         "@typescript-eslint/eslint-plugin": "^5.7.0",
-        "@typescript-eslint/eslint-plugin-tslint": "^5.7.0",
         "@typescript-eslint/experimental-utils": "^5.7.0",
         "@typescript-eslint/parser": "^5.7.0",
         "@typescript-eslint/scope-manager": "^5.7.0",
@@ -47,16 +42,13 @@
             "plugin:@typescript-eslint/recommended"
         ],
         "rules": {
+            "no-async-promise-executor": 0,
             "@typescript-eslint/no-explicit-any": 0,
             "@typescript-eslint/explicit-function-return-type": 0,
             "@typescript-eslint/no-use-before-define": 0,
             "@typescript-eslint/no-empty-interface": 0,
             "@typescript-eslint/explicit-module-boundary-types": 0,
             "@typescript-eslint/no-empty-function": 0,
-            "@typescript-eslint/no-unused-vars": 0,
-            "@typescript-eslint/no-inferrable-types": 0,
-            "@typescript-eslint/ban-types": 0,
-            "@typescript-eslint/ban-ts-comment": 0,
             "no-sequences": "error"
         },
         "ignorePatterns": [
