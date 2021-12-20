@@ -1,3 +1,9 @@
+## Setup ##
+
+```bash
+npm run setup
+```
+
 ### Applicable Types of Environment Configuration File(s) ###
 
 `@cloud-vault` will override in the following order (highest defined variable overrides lower):
