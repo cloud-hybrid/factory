@@ -16,7 +16,7 @@ const Subprocess = async (command: string, directory: string = Process.cwd()) =>
             argv0: Process.argv0,
             cwd: directory,
             env: Process.env,
-            stdio: "pipe"
+            stdio: "overlapped"
         });
 
         const Output = Command.stdout;

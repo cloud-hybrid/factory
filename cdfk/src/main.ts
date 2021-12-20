@@ -25,9 +25,11 @@ import {Apigatewayv2StageDefaultRouteSettings} from "@cdktf/provider-aws/lib/api
 type Policy = IAM.IamPolicy;
 
 /*** ESM Resolver for *Current-Working-Directory* */
-const CWD: string = Path.dirname(import.meta.url.replace("file" + ":" + "/", ""));
+const CWD: string = Path.dirname(import.meta.url.replace("file" + ":" + "//", ""));
 /*** ESM Resolve for Package Directory relative to Current Working Directory */
 const PKG: string = Path.dirname(CWD);
+
+const Repository: string = Path.join(PKG, "..");
 
 /*** ESM Compatability & JSON Importer */
 const Import: NodeRequire = Module.createRequire(import.meta.url);
@@ -43,7 +45,7 @@ const Generic: Symbol = Symbol();
  *
  */
 
-const Settings = Import("./configuration/settings.json");
+const Settings = Import("../configuration/settings.json");
 
 function UUID() {
     let source = new Date().getTime(); // Timestamp
@@ -202,10 +204,10 @@ class Lambda extends Configuration {
         Assertion.notStrictEqual(this.service, undefined);
 
         if (sam) {
-            const Artifact = Path.join(PKG, "packages", this.settings?.SAM, this.name, this.distribution);
+            const Artifact = Path.join(Repository, "packages", this.settings?.SAM, this.name, this.distribution);
             const Package = Path.join(Path.dirname(Artifact), "package.json");
             const Version = Import(Package)?.version || null;
-            const Source = Path.join(PKG, "packages", this.settings?.SAM, this.name, Configuration.Settings.Source);
+            const Source = Path.join(Repository, "packages", this.settings?.SAM, this.name, Configuration.Settings.Source);
 
             (!FS?.existsSync(Source)) && console.warn("[Warning] Source Not Found" + ":", Source);
 
@@ -216,10 +218,10 @@ class Lambda extends Configuration {
             this.directory = Artifact;
             this.source = Source;
         } else {
-            const Artifact = Path.join(PKG, "packages", this.name, this.distribution);
+            const Artifact = Path.join(Repository, "packages", this.name, this.distribution);
             const Package = Path.join(Path.dirname(Artifact), "package.json");
             const Version = Import(Package)?.version || null;
-            const Source = Path.join(PKG, "packages", this.name, Configuration.Settings.Source);
+            const Source = Path.join(Repository, "packages", this.name, Configuration.Settings.Source);
 
             (!FS?.existsSync(Source)) && console.warn("[Warning] Source Not Found" + ":", Source);
 
@@ -352,7 +354,7 @@ class SAM {
         this.name = name;
         this.service = service;
 
-        const Source = Path.join(PKG, "packages", this.name);
+        const Source = Path.join(Repository, "packages", this.name);
 
         (!FS?.existsSync(Source)) && console.warn("[Warning] Source Not Found" + ":", Source);
 
@@ -772,7 +774,9 @@ class Service extends TerraformStack {
     }
 }
 
-const Application = new App();
+const Application = new App({
+    skipValidation: true, stackTraces: true
+});
 
 const Single = async () => {
     Assertion.strictEqual(Settings.Functions.length, 1);

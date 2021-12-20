@@ -1,8 +1,12 @@
-import FS, {Dirent} from "fs";
+import FS from "fs";
 import Path from "path";
 import Module from "module";
 import Process from "process";
 import Assertion from "assert";
+
+import {Argv} from "@cloud-vault/cli";
+import {Prompt} from "@cloud-vault/cli";
+import {Cast, Flatten} from "@cloud-vault/cli";
 
 /*** *Current Module Path* */
 const File: string = import.meta.url.replace("file" + ":" + "//", "");
@@ -22,7 +26,27 @@ const PKG: string = Path.dirname(CWD);
 
 const Import = Module.createRequire(PKG);
 
-import {Argv} from "@cloud-vault/cli/arguments";
+const Schema = {
+    "TF": true,
+    "CDK": true,
+    "CFN": false,
+    "Cloud": {
+        "Provider": "AWS",
+        "Region": "us-east-2"
+    },
+    "Source": "src",
+    "Service": "Proof-of-Concept",
+    "Environment": "Development",
+    "Organization": "Cloud-Vault",
+    "Deployment": {
+        "Type": "Service",
+        "Method": "Single"
+    },
+    "SAM": "service",
+    "Functions": [
+        "lambda"
+    ]
+};
 
 /*** Debug Console Utility String Generator */
 const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";
@@ -59,7 +83,6 @@ function Configuration(Arguments: Argv) {
     ].join("\n"));
 }
 
-
 /***
  * File System Path Resolution Factory
  *
@@ -94,9 +117,12 @@ function Mapper(file: FS.Dirent, directory: string) {
 const Command = async ($: Argv) => {
     const Arguments: Argv = $;
 
+    console.warn("[Warning] The Current Command is Under Development.");
+    console.warn("... To view runtime debug logs, provide the \"--debug\" flag", "\n");
+
     Configuration(Arguments);
 
-    Arguments.check(($) => {
+    Arguments.check(async ($) => {
         ($?.debug) && console.debug(Input($._), JSON.stringify($, null, 4), "\n");
 
         ($?.debug) && console.debug("[Debug] User CWD" + ":", Process.cwd(), "\n");
@@ -126,6 +152,25 @@ const Command = async ($: Argv) => {
         const Trigger = (!Files.Paths.includes(Target));
 
         ($?.debug) && console.debug("[Debug] Configuration Prompt(s) Trigger" + ":", Trigger, "\n");
+
+        if (Trigger) {
+            Process.stdout.write("A Configuration File (\"settings.json\") Couldn't be Found..." + "\n");
+
+            const Begin = async () => await Prompt("    >>> Create File Now? (Y/N)" + ":" + " ");
+
+            let _: string = await Begin().then(($) => $.toUpperCase());
+
+            while (_ !== "Y" && _ !== "N") _ = await Begin().then(($) => $.toUpperCase());
+
+            switch (_) {
+                case "N":
+                    break;
+                case "Y":
+                    const Keys = Flatten(Schema);
+                    console.log(Keys);
+                    break;
+            }
+        }
 
         return true;
     }).strict();

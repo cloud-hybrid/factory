@@ -13,7 +13,8 @@
         "compile": "npm run get && tsc --pretty --watch",
         "install": "npm run get && tsc --pretty",
         "synth": "cdktf synth",
-        "deploy": "node cli.js && npm run get && cdktf deploy",
+        "deploy": "cdktf deploy",
+        "ci-cd": "cdktf deploy --auto-approve",
         "destroy": "cdktf destroy",
         "upgrade": "npm i cdktf@latest cdktf-cli@latest"
     },
@@ -46,6 +47,7 @@
             "plugin:@typescript-eslint/recommended"
         ],
         "rules": {
+            "no-case-declarations": 0,
             "@typescript-eslint/no-explicit-any": 0,
             "@typescript-eslint/explicit-function-return-type": 0,
             "@typescript-eslint/no-use-before-define": 0,

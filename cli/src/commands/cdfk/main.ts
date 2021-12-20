@@ -4,8 +4,13 @@ import Module from "module";
 import Process from "process";
 import Assertion from "assert";
 
+import {Argv, Subprocess, Prompt} from "@cloud-vault/cli";
+
+/*** *Current Module Path* */
+const File: string = import.meta.url.replace("file" + ":" + "//", "");
+
 /*** *Current Working Directory* */
-const CWD: string = Path.dirname(import.meta.url.replace("file" + ":" + "/", ""));
+const CWD: string = Path.dirname(File);
 
 /*** *Package Directory* */
 const PKG: string = Path.dirname(CWD);
@@ -18,8 +23,6 @@ const PKG: string = Path.dirname(CWD);
  */
 
 const Import = Module.createRequire(PKG);
-
-import {Argv} from "@cloud-vault/cli/arguments";
 
 /*** Debug Console Utility String Generator */
 const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";
@@ -41,7 +44,7 @@ function Configuration(Arguments: Argv) {
     Arguments.hide("version");
     Arguments.help("help", "Display Usage Guide").default("help", false);
 
-    Arguments.option("debug", {type: "boolean"}).alias("debug", "d").default("debug", true);
+    Arguments.option("debug", {type: "boolean"}).alias("debug", "d").default("debug", false);
     Arguments.describe("debug", "Enable Debug Logging");
 
     Arguments.example("Global", Syntax("npx cli factory main"));
@@ -69,10 +72,27 @@ function Configuration(Arguments: Argv) {
 const Command = async ($: Argv) => {
     const Arguments: Argv = $;
 
+    console.warn("[Warning] The Current Command is Under Development.");
+    console.warn("... To view runtime debug logs, provide the \"--debug\" flag", "\n");
+
+    /*** @Task Create No-Prompt Flag to Avoid User Input */
+
     Configuration(Arguments);
 
-    Arguments.check(($) => {
+    Arguments.check(async ($) => {
         ($?.debug) && console.log(Input($._), JSON.stringify($, null, 4), "\n");
+
+        const Target = Path.resolve(CWD, "..", "..", "..", "..", "cdfk");
+
+        Assertion.strictEqual(FS.existsSync(Target), true);
+
+        const Trigger = async () => await Prompt("Continue? (Y/N)" + ":" + " ");
+
+        let _: string = await Trigger().then(($) => $.toUpperCase());
+
+        while (_ !== "Y" && _ !== "N") _ = await Trigger().then(($) => $.toUpperCase());
+
+        (Trigger) && await Subprocess("npm run ci-cd", Target);
 
         return true;
     }).strict();

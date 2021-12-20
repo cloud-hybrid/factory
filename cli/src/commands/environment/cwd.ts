@@ -3,9 +3,9 @@ import Path from "path";
 import Process from "process";
 import Assertion from "assert";
 
-import {Argv} from "@cloud-vault/cli/arguments";
+import {Argv} from "@cloud-vault/cli";
 
-import {Local} from "@cloud-vault/cli/utilities/index";
+import {Local} from "@cloud-vault/cli";
 
 /*** Debug Console Utility String Generator */
 const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";
@@ -121,6 +121,14 @@ const Command = async ($: Argv) => {
     const Arguments: Argv = $;
 
     Configuration(Arguments);
+
+    if (Local === "") {
+        Process.stderr.write("[Warning] CWD is intended for usage relative to a package.json file." + "\n");
+        Process.stderr.write("... If there doesn't exist a package.json file relative to the current" + "\n");
+        Process.stderr.write("... working directory, CWD will return \"\"" + "\n");
+
+        Process.stdout.write("\n");
+    }
 
     const Data = {"CWD": Local};
     const Serial = JSON.stringify(Data, null, 4);
