@@ -11,7 +11,7 @@
         "get": "cdktf get",
         "build": "npm run get && tsc --pretty",
         "compile": "npm run get && tsc --pretty --watch",
-        "install": "tsc --pretty",
+        "install": "npm run get && tsc --pretty",
         "synth": "cdktf synth",
         "deploy": "node cli.js && npm run get && cdktf deploy",
         "destroy": "cdktf destroy",
