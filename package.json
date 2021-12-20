@@ -1,7 +1,7 @@
 {
     "name": "@cloud-vault/factory",
     "private": false,
-    "version": "0.0.1",
+    "version": "0.0.0",
     "type": "module",
     "scripts": {
         "cli": "node cli/index.js",
@@ -15,6 +15,7 @@
     "workspaces": [
         "./cli",
         "./cdfk",
+        "./prompt",
         "./packages",
         "./templates"
     ]

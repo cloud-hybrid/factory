@@ -18,10 +18,9 @@ import AWS, {iam as IAM} from "@cdktf/provider-aws";
 
 import {App, TerraformStack, TerraformAsset, AssetType, TerraformOutput} from "cdktf";
 
-import {Subprocess} from "./subprocess.js";
+import {Subprocess} from "./utilities/subprocess.js";
 
-import {Apigatewayv2StageDefaultRouteSettings} from ".gen/providers/aws/apigatewayv2";
-import {Settings} from "http2";
+import {Apigatewayv2StageDefaultRouteSettings} from "@cdktf/provider-aws/lib/apigatewayv2";
 
 type Policy = IAM.IamPolicy;
 
@@ -202,7 +201,7 @@ class Lambda extends Configuration {
         Assertion.notStrictEqual(this.name, undefined);
         Assertion.notStrictEqual(this.service, undefined);
 
-        if (sam === true) {
+        if (sam) {
             const Artifact = Path.join(PKG, "packages", this.settings?.SAM, this.name, this.distribution);
             const Package = Path.join(Path.dirname(Artifact), "package.json");
             const Version = Import(Package)?.version || null;
@@ -541,42 +540,42 @@ class Stack extends TerraformStack {
     constructor($: Construct, ID: string, settings: Lambda) {
         super($, ID);
 
-        /// Cloud Provider (AWS)
+        /*** Cloud Provider (AWS) */
         const provider = new AWS.AwsProvider(this, [ID, "AWS-Provider"].join("-"), {
             region: settings.cloud["Region"]
         });
 
-        /// Lambda Artifact(s) (Executable)
+        /*** Lambda Artifact(s) (Executable) */
         const asset = new TerraformAsset(this, [ID, "Asset"].join("-"), {
             type: AssetType.ARCHIVE,
             path: settings.directory
         });
 
-        /// Unique S3 Bucket Containing Lambda Artifact(s)
+        /*** Unique S3 Bucket Containing Lambda Artifact(s) */
         const bucket = new AWS.s3.S3Bucket(this, [ID, "S3-Bucket"].join("-"), {
             bucketPrefix: String(UUID() + "-").toLowerCase()
         });
 
-        /// Upload Lambda Artifact(s) --> S3
+        /*** Upload Lambda Artifact(s) --> S3 */
         const archive = new AWS.s3.S3BucketObject(this, [ID, "Archive"].join("-"), {
             source: asset.path,
             bucket: bucket.bucket,
             key: [settings.version, asset.fileName].join("/")
         });
 
-        /// Lambda Execution Role
+        /*** Lambda Execution Role */
         const role = new AWS.iam.IamRole(this, [ID, "Execution-Role"].join("-"), {
             name: [ID, "Execution-Role"].join("-"),
             assumeRolePolicy: String(settings.policy)
         })
 
-        /// Managed Policy Permitting Lambda Write Access to CloudWatch
+        /*** Managed Policy Permitting Lambda Write Access to CloudWatch */
         new AWS.iam.IamRolePolicyAttachment(this, [ID, "Managed-Policy"].join("-"), {
             policyArn: Lambda.Attachment,
             role: role.name
         })
 
-        /// Lambda Function
+        /*** Lambda Function */
         const lambda = new AWS.lambdafunction.LambdaFunction(this, ID, {
             functionName: ID,
             handler: settings.handler,
@@ -586,14 +585,14 @@ class Stack extends TerraformStack {
             role: role.arn
         });
 
-        /// API Gateway
+        /*** API Gateway */
         const api = new AWS.apigatewayv2.Apigatewayv2Api(this, [ID, "Gateway"].join("-"), {
             name: [ID, "Gateway"].join("-"),
             protocolType: "HTTP",
             target: lambda.arn
         })
 
-        /// Inline API Gateway ==> Lambda Invocation
+        /*** Inline API Gateway ==> Lambda Invocation */
         new AWS.lambdafunction.LambdaPermission(this, [ID, "Gateway-Invoke-Permission"].join("-"), {
             functionName: lambda.functionName,
             action: "lambda:InvokeFunction",
@@ -601,7 +600,7 @@ class Stack extends TerraformStack {
             sourceArn: [api.executionArn, "*", "*"].join("/")
         })
 
-        /// URI to API-Gateway-Lambda Invocation URL
+        /*** URI to API-Gateway-Lambda Invocation URL */
         new TerraformOutput(this, "url", {
             value: api.apiEndpoint.trim()
         });
@@ -612,28 +611,28 @@ class Service extends TerraformStack {
     constructor($: Construct, ID: string, settings: SAM) {
         super($, ID);
 
-        /// Cloud Provider (AWS)
+        /*** Cloud Provider (AWS) */
         const provider = new AWS.AwsProvider(this, [ID, "AWS-Provider"].join("-").toLowerCase(), {
             region: settings.cloud["Region"]
         });
 
-        /// Unique S3 Bucket Containing Lambda Artifact(s)
+        /*** Unique S3 Bucket Containing Lambda Artifact(s) */
         const bucket = new AWS.s3.S3Bucket(this, [ID, "S3-Bucket"].join("-").toLowerCase(), {
             bucketPrefix: settings.bucket
         });
 
-        /// Logging Group
+        /*** Logging Group */
         const group = new AWS.cloudwatch.CloudwatchLogGroup(this, [ID, "Log-Group"].join("-").toLowerCase(), {
             name: [settings.ID, "Log-Group"].join("-")
         });
 
-        /// Logging Stream(s)
+        /*** Logging Stream(s) */
         const stream = new AWS.cloudwatch.CloudwatchLogStream(this, [ID, "Log-Stream"].join("-").toLowerCase(), {
             name: [settings.ID, "Log-Stream"].join("-"),
             logGroupName: group.name
         });
 
-        /// API Gateway
+        /*** API Gateway */
         const api = new AWS.apigatewayv2.Apigatewayv2Api(this, [ID, "Gateway"].join("-").toLowerCase(), {
             name: [ID, settings.gateway].join("-"),
             protocolType: "HTTP"
@@ -642,7 +641,7 @@ class Service extends TerraformStack {
         /// @todo Update Variable and Class Name to something more Descriptive (and accurate)
         // const staging = new Staging(settings);
 
-        /// API Gateway-V2 Stage Configuration
+        /*** API Gateway-V2 Stage Configuration */
         const stage = new AWS.apigatewayv2.Apigatewayv2Stage(this, [ID, "Environment-Stage"].join("-").toLowerCase(), {
             apiId: api.id,
             name: settings.environment.toLowerCase(),
@@ -684,20 +683,20 @@ class Service extends TerraformStack {
 
             console.debug("[Debug] Successfully Compiled Directory" + ":", Function.directory);
 
-            /// Lambda Artifact(s) (Executable)
+            /*** Lambda Artifact(s) (Executable) */
             const asset = new TerraformAsset(this, [ID, "Asset"].join("-").toLowerCase(), {
                 type: AssetType.ARCHIVE,
                 path: Function.directory
             });
 
-            /// Upload Lambda Artifact(s) --> S3
+            /*** Upload Lambda Artifact(s) --> S3 */
             const archive = new AWS.s3.S3BucketObject(this, [ID, "Archive"].join("-").toLowerCase(), {
                 source: asset.path,
                 bucket: bucket.bucket,
                 key: asset.fileName
             });
 
-            /// Lambda Execution Role
+            /*** Lambda Execution Role */
             const role = new AWS.iam.IamRole(this, [ID, "Execution-Role"].join("-").toLowerCase(), {
                 name: [ID, "Execution-Role"].join("-"),
                 assumeRolePolicy: String(Function.policy),
@@ -706,7 +705,7 @@ class Service extends TerraformStack {
                 }
             });
 
-            /// Lambda Function
+            /*** Lambda Function */
             const lambda = new AWS.lambdafunction.LambdaFunction(this, ID, {
                 functionName: Function.ID,
                 handler: Function.handler,
@@ -716,7 +715,7 @@ class Service extends TerraformStack {
                 role: role.arn
             });
 
-            /// Inline API Gateway ==> Lambda Invocation
+            /*** Inline API Gateway ==> Lambda Invocation */
             const invocation = new AWS.lambdafunction.LambdaPermission(this, [ID, "Gateway-Invoke-Permission"].join("-").toLowerCase(), {
                 functionName: lambda.functionName,
                 action: "lambda:InvokeFunction",
@@ -724,7 +723,7 @@ class Service extends TerraformStack {
                 sourceArn: [api.executionArn, "*", "*"].join("/")
             });
 
-            /// Managed Policy Permitting Lambda Write Access to CloudWatch
+            /*** Managed Policy Permitting Lambda Write Access to CloudWatch */
             const policy = new AWS.iam.IamRolePolicyAttachment(this, [ID, "Managed-Policy"].join("-").toLowerCase(), {
                 policyArn: Lambda.Attachment,
                 role: role.name
@@ -733,15 +732,19 @@ class Service extends TerraformStack {
             // console.debug("[Debug] Target Integration API Endpoint" + ":", [api.apiEndpoint, Function.name].join("/"));
 
             /***
+             * API Gateway-V2 Integration Resource
+             * ===================================
+             * Overview
+             * --------
              * The following list summarizes the supported integration types:
-             * - AWS: This type of integration lets an API expose AWS service actions. In AWS integration, you must configure both the integration request and integration response and set up necessary data mappings from the method request to the integration request, and from the integration response to the method response.
-             * - AWS_PROXY: This type of integration lets an API method be integrated with the Lambda function invocation action with a flexible, versatile, and streamlined integration setup. This integration relies on direct interactions between the client and the integrated Lambda function.
-             *      - With this type of integration, also known as the Lambda proxy integration, you do not set the integration request or the integration response. API Gateway passes the incoming request from the client as the input to the backend Lambda function. The integrated Lambda function takes the input of this format and parses the input from all available sources, including request headers, URL path variables, query string parameters, and applicable body. The function returns the result following this output format.
-             *      - This is the preferred integration type to call a Lambda function through API Gateway and is not applicable to any other AWS service actions, including Lambda actions other than the function-invoking action.
-             * - HTTP: This type of integration lets an API expose HTTP endpoints in the backend. With the HTTP integration, also known as the HTTP custom integration, you must configure both the integration request and integration response. You must set up necessary data mappings from the method request to the integration request, and from the integration response to the method response.
-             * - HTTP_PROXY: The HTTP proxy integration allows a client to access the backend HTTP endpoints with a streamlined integration setup on single API method. You do not set the integration request or the integration response. API Gateway passes the incoming request from the client to the HTTP endpoint and passes the outgoing response from the HTTP endpoint to the client.
-             * - MOCK: This type of integration lets API Gateway return a response without sending the request further to the backend. This is useful for API testing because it can be used to test the integration set up without incurring charges for using the backend and to enable collaborative development of an API.
-             *      - In collaborative development, a team can isolate their development effort by setting up simulations of API components owned by other teams by using the MOCK integrations. It is also used to return CORS-related headers to ensure that the API method permits CORS access. In fact, the API Gateway console integrates the OPTIONS method to support CORS with a mock integration. Gateway responses are other examples of mock integrations.
+             *      - AWS: This type of integration lets an API expose AWS service actions. In AWS integration, you must configure both the integration request and integration response and set up necessary data mappings from the method request to the integration request, and from the integration response to the method response.
+             *      - AWS_PROXY: This type of integration lets an API method be integrated with the Lambda function invocation action with a flexible, versatile, and streamlined integration setup. This integration relies on direct interactions between the client and the integrated Lambda function.
+             *           - With this type of integration, also known as the Lambda proxy integration, you do not set the integration request or the integration response. API Gateway passes the incoming request from the client as the input to the backend Lambda function. The integrated Lambda function takes the input of this format and parses the input from all available sources, including request headers, URL path variables, query string parameters, and applicable body. The function returns the result following this output format.
+             *           - This is the preferred integration type to call a Lambda function through API Gateway and is not applicable to any other AWS service actions, including Lambda actions other than the function-invoking action.
+             *      - HTTP: This type of integration lets an API expose HTTP endpoints in the backend. With the HTTP integration, also known as the HTTP custom integration, you must configure both the integration request and integration response. You must set up necessary data mappings from the method request to the integration request, and from the integration response to the method response.
+             *      - HTTP_PROXY: The HTTP proxy integration allows a client to access the backend HTTP endpoints with a streamlined integration setup on single API method. You do not set the integration request or the integration response. API Gateway passes the incoming request from the client to the HTTP endpoint and passes the outgoing response from the HTTP endpoint to the client.
+             *      - MOCK: This type of integration lets API Gateway return a response without sending the request further to the backend. This is useful for API testing because it can be used to test the integration set up without incurring charges for using the backend and to enable collaborative development of an API.
+             *           - In collaborative development, a team can isolate their development effort by setting up simulations of API components owned by other teams by using the MOCK integrations. It is also used to return CORS-related headers to ensure that the API method permits CORS access. In fact, the API Gateway console integrates the OPTIONS method to support CORS with a mock integration. Gateway responses are other examples of mock integrations.
              *
              * - passthroughBehavior: "WHEN_NO_MATCH" (Websocket APIs Only)
              */
@@ -762,7 +765,7 @@ class Service extends TerraformStack {
             });
         });
 
-        /// URI to API-Gateway-Lambda Invocation URL
+        /*** URI to API-Gateway-Lambda Invocation URL */
         new TerraformOutput(this, "url", {
             value: api.apiEndpoint.trim() + "\n"
         });

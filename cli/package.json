@@ -12,7 +12,8 @@
     },
     "dependencies": {
         "@cloud-vault/cli": "./src",
-        "@cloud-vault/cli-prompt": "^0.1.86",
+        "@cloud-vault/prompt": "../prompt",
+        "@cloud-vault/factory": "..",
         "chalk": "^5.0.0",
         "yargs": "^17.3.0"
     },

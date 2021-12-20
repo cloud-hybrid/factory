@@ -1,5 +1,4 @@
-// @ts-ignore
-import { Prompt } from "@cloud-vault/cli-prompt";
+import { Prompt } from "@cloud-vault/prompt";
 
 export { Prompt };
 

@@ -10,23 +10,31 @@
 
 ### Local Development ###
 
+#### Dependencies ####
+
+```bash
+npm install .
+```
+
+#### Auto-Compilation ####
+
 ```bash
 # Runs Type-Script Compiler: tsc --pretty --watch
 npm run compile
 
-# Runs the CLI Package
+# In another separate TTY or Terminal Session:
 npm run start || npm run cli
 ```
 
 ## External Usage ##
 
-In order to integrate `@cloud-vault/cli` with any given package, establish any new
-named file -- `cli.ts` as an example -- with the following contents:
+In order to integrate `@cloud-vault/cli` with a given package, establish any
+named file -- `cli.ts` as an example -- with the following content:
 
 ```js
 import { default as CLI } from "@cloud-vault/cli";
 
-export const Main = async () => await CLI();
+const Main = async () => await CLI;
 
 export default await Main();
 ```
@@ -34,3 +42,8 @@ export default await Main();
 With the above code content, it is a requirement for the given package to be ESM
 module compliant.
 
+Optionally, the CLI package can also be interfaced via:
+
+```js
+await import("@cloud-vault/cli");
+```
