@@ -18,12 +18,5 @@
         "@cloud-vault/cli": "./cli",
         "@cloud-vault/templates": "./templates",
         "@cloud-vault/packages": "./packages"
-    },
-    "workspaces": [
-        "./cli",
-        "./cdfk",
-        "./prompt",
-        "./packages",
-        "./templates"
-    ]
+    }
 }
