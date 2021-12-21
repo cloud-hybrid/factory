@@ -9,6 +9,7 @@
     "scripts": {
         "preinstall": "tsc --build",
         "start": "node index.js",
+
         "compile": "tsc --pretty --watch",
         "package": "npm pack",
         "upload": "npm publish --access public",
