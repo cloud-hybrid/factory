@@ -15,10 +15,17 @@
     },
     "dependencies": {
         "typescript": "latest",
+        "chalk": "latest",
+        "yargs": "latest",
+        "cdktf": "latest",
+        "cdktf-cli": "latest",
+        "constructs": "latest",
         "@cloud-vault/cli-prompt": "./prompt",
         "@cloud-vault/cdfk": "./cdfk",
         "@cloud-vault/cli": "./cli",
         "@cloud-vault/templates": "./templates",
-        "@cloud-vault/packages": "./packages"
+        "@cloud-vault/packages": "./packages",
+        "@types/aws-lambda": "latest",
+        "@types/node": "latest"
     }
 }
