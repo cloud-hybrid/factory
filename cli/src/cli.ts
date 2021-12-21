@@ -12,14 +12,14 @@ const Main = async () => {
 
     const Arguments = async () => {
         const Commands = {
-            cwd: async (input: Argv) => (await import("@cloud-vault/cli")).CWD(input),
-            input: async (input: Argv) => (await import("@cloud-vault/cli")).Input(input),
-            version: (await import("@cloud-vault/cli")).Version,
+            cwd: async (input: Argv) => (await import("@cloud-vault/cli/commands/environment/cwd")).CWD(input),
+            input: async (input: Argv) => (await import("@cloud-vault/cli/commands/test-input")).Input(input),
+            version: (await import("@cloud-vault/cli/commands/version")).Version,
 
             cdfk: {
-                deploy: async (input: Argv) => (await import("@cloud-vault/cli")).Deploy(input),
-                build: async (input: Argv) => (await import("@cloud-vault/cli")).Build(input),
-                configuration: async (input: Argv) => (await import("@cloud-vault/cli")).Configuration(input)
+                deploy: async (input: Argv) => (await import("@cloud-vault/cli/commands/cdfk/deploy")).Deploy(input),
+                build: async (input: Argv) => (await import("@cloud-vault/cli/commands/cdfk/build")).Build(input),
+                configuration: async (input: Argv) => (await import("@cloud-vault/cli/commands/cdfk/configuration")).Configuration(input)
             }
         };
 

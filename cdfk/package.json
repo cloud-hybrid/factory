@@ -11,7 +11,7 @@
         "get": "cdktf get",
         "build": "npm run get && tsc --pretty",
         "compile": "npm run get && tsc --pretty --watch",
-        "install": "npm run get && tsc --pretty",
+        "install": "npm run get && tsc --build .",
         "synth": "cdktf synth",
         "deploy": "cdktf deploy",
         "ci-cd": "cdktf deploy --auto-approve",

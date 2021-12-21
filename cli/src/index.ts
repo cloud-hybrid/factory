@@ -16,4 +16,4 @@ const CLI: CLI = await import("./cli.js");
 
 export { CLI };
 
-export default CLI.Main();
+export default await CLI.Main();

@@ -11,30 +11,11 @@
         "start": "node Entry-Point.js",
         "help": "node Entry-Point.js --help",
         "setup": "npm install",
-        "install": "tsc --build"
+        "install": "tsc --build ."
     },
     "dependencies": {
         "@cloud-vault/cdfk": "./cdfk",
         "@cloud-vault/cli": "./cli",
-        "@cloud-vault/cli-prompt": "./prompt",
-        "@cloud-vault/packages": "./packages",
-        "@cloud-vault/templates": "./templates",
-        "cdktf": "latest",
-        "cdktf-cli": "latest",
-        "chalk": "latest",
-        "constructs": "latest",
-        "typescript": "latest",
-        "yargs": "latest"
-    },
-    "devDependencies": {
-        "@types/aws-lambda": "latest",
-        "@types/node": "^17.0.2"
-    },
-    "exports": {
-        "@cloud-vault/cdfk": "./cdfk",
-        "@cloud-vault/cli": "./cli",
-        "@cloud-vault/prompt": "./prompt",
-        "@cloud-vault/packages": "./packages",
-        "@cloud-vault/templates": "./templates"
+        "@cloud-vault/cli-prompt": "./prompt"
     }
 }

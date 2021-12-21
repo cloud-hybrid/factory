@@ -8,7 +8,7 @@
     "type": "module",
     "scripts": {
         "start": "node index.js",
-        "install": "tsc --pretty",
+        "install": "tsc --build .",
         "compile": "tsc --pretty --watch",
         "package": "npm pack",
         "upload": "npm publish --access public",
@@ -16,7 +16,6 @@
     },
     "dependencies": {
         "@cloud-vault/prompt": "."
-
     },
     "exports": {
         ".": "./index.js"
