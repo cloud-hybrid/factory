@@ -5,10 +5,9 @@
     "type": "module",
     "main": "Entry-Point.js",
     "bin": {
-        "factory": "./Entry-Point.js"
+        "factory": "./bin/Entry-Point.js"
     },
     "scripts": {
-        "preinstall": "tsc --build",
         "start": "node Entry-Point.js",
         "help": "node Entry-Point.js --help",
         "setup": "npm install"
