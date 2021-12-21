@@ -5,7 +5,7 @@
     "type": "module",
     "main": "Entry-Point.js",
     "bin": {
-        "factory": "Entry-Point.js"
+        "factory": "./Entry-Point.js"
     },
     "scripts": {
         "start": "node Entry-Point.js",
@@ -13,10 +13,10 @@
         "setup": "npm install"
     },
     "dependencies": {
-        "@cloud-vault/cli-prompt": "./prompt",
-        "@cloud-vault/cdfk": "./cdfk",
-        "@cloud-vault/cli": "./cli",
-        "@cloud-vault/templates": "./templates",
-        "@cloud-vault/packages": "./packages"
+        "@cloud-vault/cli-prompt": "file:./prompt",
+        "@cloud-vault/cdfk": "file:./cdfk",
+        "@cloud-vault/cli": "file:./cli",
+        "@cloud-vault/templates": "file:./templates",
+        "@cloud-vault/packages": "file:./packages"
     }
 }
