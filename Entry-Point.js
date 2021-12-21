@@ -1,10 +1,6 @@
 #!/usr/bin/env node
 
-import Subprocess  from "child_process";
-
-Subprocess.execSync("npm install", )
-
-import { default as CLI } from "./cli/src/index.js";
+import { default as CLI } from "@cloud-vault/cli";
 
 const Main = async () => await CLI;
 

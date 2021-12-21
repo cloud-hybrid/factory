@@ -14,18 +14,27 @@
         "install": "tsc --build"
     },
     "dependencies": {
-        "typescript": "latest",
-        "chalk": "latest",
-        "yargs": "latest",
-        "cdktf": "latest",
-        "cdktf-cli": "latest",
-        "constructs": "latest",
-        "@cloud-vault/cli-prompt": "./prompt",
         "@cloud-vault/cdfk": "./cdfk",
         "@cloud-vault/cli": "./cli",
-        "@cloud-vault/templates": "./templates",
+        "@cloud-vault/cli-prompt": "./prompt",
         "@cloud-vault/packages": "./packages",
+        "@cloud-vault/templates": "./templates",
+        "cdktf": "latest",
+        "cdktf-cli": "latest",
+        "chalk": "latest",
+        "constructs": "latest",
+        "typescript": "latest",
+        "yargs": "latest"
+    },
+    "devDependencies": {
         "@types/aws-lambda": "latest",
-        "@types/node": "latest"
+        "@types/node": "^17.0.2"
+    },
+    "exports": {
+        "@cloud-vault/cdfk": "./cdfk",
+        "@cloud-vault/cli": "./cli",
+        "@cloud-vault/prompt": "./prompt",
+        "@cloud-vault/packages": "./packages",
+        "@cloud-vault/templates": "./templates"
     }
 }
