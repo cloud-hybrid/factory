@@ -14,7 +14,7 @@
         "preinstall": "tsc --build",
         "synth": "cdktf synth",
         "deploy": "cdktf deploy",
-        "ci-cd": "cdktf deploy --auto-approve",
+        "ci-cd": "cdftf get && cdktf deploy --auto-approve",
         "destroy": "cdktf destroy",
         "upgrade": "npm i cdktf@latest cdktf-cli@latest"
     },

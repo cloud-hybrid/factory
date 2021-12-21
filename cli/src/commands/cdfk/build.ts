@@ -97,7 +97,7 @@ const Command = async ($: Argv) => {
             }
         }, null, 4), "\n");
 
-        await Subprocess("cdktf synth --disable-plugin-cache-env --disable-logging", CDFK);
+        await Subprocess("cdktf get && cdktf synth --disable-plugin-cache-env --disable-logging", CDFK);
 
         return true;
     }).strict();
