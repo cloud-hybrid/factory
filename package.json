@@ -10,7 +10,8 @@
     "scripts": {
         "start": "node Entry-Point.js",
         "help": "node Entry-Point.js --help",
-        "setup": "npm install"
+        "setup": "npm install",
+        "install": "tsc --build ."
     },
     "dependencies": {
         "@cloud-vault/cdfk": "./cdfk",
