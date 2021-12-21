@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { default as CLI } from "@cloud-vault/cli";
+import { default as CLI } from "./cli/src/index.js";
 
 const Main = async () => await CLI;
 
