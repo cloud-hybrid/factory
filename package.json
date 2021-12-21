@@ -7,11 +7,13 @@
     "bin": {
         "factory": "./bin/Entry-Point.js"
     },
+    "files": [
+        "**/*.js"
+    ],
     "scripts": {
         "start": "node Entry-Point.js",
         "help": "node Entry-Point.js --help",
-        "setup": "npm install",
-        "install": "tsc --build ."
+        "setup": "npm install"
     },
     "dependencies": {
         "@cloud-vault/cdfk": "./cdfk",
