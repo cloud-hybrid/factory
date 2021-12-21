@@ -1,3 +1,3 @@
 #!/usr/bin/env node
 
-import { default as CLI } from "../"
+import { default as CLI } from "@cloud-vault/cli";
