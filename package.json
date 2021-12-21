@@ -12,6 +12,13 @@
         "help": "node Entry-Point.js --help",
         "setup": "npm install"
     },
+    "dependencies": {
+        "@cloud-vault/cli-prompt": "./prompt",
+        "@cloud-vault/cdfk": "./cdfk",
+        "@cloud-vault/cli": "./cli",
+        "@cloud-vault/templates": "./templates",
+        "@cloud-vault/packages": "./packages"
+    },
     "workspaces": [
         "./cli",
         "./cdfk",
