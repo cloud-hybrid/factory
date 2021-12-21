@@ -4,7 +4,9 @@ import Module from "module";
 import Process from "process";
 import Assertion from "assert";
 
-import {Argv, Subprocess, Prompt} from "@cloud-vault/cli";
+import {Argv} from "@cloud-vault/cli/arguments";
+import {Subprocess} from "@cloud-vault/cli/utilities/subprocess";
+import {Prompt} from "@cloud-vault/cli/utilities/prompt";
 
 /*** *Current Module Path* */
 const File: string = import.meta.url.replace("file" + ":" + "//", "");

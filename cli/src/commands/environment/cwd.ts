@@ -3,9 +3,9 @@ import Path from "path";
 import Process from "process";
 import Assertion from "assert";
 
-import {Argv} from "@cloud-vault/cli";
+import {Argv} from "@cloud-vault/cli/arguments";
 
-import {Local} from "@cloud-vault/cli";
+import {Local} from "@cloud-vault/cli/utilities/environment";
 
 /*** Debug Console Utility String Generator */
 const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";

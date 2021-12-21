@@ -4,9 +4,9 @@ import Module from "module";
 import Process from "process";
 import Assertion from "assert";
 
-import {Argv} from "@cloud-vault/cli";
-import {Prompt} from "@cloud-vault/cli";
-import {Cast, Flatten} from "@cloud-vault/cli";
+import {Argv} from "@cloud-vault/cli/arguments";
+import {Prompt} from "@cloud-vault/cli/utilities/prompt";
+import {Flatten} from "@cloud-vault/cli/utilities/flatten";
 
 /*** *Current Module Path* */
 const File: string = import.meta.url.replace("file" + ":" + "//", "");
