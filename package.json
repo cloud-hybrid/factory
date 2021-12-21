@@ -10,13 +10,15 @@
     "scripts": {
         "start": "node Entry-Point.js",
         "help": "node Entry-Point.js --help",
-        "setup": "npm install"
+        "setup": "npm install",
+        "install": "tsc --build"
     },
     "dependencies": {
-        "@cloud-vault/cli-prompt": "file:./prompt",
-        "@cloud-vault/cdfk": "file:./cdfk",
-        "@cloud-vault/cli": "file:./cli",
-        "@cloud-vault/templates": "file:./templates",
-        "@cloud-vault/packages": "file:./packages"
+        "typescript": "latest",
+        "@cloud-vault/cli-prompt": "./prompt",
+        "@cloud-vault/cdfk": "./cdfk",
+        "@cloud-vault/cli": "./cli",
+        "@cloud-vault/templates": "./templates",
+        "@cloud-vault/packages": "./packages"
     }
 }
