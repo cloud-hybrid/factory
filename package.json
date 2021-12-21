@@ -3,9 +3,8 @@
     "private": false,
     "version": "0.0.0",
     "type": "module",
-    "main": "Entry-Point.js",
     "bin": {
-        "factory": "./bin/Entry-Point.js"
+        "factory": "./cli/index.js"
     },
     "files": [
         "**/*.js",
