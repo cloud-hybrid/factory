@@ -8,13 +8,8 @@
         "factory": "Entry-Point.js"
     },
     "scripts": {
-        "cli": "node Entry-Point.js",
         "start": "node Entry-Point.js",
         "help": "node Entry-Point.js --help",
-        "build": "npm run build --workspace ./cdfk",
-        "compile": "npm run synth --workspace ./cdfk",
-        "deploy": "npm run deploy --workspace ./cdfk",
-        "destroy": "npm run destroy --workspace ./cdfk",
         "setup": "npm install"
     },
     "workspaces": [
