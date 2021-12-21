@@ -17,6 +17,12 @@ const CWD: string = Path.dirname(File);
 /*** *Package Directory* */
 const PKG: string = Path.dirname(CWD);
 
+/*** CDFK Packaged Directory */
+const CDFK = Path.resolve(CWD, "..", "..", "..", "..", "cdfk");
+
+/// --> Runtime Assertion
+Assertion.strictEqual(FS.existsSync(CDFK), true);
+
 /***
  *  JSON Capable Importer
  *
@@ -126,6 +132,7 @@ const Command = async ($: Argv) => {
         ($?.debug) && console.debug(Input($._), JSON.stringify($, null, 4), "\n");
 
         ($?.debug) && console.debug("[Debug] User CWD" + ":", Process.cwd(), "\n");
+        ($?.debug) && console.debug("[Debug] CDFK Target Directory" + ":", CDFK, "\n");
         ($?.debug) && console.debug("[Debug] Relative Runtime Path(s)" + ":", JSON.stringify({
             Paths: {
                 Runtime: File,

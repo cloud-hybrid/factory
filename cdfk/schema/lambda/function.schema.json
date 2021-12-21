@@ -1,0 +1,90 @@
+{
+    "$id": "schema.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "Schema Definition for Schema-CLI Provider(s)",
+    "required": [
+        "Name",
+        "Description",
+        "URI"
+    ],
+    "type": "object",
+    "properties": {
+        "Name": {
+            "description": "Basename of the package's directory",
+            "type": "string"
+        },
+        "Description": {
+            "type": "string",
+            "description": "A description of the function"
+        },
+        "Package": {
+            "type": "string",
+            "description": "Path to the function's deployment package within the local filesystem"
+        },
+        "Runtime": {
+            "type": "string",
+            "description": "Program Runtime Environment",
+            "enum": [
+                "node14.x"
+            ],
+            "default": "node14.x"
+        },
+        "Handler": {
+            "type": "string",
+            "description": "Function entrypoint. Lambda Handler's are strictly set to ensure of consistent architecture(s) & deployable(s)",
+            "enum": [
+                "index.handler"
+            ],
+            "default": "index.handler"
+        },
+        "Type": {
+            "type": "string",
+            "description": "Function Packaging Type. Defaults and is enforced to Zip",
+            "enum": [
+                "zip"
+            ],
+            "default": "zip"
+        },
+        "Memory": {
+            "type": "number",
+            "description": "Lambda runtime memory allocation. Defaults to 128MB",
+            "default": 128
+        },
+        "Timeout": {
+            "type": "number",
+            "description": "Function timeout. Defaults to 10 seconds",
+            "default": 10
+        },
+        "Environment": {
+            "description": "Environment variables that are accessible from function code during execution",
+            "$ref": "#/$defs/Environment"
+        }
+    },
+    "$defs": {
+        "unique": {
+            "type": "array",
+            "uniqueItems": true,
+            "minItems": 1,
+            "items": {
+                "type": "string"
+            }
+        },
+        "Environment": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "A function's environment variable settings",
+            "properties": {
+                "Variables": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "description": "Environment variable key-value pairs",
+                    "patternProperties": {
+                        "[a-zA-Z][a-zA-Z0-9_]+": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

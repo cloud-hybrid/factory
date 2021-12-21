@@ -1,3 +1,4 @@
 export * from "./index.js";
-export * from "./main.js";
+export * from "./deploy.js";
+export * from "./build.js";
 export * from "./configuration.js";

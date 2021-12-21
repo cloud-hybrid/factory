@@ -1,11 +1,12 @@
 import Process from "process";
 import Spawn from "child_process";
 
+
 const Subprocess = async (command: string, directory: string = Process.cwd()) => {
     const Binary = command.split(" ")[0];
     const Arguments = command.split(" ").splice(1);
 
-    const Awaitable = new Promise((resolve, reject) => {
+    const Awaitable = new Promise<Spawn.ChildProcessWithoutNullStreams>((resolve, reject) => {
         const Stream = {
             PID: 0,
             Status: "",
@@ -16,40 +17,54 @@ const Subprocess = async (command: string, directory: string = Process.cwd()) =>
             argv0: Process.argv0,
             cwd: directory,
             env: Process.env,
-            stdio: "overlapped"
+            stdio: "pipe"
         });
+
+        const Data = {
+            Output: [""],
+            Input: [""],
+            Error: [""],
+
+            PID: 0,
+            Status: "",
+            Signal: ""
+        };
 
         const Output = Command.stdout;
         const Error = Command.stderr;
 
-        Output.on("data", async (_) => {
+        Output.on("data", (_) => {
             let Allocation = 0;
 
             // Allocate --> Array Buffer of (n + 1) Bytes
-            const Buffer = await _;
+            const Buffer = _;
             new Array(Buffer[Symbol.iterator]).forEach(
-                (_) => Allocation += 1
+                () => Allocation += 1
             );
 
             // Shift <-- Left to Release Empty Byte for String[0]
-            const Output = Buffer.toString("UTF-8", Allocation - 1);
+            const Output = Buffer.toString("utf-8", Allocation - 1);
+
+            Data.Error.push(Output);
 
             Process.stdout.write(Output);
         });
 
-        Error.on("data", async (_) => {
+        Error.on("data", (_) => {
             let Allocation = 0;
 
             // Allocate an Array Buffer of (n + 1) Bytes
-            const Buffer = await _;
+            const Buffer = _;
             new Array(Buffer[Symbol.iterator]).forEach(
-                (_) => Allocation += 1
+                () => Allocation += 1
             );
 
             // Shift <-- Left to Release Empty Byte for String[0]
-            const Output = Buffer.toString("UTF-8", Allocation - 1);
+            const Output = Buffer.toString("utf-8", Allocation - 1);
 
-            Process.stdout.write(Output);
+            Data.Error.push(Output);
+
+            Process.stderr.write(Output);
         });
 
         Command.on("error", ($) => {
@@ -57,13 +72,21 @@ const Subprocess = async (command: string, directory: string = Process.cwd()) =>
             Stream.Status = String($);
             Stream.Signal = Command.signalCode || "";
 
-            reject({$, Command});
+            Data.PID = Stream.PID;
+            Data.Status = Stream.Status;
+            Data.Signal = Stream.Signal;
+
+            resolve(Command);
         });
 
         Command.on("exit", ($) => {
             Stream.PID = Command.pid || 0;
             Stream.Status = String($);
             Stream.Signal = Command.signalCode || "";
+
+            Data.PID = Stream.PID;
+            Data.Status = Stream.Status;
+            Data.Signal = Stream.Signal;
 
             resolve(Command);
         });
@@ -73,6 +96,10 @@ const Subprocess = async (command: string, directory: string = Process.cwd()) =>
             Stream.Status = "-1";
             Stream.Signal = Command.signalCode || "";
 
+            Data.PID = Stream.PID;
+            Data.Status = Stream.Status;
+            Data.Signal = Stream.Signal;
+
             resolve(Command);
         });
 
@@ -81,7 +108,11 @@ const Subprocess = async (command: string, directory: string = Process.cwd()) =>
             Stream.Status = String($);
             Stream.Signal = Command.signalCode || "";
 
-            resolve(Command);
+            Data.PID = Stream.PID;
+            Data.Status = Stream.Status;
+            Data.Signal = Stream.Signal;
+
+            resolve(Command); // ? resolve(Command);
         });
     });
 

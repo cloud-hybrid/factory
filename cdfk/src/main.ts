@@ -24,133 +24,11 @@ import {Apigatewayv2StageDefaultRouteSettings} from "@cdktf/provider-aws/lib/api
 
 type Policy = IAM.IamPolicy;
 
-/*** ESM Resolver for *Current-Working-Directory* */
-const CWD: string = Path.dirname(import.meta.url.replace("file" + ":" + "//", ""));
-/*** ESM Resolve for Package Directory relative to Current Working Directory */
-const PKG: string = Path.dirname(CWD);
-
-const Repository: string = Path.join(PKG, "..");
-
-/*** ESM Compatability & JSON Importer */
-const Import: NodeRequire = Module.createRequire(import.meta.url);
-
-/*** Generic Type Symbol */
-const Generic: Symbol = Symbol();
-
-/***
- * JSON Configuration
- * ==================
- *
- *  @type {await import("./configuration/settings.json")}
- *
- */
-
-const Settings = Import("../configuration/settings.json");
-
-function UUID() {
-    let source = new Date().getTime(); // Timestamp
-    let delta = ((typeof performance !== "undefined") && performance.now && (performance.now() * 1000)) || 0;
-
-    return String((new Array(8)).join(":") + (new Array(4).join(":") + "4" + (new Array(3).join(":") + "*" + (new Array(8)).join(":")))).replace(/[:*]/g, ($) => {
-        let random = Math.random() * 16; // Random number between 0 and 16
-
-        if (source > 0) {
-            random = (source + random) % 16 | 0;
-            source = Math.floor(source / 16);
-        } else {
-            random = (delta + random) % 16 | 0;
-            delta = Math.floor(delta / 16);
-        }
-
-        return ($ === ":" ? random : (random & 0x3 | 0x8)).toString(16);
-    });
-}
-
-/***
- * Base Composition of `Settings`
- */
-
-class Default {
-    public configuration: typeof Settings;
-
-    constructor() {
-        this.configuration = Settings;
-    }
-}
-
-/***
- * JSON Settings
- * =============
- *
- * @externs {{@link Default}, {@link Settings}}
- *
- */
-
-class Configuration {
-    public tf: boolean;
-    public cfn: boolean;
-    public cdk: boolean;
-
-    public source: FS.PathLike | string;
-
-    public environment: string;
-    public organization: string;
-
-    public readonly cloud: typeof Settings.Cloud = Settings.Cloud;
-
-    protected readonly functions: typeof Settings.Functions = Settings.Functions;
-    protected readonly deployment: typeof Settings.Deployment = Settings.Deployment;
-
-    public settings: typeof Settings;
-
-    private readonly defaults: typeof Settings = Settings;
-
-    public static Settings: typeof Settings = Settings;
-
-
-    /***
-     * JSON Configuration Constructor
-     * ==============================
-     *
-     * @param settings {{ TF: boolean, CDK: boolean, CFN: boolean, Cloud: { Provider: string, Region: string }, Source: string, Service: string, Environment: string, Organization: string, Deployment: { Type: string, Method: string }, SAM: string, Functions: {} }; tf: boolean; environment: string; functions: {}; organization: string; cfn: boolean; cdk: boolean; source: string; deployment: { Type: string, Method: string }}
-     *
-     * @constructor
-     *
-     */
-
-    constructor(settings: { settings: { TF: boolean, CDK: boolean, CFN: boolean, Cloud: { Provider: string, Region: string }, Source: string, Service: string, Environment: string, Organization: string, Deployment: { Type: string, Method: string }, SAM: string, Functions: {} }; tf: boolean; environment: string; functions: {}; organization: string; cfn: boolean; cdk: boolean; source: string; deployment: { Type: string, Method: string } } = {
-        tf: Settings.TF,
-        cfn: Settings.CFN,
-        cdk: Settings.CDK,
-        source: Settings.Source,
-        environment: Settings.Environment,
-        organization: Settings.Organization,
-        functions: Settings.Functions,
-        deployment: Settings.Deployment,
-        settings: Settings
-    }) {
-        this.settings = settings || Settings;
-
-        this.defaults = (new Default()).configuration;
-
-        this.tf = settings.tf || this.defaults.TF;
-        this.cdk = settings.cfn || this.defaults.CDK;
-        this.cfn = settings.cdk || this.defaults.CFN;
-
-        this.source = settings.source || this.defaults.Source;
-
-        this.environment = settings.environment || this.defaults.Environment;
-        this.organization = settings.organization || this.defaults.Organization;
-
-        this.functions = settings.functions || this.defaults.Functions;
-        this.deployment = settings.deployment || this.defaults.Deployment;
-    }
-}
+import {Import, Repository, Settings, Configuration} from "./settings.js";
 
 /*** The {@link Lambda} Construct */
-class Lambda extends Configuration {
+class Lambda {
     public name: string;
-    public service: string = Settings.Service;
 
     public readonly ID: string;
 
@@ -162,7 +40,7 @@ class Lambda extends Configuration {
     public readonly source: string;
 
     protected readonly functions: string[] = Settings.Functions;
-    protected readonly deployment: string[] = Settings.Deployment;
+    protected readonly deployment: typeof Settings.Deployment = Settings.Deployment;
 
     public readonly settings: typeof Settings = Settings;
 
@@ -184,21 +62,24 @@ class Lambda extends Configuration {
 
     public static Attachment = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole";
 
+    public cloud: typeof Configuration.settings["Cloud"] = Configuration.settings["Cloud"];
+
+    /*** Common-Name or Service Extension to be used when constructing the Lambda Function Name */
+    public service: string = Configuration.settings["Service"];
+
+    public organization: string = Configuration.settings["Organization"];
+    public environment: string = Configuration.settings["Environment"];
+
     /***
      * Lambda Strict Configuration Constructor
      *
      * @param name {String} Lambda's Folder Name (**Note**: attribute *must match folder directory name*)
      *
-     * @param service {String} Common-Name or Service Extension to be used when constructing the Lambda Function Name
-     *
      * @param sam
      */
 
-    constructor(name: string, service: string = Settings.Service, sam: boolean = false) {
-        super();
-
+    constructor(name: string, sam: boolean = false) {
         this.name = name;
-        this.service = service;
 
         Assertion.notStrictEqual(this.name, undefined);
         Assertion.notStrictEqual(this.service, undefined);
@@ -207,7 +88,7 @@ class Lambda extends Configuration {
             const Artifact = Path.join(Repository, "packages", this.settings?.SAM, this.name, this.distribution);
             const Package = Path.join(Path.dirname(Artifact), "package.json");
             const Version = Import(Package)?.version || null;
-            const Source = Path.join(Repository, "packages", this.settings?.SAM, this.name, Configuration.Settings.Source);
+            const Source = Path.join(Repository, "packages", this.settings?.SAM, this.name, Configuration.settings["Source"]);
 
             (!FS?.existsSync(Source)) && console.warn("[Warning] Source Not Found" + ":", Source);
 
@@ -221,7 +102,7 @@ class Lambda extends Configuration {
             const Artifact = Path.join(Repository, "packages", this.name, this.distribution);
             const Package = Path.join(Path.dirname(Artifact), "package.json");
             const Version = Import(Package)?.version || null;
-            const Source = Path.join(Repository, "packages", this.name, Configuration.Settings.Source);
+            const Source = Path.join(Repository, "packages", this.name, Configuration.settings["Source"]);
 
             (!FS?.existsSync(Source)) && console.warn("[Warning] Source Not Found" + ":", Source);
 
@@ -337,7 +218,7 @@ class SAM {
     public readonly organization: typeof Settings.Organization = Settings.Organization;
 
     /*** Deployment Type - *Under Development* */
-    protected readonly deployment: string[] = Settings.Deployment;
+    protected readonly deployment: typeof Configuration.settings["Deployment"] = Settings.Deployment;
 
     /***
      * Construct Initializer
@@ -555,7 +436,7 @@ class Stack extends TerraformStack {
 
         /*** Unique S3 Bucket Containing Lambda Artifact(s) */
         const bucket = new AWS.s3.S3Bucket(this, [ID, "S3-Bucket"].join("-"), {
-            bucketPrefix: String(UUID() + "-").toLowerCase()
+            bucketPrefix: settings.name
         });
 
         /*** Upload Lambda Artifact(s) --> S3 */
@@ -669,7 +550,7 @@ class Service extends TerraformStack {
         settings.functions.forEach(($: string, count) => {
             console.debug("[Debug] Lambda Function Initialization" + ":", $);
 
-            const Function = new Lambda($, settings.service, true);
+            const Function = new Lambda($, true);
             const ID = Function.name;
 
             console.debug("[Debug] Successfully Instantiated Function Configuration" + ":", ID);
@@ -783,15 +664,17 @@ const Single = async () => {
     console.debug("[Debug] Initializing Singleton Deployment Configuration(s) ...");
     const Function = Settings.Functions.pop();
 
-    const Awaitable = new Promise((resolve) => {
-        const Instance = new Lambda(Function, Settings.Service);
-        const Deployment = new Stack(Application, Function.ID, Function);
+    if (Function) {
+        const Awaitable = new Promise((resolve) => {
+            const Instance = new Lambda(Function, false);
+            const Deployment = new Stack(Application, Instance.ID, Instance);
 
-        resolve(Deployment);
-    });
+            resolve(Deployment);
+        });
 
-    await Awaitable;
-}
+        await Awaitable;
+    }
+};
 
 const Iterative = async () => {
     console.debug("[Debug] Initializing Iterative Deployment Configuration(s) ...");
@@ -799,7 +682,7 @@ const Iterative = async () => {
     const Awaitables: Promise<unknown>[] = [];
     Settings.Functions.forEach(async ($: string) => {
         const Awaitable = new Promise((resolve) => {
-            const Function = new Lambda($, Settings.Service);
+            const Function = new Lambda($, false);
             const Instance = new Stack(Application, Function.ID, Function);
 
             resolve(Instance);

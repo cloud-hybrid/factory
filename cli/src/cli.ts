@@ -17,7 +17,8 @@ const Main = async () => {
             version: (await import("@cloud-vault/cli")).Version,
 
             cdfk: {
-                main: async (input: Argv) => (await import("@cloud-vault/cli")).Main(input),
+                deploy: async (input: Argv) => (await import("@cloud-vault/cli")).Deploy(input),
+                build: async (input: Argv) => (await import("@cloud-vault/cli")).Build(input),
                 configuration: async (input: Argv) => (await import("@cloud-vault/cli")).Configuration(input)
             }
         };
@@ -55,9 +56,15 @@ const Main = async () => {
             /*** CDFK Configuration */
             .command("cdfk", "(WIP) Construct Development Factory Kit", (
                 async ($: Argv) => {
-                    $.command("main", "(WIP) Construct Factory Entry-Point", (
+                    $.command("build", "(WIP) Synthesize Target Resource(s)", (
                         async ($: Argv) => {
-                            return await Commands.cdfk.main($);
+                            return await Commands.cdfk.build($);
+                        }
+                    ));
+
+                    $.command("deploy", "(WIP) CDFK Stack Deployment", (
+                        async ($: Argv) => {
+                            return await Commands.cdfk.deploy($);
                         }
                     ));
 

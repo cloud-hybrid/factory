@@ -15,6 +15,13 @@ const CWD: string = Path.dirname(File);
 /*** *Package Directory* */
 const PKG: string = Path.dirname(CWD);
 
+/*** CDFK Packaged Directory */
+
+const CDFK = Path.resolve(CWD, "..", "..", "..", "..", "cdfk");
+
+/// --> Runtime Assertion
+Assertion.strictEqual(FS.existsSync(CDFK), true);
+
 /***
  *  JSON Capable Importer
  *
@@ -81,10 +88,7 @@ const Command = async ($: Argv) => {
 
     Arguments.check(async ($) => {
         ($?.debug) && console.log(Input($._), JSON.stringify($, null, 4), "\n");
-
-        const Target = Path.resolve(CWD, "..", "..", "..", "..", "cdfk");
-
-        Assertion.strictEqual(FS.existsSync(Target), true);
+        ($?.debug) && console.debug("CDFK Target Directory" + ":", CDFK, "\n");
 
         const Continue = async () => await Prompt("Continue? (Y/N)" + ":" + " ");
 
@@ -92,12 +96,12 @@ const Command = async ($: Argv) => {
 
         while (trigger !== "Y" && trigger !== "N") trigger = await Continue().then(($) => $.toUpperCase());
 
-        (trigger === "Y") && await Subprocess("npm run ci-cd", Target);
+        (trigger === "Y") && await Subprocess("npm run ci-cd", CDFK);
 
         return true;
     }).strict();
 };
 
-export {Command as Main};
+export {Command as Deploy};
 
 export default {Command};
