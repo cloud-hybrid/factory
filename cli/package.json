@@ -18,7 +18,7 @@
         "yargs": "^17.3.0"
     },
     "exports": {
-        ".": "./src/index.js",
+        ".": "./index.js",
         "./header": "./src/header.js",
         "./arguments": "./src/arguments.js",
         "./commands": "./src/commands/index.js",
