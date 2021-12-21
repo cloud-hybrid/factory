@@ -1,17 +1,3 @@
-## Usage ##
-
-1. Determine Target Lambda Repositories.
-   1. Do the Lambda's Fall under a general category, potentially a ***service***?
-      1. Yes - Deploy together
-      2. No - Deploy individually
-   2. 
-
-## Setup ##
-
-```bash
-npm install && npm run setup
-```
-
 ### Applicable Types of Environment Configuration File(s) ###
 
 `@cloud-vault` will override in the following order (highest defined variable overrides lower):
