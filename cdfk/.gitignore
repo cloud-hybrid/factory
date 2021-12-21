@@ -8,8 +8,6 @@ cdktf.log
 
 *terraform.*.tfstate*
 
-.gen
-
 .terraform
 
 distribution
@@ -17,3 +15,7 @@ distribution
 tsconfig.tsbuildinfo
 
 !./**/.gitignore
+
+!./.gen
+!./.gen/*
+!./**/.gen
