@@ -15,8 +15,8 @@
         "rm-node-modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
     },
     "dependencies": {
-        "@cloud-vault/cdfk": "./cdfk",
-        "@cloud-vault/cli": "./cli",
-        "@cloud-vault/cli-prompt": "./prompt"
+        "@cloud-vault/cdfk": "file:./cdfk",
+        "@cloud-vault/cli": "file:./cli",
+        "@cloud-vault/cli-prompt": "file:./prompt"
     }
 }
