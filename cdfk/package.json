@@ -2,16 +2,21 @@
     "name": "@cloud-vault/cdfk",
     "description": "Construct Development Factory Kit - Cloud Configuration & Management",
     "license": "BSD-3-Clause",
+    "main": "src/index.js",
     "readme": "README.md",
     "version": "0.0.0",
     "type": "module",
     "private": true,
+    "files": [
+        "package.json",
+        "tsconfig.json",
+        "README.md",
+        "cdktf.json"
+    ],
     "scripts": {
-        "cli": "node src/index.js",
         "get": "cdktf get",
         "build": "cdktf synth",
         "compile": "npm run get && tsc --pretty --watch",
-        "install": "tsc --build",
         "synth": "cdktf synth",
         "deploy": "cdktf deploy",
         "ci-cd": "cdktf deploy --auto-approve",
@@ -19,7 +24,6 @@
         "upgrade": "npm i cdktf@latest cdktf-cli@latest"
     },
     "dependencies": {
-        "@cloud-vault/cli": "file:../cli",
         "@cdktf/provider-aws": "^3.0.1",
         "ajv": "^8.8.2",
         "ajv-formats": "^3.0.0-rc.0",
