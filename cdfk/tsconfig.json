@@ -35,7 +35,11 @@
         "removeComments": false,
         "skipLibCheck": true,
         "strict": true,
-        "target": "ES2021"
+        "target": "ES2021",
+        "typeRoots": [
+            "./node_modules/@types",
+            "../node_modules/@types"
+        ]
     },
     "include": [
         "**/*.ts"
