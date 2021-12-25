@@ -6,6 +6,7 @@ import {Subprocess} from "@cloud-vault/cli/utilities/subprocess";
 import {Arguments as CLI, Argv} from "@cloud-vault/cli/arguments";
 import {Prompt} from "@cloud-vault/cli/utilities/prompt";
 import {Binary} from "@cloud-vault/cli/utilities/binary";
+import {Initialize} from "./commands/cdfk";
 
 const Main = async () => {
     Process.stdout.write(Header + "\n");
@@ -19,12 +20,13 @@ const Main = async () => {
             cdfk: {
                 deploy: async (input: Argv) => (await import("@cloud-vault/cli/commands/cdfk/deploy")).Deploy(input),
                 build: async (input: Argv) => (await import("@cloud-vault/cli/commands/cdfk/build")).Build(input),
+                initialize: async (input: Argv) => (await import("@cloud-vault/cli/commands/cdfk/initialize")).Initialize(input),
                 configuration: async (input: Argv) => (await import("@cloud-vault/cli/commands/cdfk/configuration")).Configuration(input)
             }
         };
 
         return await CLI(Process.argv.splice(2))
-            .scriptName("").wrap(Columns())
+            .scriptName("factory").wrap(80)
 
             /*** Version */
             .version(...Commands.version)
@@ -56,6 +58,12 @@ const Main = async () => {
             /*** CDFK Configuration */
             .command("cdfk", "(WIP) Construct Development Factory Kit", (
                 async ($: Argv) => {
+                    $.command("initialize", "(WIP) CDFK Package Initialization", (
+                        async ($: Argv) => {
+                            return await Commands.cdfk.initialize($);
+                        }
+                    ));
+
                     $.command("build", "(WIP) Synthesize Target Resource(s)", (
                         async ($: Argv) => {
                             return await Commands.cdfk.build($);
