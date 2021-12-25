@@ -5,7 +5,6 @@
     "type": "module",
     "types": "src/index.js",
     "scripts": {
-        "preinstall": "tsc --build",
         "compile": "tsc --pretty --watch",
         "start": "node src/index.js",
         "cli": "node src/index.js"
@@ -16,6 +15,11 @@
         "chalk": "^5.0.0",
         "yargs": "^17.3.0"
     },
+    "files": [
+        "./package.json",
+        "README.md",
+        "tsconfig.json"
+    ],
     "exports": {
         ".": "./index.js",
         "./header": "./src/header.js",
