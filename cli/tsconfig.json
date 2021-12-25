@@ -34,7 +34,7 @@
         "pretty": true,
         "removeComments": false,
         "skipLibCheck": true,
-        "strict": false,
+        "strict": true,
         "target": "ES2021",
         "typeRoots": [
             "./node_modules/@types"
