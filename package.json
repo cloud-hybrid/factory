@@ -18,6 +18,8 @@
         "rm-node-modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
     },
     "dependencies": {
-        "@cloud-vault/factory": "."
+        "@cloud-vault/factory": ".",
+        "@cloud-vault/cli": "./cli",
+        "@cloud-vault/cdfk": "./cdfk"
     }
 }
