@@ -1,0 +1,17 @@
+{
+    "name": "test",
+    "version": "0.0.1",
+    "lambdas": [
+        "./local/example",
+        "git+https://github.com/cloud-technology/example-lambda.git",
+        {
+            "url": "https://github.com/cloud-technology/https-example-lambda.git",
+            "branch": "Development"
+        },
+        {
+            "url": "git://github@github.com:cloud-technology/git-example-lambda.git",
+            "commit": "sha256-asdfasdfasdfkjljkhuhiothuhdfsbjhkasdgfoerhglkasdbfhajsdgf"
+        }
+    ],
+    "artifacts": "./artifacts"
+}
