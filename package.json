@@ -4,6 +4,7 @@
     "version": "0.0.0",
     "type": "module",
     "bin": {
+        "factory-install": "./Install.js",
         "factory": "./Entry-Point.js"
     },
     "files": [
@@ -12,7 +13,8 @@
         "**/package.json"
     ],
     "scripts": {
-        "start": "node Entry-Point.js",
+        "start": "factory",
+        "install": "factory-install",
         "rm-locks": "find . -type f -name \"package-lock.json\" -prune -exec rm -rf '{}' +",
         "rm-node-modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
     },
