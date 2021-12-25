@@ -5,3 +5,9 @@
 */**/*/
 */**/
 */
+
+./library/*
+./library/**
+./library/**/*
+
+!./library

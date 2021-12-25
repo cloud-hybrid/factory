@@ -9,7 +9,6 @@
 
 import FS from "fs";
 import Path from "path";
-import Module from "module";
 import Assertion from "assert";
 
 import {Construct} from "constructs";
@@ -18,13 +17,9 @@ import AWS, {iam as IAM} from "@cdktf/provider-aws";
 
 import {App, TerraformStack, TerraformAsset, AssetType, TerraformOutput} from "cdktf";
 
-import {Subprocess} from "./utilities/subprocess.js";
-
-import {Apigatewayv2StageDefaultRouteSettings} from "@cdktf/provider-aws/lib/apigatewayv2";
-
 type Policy = IAM.IamPolicy;
 
-import {Import, Repository, Settings, Configuration} from "./settings.js";
+import {Import, Settings, Configuration, Distribution} from "./settings.js";
 
 /*** The {@link Lambda} Construct */
 class Lambda {
@@ -78,100 +73,25 @@ class Lambda {
      * @param sam
      */
 
-    constructor(name: string, sam: boolean = false) {
-        this.name = name;
+    constructor(name: string) {
+        this.name = Path.parse(name).base;
+
+        console.log(this.name);
 
         Assertion.notStrictEqual(this.name, undefined);
         Assertion.notStrictEqual(this.service, undefined);
 
-        if (sam) {
-            const Artifact = Path.join(Repository, "packages", this.settings?.SAM, this.name, this.distribution);
-            const Package = Path.join(Path.dirname(Artifact), "package.json");
-            const Version = Import(Package)?.version || null;
-            const Source = Path.join(Repository, "packages", this.settings?.SAM, this.name, Configuration.settings["Source"]);
+        const Artifact = Path.join(Distribution, this.name);
+        const Package = Path.join(Artifact, "package.json");
+        const Version = Import(Package)?.version || null;
 
-            (!FS?.existsSync(Source)) && console.warn("[Warning] Source Not Found" + ":", Source);
+        Assertion.strictEqual(typeof Version, "string", "Version not Found");
 
-            Assertion.strictEqual(FS?.existsSync(Package), true, Lambda.Throw("Package"));
-            Assertion.strictEqual(typeof Version, "string", Lambda.Throw("Version"));
-
-            this.version = Version;
-            this.directory = Artifact;
-            this.source = Source;
-        } else {
-            const Artifact = Path.join(Repository, "packages", this.name, this.distribution);
-            const Package = Path.join(Path.dirname(Artifact), "package.json");
-            const Version = Import(Package)?.version || null;
-            const Source = Path.join(Repository, "packages", this.name, Configuration.settings["Source"]);
-
-            (!FS?.existsSync(Source)) && console.warn("[Warning] Source Not Found" + ":", Source);
-
-            Assertion.strictEqual(FS?.existsSync(Package), true, Lambda.Throw("Package"));
-            Assertion.strictEqual(typeof Version, "string", Lambda.Throw("Version"));
-
-            this.version = Version;
-            this.directory = Artifact;
-            this.source = Source;
-        }
+        this.version = Version;
+        this.directory = Artifact;
+        this.source = Artifact; /// @todo
 
         this.ID = [this.organization, this.environment, "Lambda", this.service, this.name.split("_")].join("-");
-    }
-
-    /***
-     * Private Error Constructor
-     *
-     * @param type {"Artifact" | "Package" | "Version"}
-     *
-     * @constructor
-     *
-     */
-
-    private static Throw = (type: string) => {
-        const Data = {
-            Type: "",
-            Name: "",
-            Message: "",
-            error: Object.create({})
-        };
-
-        switch (type) {
-            case "Artifact":
-                Data.Type = "[Error] Artifact";
-                Data.Name = "Distributable Artifact(s) Not Found Exception";
-                Data.Message = "Lambda Source Distribution Doesn't Exist";
-
-                Data.error = Error([Data.Type, Data.Message].join(" "));
-                Data.error.name = Data.Name;
-
-                return Data.error;
-            case "Package":
-                Data.Type = "[Error] Package";
-                Data.Name = "Lambda Function Package Not Found Exception";
-                Data.Message = "Lambda Source package.json Doesn't Exist";
-
-                Data.error = Error([Data.Type, Data.Message].join(" "));
-                Data.error.name = Data.Name;
-
-                return Data.error;
-            case "Version":
-                Data.Type = "[Error] Version";
-                Data.Name = "Lambda Function Package Version := nil Exception";
-                Data.Message = "Lambda Version Not Found";
-
-                Data.error = Error([Data.Type, Data.Message].join(" "));
-                Data.error.name = Data.Name;
-
-                return Data.error;
-            default:
-                Data.Type = "[Error] Unknown";
-                Data.Name = "Unhandled Exception";
-                Data.Message = "An Unknown Error has Occurred";
-
-                Data.error = Error([Data.Type, Data.Message].join(" "));
-                Data.error.name = Data.Name;
-
-                return Data.error;
-        }
     }
 }
 
@@ -208,7 +128,8 @@ class SAM {
     public readonly directory?: string | undefined = undefined;
 
     /*** Configuration Setting Specifiying List of Folder(s) that Contain Lambda(s) */
-    public readonly functions: string[] = Settings.Functions;
+        // public readonly functions: string[] = Settings.Functions;
+    public readonly functions: string[] = [];
 
     /*** AWS Cloud Provider, Derived from Configuration (Settings) File */
     public readonly cloud: typeof Settings.Cloud = Settings.Cloud;
@@ -235,11 +156,12 @@ class SAM {
         this.name = name;
         this.service = service;
 
-        const Source = Path.join(Repository, "packages", this.name);
-
-        (!FS?.existsSync(Source)) && console.warn("[Warning] Source Not Found" + ":", Source);
-
-        Assertion.strictEqual(FS?.existsSync(Source), true, SAM.Throw("Directory"));
+        FS.readdirSync(Distribution).forEach(($) => {
+            /// Don't include library (Lambda-Layers)
+            if ($ !== "library") {
+                this.functions.push(Path.join(Distribution, $))
+            }
+        });
 
         this.bucket = ["SAM", this.service, this.name].join("-").toLowerCase();
 
@@ -280,7 +202,6 @@ class SAM {
                 return $.value;
         }
     }
-
 
     /***
      * {@link SAM.getAPIGatewayStageMetricsEnabled|API Gateway-V2 Metrics Enablement}
@@ -339,155 +260,6 @@ class SAM {
             format: String(format)
         };
     }
-
-    /***
-     * Private Error Constructor
-     * =========================
-     *
-     * @param type {"Artifact" | "Package" | "Version"}
-     *
-     * @constructor
-     *
-     */
-
-    private static Throw = (type: string) => {
-        const Data = {
-            Type: "",
-            Name: "",
-            Message: "",
-            error: Object.create({})
-        };
-
-        switch (type) {
-            case "Directory":
-                Data.Type = "[Error] Directory";
-                Data.Name = "Service Directory Not Found";
-                Data.Message = "SAM Application Source Directory Doesn't Exist";
-
-                Data.error = Error([Data.Type, Data.Message].join(" "));
-                Data.error.name = Data.Name;
-
-                return Data.error;
-            default:
-                Data.Type = "[Error] Unknown";
-                Data.Name = "Unhandled Exception";
-                Data.Message = "An Unknown Error has Occurred";
-
-                Data.error = Error([Data.Type, Data.Message].join(" "));
-                Data.error.name = Data.Name;
-
-                return Data.error;
-        }
-    }
-}
-
-class Staging implements Apigatewayv2StageDefaultRouteSettings {
-    /**
-     * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/aws/r/apigatewayv2_stage.html#logging_level Apigatewayv2Stage#logging_level}
-     */
-    public loggingLevel?: string;
-
-    /**
-     * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/aws/r/apigatewayv2_stage.html#data_trace_enabled Apigatewayv2Stage#data_trace_enabled}
-     */
-    public readonly dataTraceEnabled?: boolean = true;
-
-    /**
-     * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/aws/r/apigatewayv2_stage.html#detailed_metrics_enabled Apigatewayv2Stage#detailed_metrics_enabled}
-     */
-    public readonly detailedMetricsEnabled?: boolean | undefined = true;
-
-    /**
-     * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/aws/r/apigatewayv2_stage.html#throttling_burst_limit Apigatewayv2Stage#throttling_burst_limit}
-     */
-    readonly throttlingBurstLimit?: number | undefined = undefined
-
-    /**
-     * Docs at Terraform Registry: {@link https://www.terraform.io/docs/providers/aws/r/apigatewayv2_stage.html#throttling_rate_limit Apigatewayv2Stage#throttling_rate_limit}
-     */
-    readonly throttlingRateLimit?: number | undefined = undefined;
-
-    constructor(model: SAM) {
-        this.loggingLevel = model.getAPIGatewayLoggingLevel()
-    }
-}
-
-class Stack extends TerraformStack {
-    // public readonly provider: AwsProvider;
-    // public readonly asset: TerraformAsset;
-    // public readonly bucket: AWS.s3.S3Bucket;
-    // public readonly archive: AWS.s3.S3BucketObject;
-    // public readonly role: AWS.iam.IamRole;
-    // public readonly policy: AWS.iam.IamPolicy;
-
-    constructor($: Construct, ID: string, settings: Lambda) {
-        super($, ID);
-
-        /*** Cloud Provider (AWS) */
-        const provider = new AWS.AwsProvider(this, [ID, "AWS-Provider"].join("-"), {
-            region: settings.cloud["Region"]
-        });
-
-        /*** Lambda Artifact(s) (Executable) */
-        const asset = new TerraformAsset(this, [ID, "Asset"].join("-"), {
-            type: AssetType.ARCHIVE,
-            path: settings.directory
-        });
-
-        /*** Unique S3 Bucket Containing Lambda Artifact(s) */
-        const bucket = new AWS.s3.S3Bucket(this, [ID, "S3-Bucket"].join("-"), {
-            bucketPrefix: settings.name
-        });
-
-        /*** Upload Lambda Artifact(s) --> S3 */
-        const archive = new AWS.s3.S3BucketObject(this, [ID, "Archive"].join("-"), {
-            source: asset.path,
-            bucket: bucket.bucket,
-            key: [settings.version, asset.fileName].join("/")
-        });
-
-        /*** Lambda Execution Role */
-        const role = new AWS.iam.IamRole(this, [ID, "Execution-Role"].join("-"), {
-            name: [ID, "Execution-Role"].join("-"),
-            assumeRolePolicy: String(settings.policy)
-        })
-
-        /*** Managed Policy Permitting Lambda Write Access to CloudWatch */
-        new AWS.iam.IamRolePolicyAttachment(this, [ID, "Managed-Policy"].join("-"), {
-            policyArn: Lambda.Attachment,
-            role: role.name
-        })
-
-        /*** Lambda Function */
-        const lambda = new AWS.lambdafunction.LambdaFunction(this, ID, {
-            functionName: ID,
-            handler: settings.handler,
-            runtime: settings.runtime,
-            s3Bucket: bucket.bucket,
-            s3Key: archive.key,
-            role: role.arn
-        });
-
-        /*** API Gateway */
-        const api = new AWS.apigatewayv2.Apigatewayv2Api(this, [ID, "Gateway"].join("-"), {
-            name: [ID, "Gateway"].join("-"),
-            protocolType: "HTTP",
-            target: lambda.arn
-        })
-
-        /*** Inline API Gateway ==> Lambda Invocation */
-        new AWS.lambdafunction.LambdaPermission(this, [ID, "Gateway-Invoke-Permission"].join("-"), {
-            functionName: lambda.functionName,
-            action: "lambda:InvokeFunction",
-            principal: "apigateway.amazonaws.com",
-            sourceArn: [api.executionArn, "*", "*"].join("/")
-        })
-
-        /*** URI to API-Gateway-Lambda Invocation URL */
-        new TerraformOutput(this, "url", {
-            value: api.apiEndpoint.trim()
-        });
-    }
 }
 
 class Service extends TerraformStack {
@@ -521,9 +293,6 @@ class Service extends TerraformStack {
             protocolType: "HTTP"
         });
 
-        /// @todo Update Variable and Class Name to something more Descriptive (and accurate)
-        // const staging = new Staging(settings);
-
         /*** API Gateway-V2 Stage Configuration */
         const stage = new AWS.apigatewayv2.Apigatewayv2Stage(this, [ID, "Environment-Stage"].join("-").toLowerCase(), {
             apiId: api.id,
@@ -546,106 +315,133 @@ class Service extends TerraformStack {
             // defaultRouteSettings: staging
         });
 
-        /// const Lambdas = [];
-        settings.functions.forEach(($: string, count) => {
-            console.debug("[Debug] Lambda Function Initialization" + ":", $);
+        // const Lambdas: string[] = [];
+        FS.readdirSync(Path.join(Distribution)).forEach(($, iterator) => {
+            if ($ !== "library") {
+                console.debug("[Debug] Lambda Function Initialization" + ":", $);
 
-            const Function = new Lambda($, true);
-            const ID = Function.name;
+                const Function = new Lambda($);
+                const ID = Function.name.split("_").map(($) => {
+                    return $.toString()[0].toUpperCase() + $.toString().slice(1);
+                }).join("-");
 
-            console.debug("[Debug] Successfully Instantiated Function Configuration" + ":", ID);
+                /*** Lambda Artifact(s) (Executable) */
+                const asset = new TerraformAsset(this, [ID, "Asset"].join("-").toLowerCase(), {
+                    type: AssetType.ARCHIVE,
+                    path: Function.directory
+                });
 
-            const Target = Path.dirname(Function.source);
+                /// console.debug("[Debug] Target S3 Folder-Key" + ":", [ID, "Archive", [Function.version, "zip"].join(".")].join("-"));
 
-            console.debug("[Debug] Compiling Distribution(s) ...");
-            console.debug("[Debug] Target Directory" + ":", Target);
+                /*** Upload Lambda Artifact(s) --> S3 */
+                const archive = new AWS.s3.S3BucketObject(this, [ID, "Archive"].join("-").toLowerCase(), {
+                    source: asset.path,
+                    bucket: bucket.bucket,
+                    key: [ID, "Archive", [Function.version, "zip"].join(".")].join("-")
+                });
 
-            Subprocess("npm run compile", Target);
+                /*** Lambda Execution Role */
+                const role = new AWS.iam.IamRole(this, [ID, "Execution-Role"].join("-").toLowerCase(), {
+                    name: [ID, "Execution-Role"].join("-"),
+                    assumeRolePolicy: String(Function.policy),
+                    lifecycle: {
+                        createBeforeDestroy: false
+                    }
+                });
 
-            Assertion.strictEqual(FS.existsSync(Function.directory), true);
+                /*** Lambda Layer (Dependencies) */
+                const Layers: string[] = [];
+                FS.readdirSync(Path.join(Distribution, "library")).forEach(($, iterator) => {
+                    const Name = $.split("_").map(($) => {
+                        return $.toString()[0].toUpperCase() + $.toString().slice(1);
+                    }).join("-");
 
-            console.debug("[Debug] Successfully Compiled Directory" + ":", Function.directory);
+                    const Directory = Path.join(Distribution, "library");
 
-            /*** Lambda Artifact(s) (Executable) */
-            const asset = new TerraformAsset(this, [ID, "Asset"].join("-").toLowerCase(), {
-                type: AssetType.ARCHIVE,
-                path: Function.directory
-            });
+                    /*** Lambda-Layer Artifact(s) */
+                    const asset = new TerraformAsset(this, [ID, Name, "Layer-Asset"].join("-").toLowerCase(), {
+                        type: AssetType.ARCHIVE,
+                        path: Path.join(Directory, $)
+                    });
 
-            /*** Upload Lambda Artifact(s) --> S3 */
-            const archive = new AWS.s3.S3BucketObject(this, [ID, "Archive"].join("-").toLowerCase(), {
-                source: asset.path,
-                bucket: bucket.bucket,
-                key: asset.fileName
-            });
+                    /*** Upload Lambda Artifact(s) --> S3 */
+                    const archive = new AWS.s3.S3BucketObject(this, [ID, Name, "Layer-Archive"].join("-").toLowerCase(), {
+                        source: asset.path,
+                        bucket: bucket.bucket,
+                        key: [ID, Name, "Layer-Archive.zip"].join("-")
+                    });
 
-            /*** Lambda Execution Role */
-            const role = new AWS.iam.IamRole(this, [ID, "Execution-Role"].join("-").toLowerCase(), {
-                name: [ID, "Execution-Role"].join("-"),
-                assumeRolePolicy: String(Function.policy),
-                lifecycle: {
-                    createBeforeDestroy: false
-                }
-            });
+                    /*** Upload Lambda-Layer Artifact(s) --> S3 */
+                    const layer = new AWS.lambdafunction.LambdaLayerVersion(this, [ID, Name, "Layer"].join("-").toLowerCase(), {
+                        layerName: Name,
+                        description: "...",
+                        s3Bucket: bucket.bucket,
+                        s3Key: archive.key,
+                    });
 
-            /*** Lambda Function */
-            const lambda = new AWS.lambdafunction.LambdaFunction(this, ID, {
-                functionName: Function.ID,
-                handler: Function.handler,
-                runtime: Function.runtime,
-                s3Bucket: bucket.bucket,
-                s3Key: archive.key,
-                role: role.arn
-            });
+                    Layers.push(layer.arn);
+                });
 
-            /*** Inline API Gateway ==> Lambda Invocation */
-            const invocation = new AWS.lambdafunction.LambdaPermission(this, [ID, "Gateway-Invoke-Permission"].join("-").toLowerCase(), {
-                functionName: lambda.functionName,
-                action: "lambda:InvokeFunction",
-                principal: "apigateway.amazonaws.com",
-                sourceArn: [api.executionArn, "*", "*"].join("/")
-            });
+                /*** Lambda Function */
+                const lambda = new AWS.lambdafunction.LambdaFunction(this, ID.toLowerCase(), {
+                    functionName: $,
+                    handler: Function.handler,
+                    runtime: Function.runtime,
+                    s3Bucket: bucket.bucket,
+                    s3Key: archive.key,
+                    layers: Layers,
+                    role: role.arn
+                });
 
-            /*** Managed Policy Permitting Lambda Write Access to CloudWatch */
-            const policy = new AWS.iam.IamRolePolicyAttachment(this, [ID, "Managed-Policy"].join("-").toLowerCase(), {
-                policyArn: Lambda.Attachment,
-                role: role.name
-            });
+                /*** Inline API Gateway ==> Lambda Invocation */
+                const invocation = new AWS.lambdafunction.LambdaPermission(this, [ID, "Gateway-Invoke-Permission"].join("-").toLowerCase(), {
+                    functionName: lambda.functionName,
+                    action: "lambda:InvokeFunction",
+                    principal: "apigateway.amazonaws.com",
+                    sourceArn: [api.executionArn, "*", "*"].join("/")
+                });
 
-            // console.debug("[Debug] Target Integration API Endpoint" + ":", [api.apiEndpoint, Function.name].join("/"));
+                /*** Managed Policy Permitting Lambda Write Access to CloudWatch */
+                const policy = new AWS.iam.IamRolePolicyAttachment(this, [ID, "Managed-Policy"].join("-").toLowerCase(), {
+                    policyArn: Lambda.Attachment,
+                    role: role.name
+                });
 
-            /***
-             * API Gateway-V2 Integration Resource
-             * ===================================
-             * Overview
-             * --------
-             * The following list summarizes the supported integration types:
-             *      - AWS: This type of integration lets an API expose AWS service actions. In AWS integration, you must configure both the integration request and integration response and set up necessary data mappings from the method request to the integration request, and from the integration response to the method response.
-             *      - AWS_PROXY: This type of integration lets an API method be integrated with the Lambda function invocation action with a flexible, versatile, and streamlined integration setup. This integration relies on direct interactions between the client and the integrated Lambda function.
-             *           - With this type of integration, also known as the Lambda proxy integration, you do not set the integration request or the integration response. API Gateway passes the incoming request from the client as the input to the backend Lambda function. The integrated Lambda function takes the input of this format and parses the input from all available sources, including request headers, URL path variables, query string parameters, and applicable body. The function returns the result following this output format.
-             *           - This is the preferred integration type to call a Lambda function through API Gateway and is not applicable to any other AWS service actions, including Lambda actions other than the function-invoking action.
-             *      - HTTP: This type of integration lets an API expose HTTP endpoints in the backend. With the HTTP integration, also known as the HTTP custom integration, you must configure both the integration request and integration response. You must set up necessary data mappings from the method request to the integration request, and from the integration response to the method response.
-             *      - HTTP_PROXY: The HTTP proxy integration allows a client to access the backend HTTP endpoints with a streamlined integration setup on single API method. You do not set the integration request or the integration response. API Gateway passes the incoming request from the client to the HTTP endpoint and passes the outgoing response from the HTTP endpoint to the client.
-             *      - MOCK: This type of integration lets API Gateway return a response without sending the request further to the backend. This is useful for API testing because it can be used to test the integration set up without incurring charges for using the backend and to enable collaborative development of an API.
-             *           - In collaborative development, a team can isolate their development effort by setting up simulations of API components owned by other teams by using the MOCK integrations. It is also used to return CORS-related headers to ensure that the API method permits CORS access. In fact, the API Gateway console integrates the OPTIONS method to support CORS with a mock integration. Gateway responses are other examples of mock integrations.
-             *
-             * - passthroughBehavior: "WHEN_NO_MATCH" (Websocket APIs Only)
-             */
+                /***
+                 * API Gateway-V2 Integration Resource
+                 * ===================================
+                 * Overview
+                 * --------
+                 * The following list summarizes the supported integration types:
+                 *      - AWS: This type of integration lets an API expose AWS service actions. In AWS integration, you must configure both the integration request and integration response and set up necessary data mappings from the method request to the integration request, and from the integration response to the method response.
+                 *      - AWS_PROXY: This type of integration lets an API method be integrated with the Lambda function invocation action with a flexible, versatile, and streamlined integration setup. This integration relies on direct interactions between the client and the integrated Lambda function.
+                 *           - With this type of integration, also known as the Lambda proxy integration, you do not set the integration request or the integration response. API Gateway passes the incoming request from the client as the input to the backend Lambda function. The integrated Lambda function takes the input of this format and parses the input from all available sources, including request headers, URL path variables, query string parameters, and applicable body. The function returns the result following this output format.
+                 *           - This is the preferred integration type to call a Lambda function through API Gateway and is not applicable to any other AWS service actions, including Lambda actions other than the function-invoking action.
+                 *      - HTTP: This type of integration lets an API expose HTTP endpoints in the backend. With the HTTP integration, also known as the HTTP custom integration, you must configure both the integration request and integration response. You must set up necessary data mappings from the method request to the integration request, and from the integration response to the method response.
+                 *      - HTTP_PROXY: The HTTP proxy integration allows a client to access the backend HTTP endpoints with a streamlined integration setup on single API method. You do not set the integration request or the integration response. API Gateway passes the incoming request from the client to the HTTP endpoint and passes the outgoing response from the HTTP endpoint to the client.
+                 *      - MOCK: This type of integration lets API Gateway return a response without sending the request further to the backend. This is useful for API testing because it can be used to test the integration set up without incurring charges for using the backend and to enable collaborative development of an API.
+                 *           - In collaborative development, a team can isolate their development effort by setting up simulations of API components owned by other teams by using the MOCK integrations. It is also used to return CORS-related headers to ensure that the API method permits CORS access. In fact, the API Gateway console integrates the OPTIONS method to support CORS with a mock integration. Gateway responses are other examples of mock integrations.
+                 *
+                 * - passthroughBehavior: "WHEN_NO_MATCH" (Websocket APIs Only)
+                 */
 
-            const integration = new AWS.apigatewayv2.Apigatewayv2Integration(this, [ID, "Gateway-Integration"].join("-").toLowerCase(), {
-                apiId: api.id,
-                integrationType: "AWS_PROXY",
-                connectionType: "INTERNET",
-                description: [ID, "Gateway-Integration"].join(" "),
-                integrationUri: lambda.arn
-            });
+                const integration = new AWS.apigatewayv2.Apigatewayv2Integration(this, [ID, "Gateway-Integration"].join("-").toLowerCase(), {
+                    apiId: api.id,
+                    integrationType: "AWS_PROXY",
+                    connectionType: "INTERNET",
+                    description: [ID, "Gateway-Integration"].join(" "),
+                    payloadFormatVersion: "1.0",
+                    // payloadFormatVersion: "2.0", // Invalid JSON
+                    integrationUri: lambda.arn
+                });
 
-            const route = new AWS.apigatewayv2.Apigatewayv2Route(this, [ID, "Gateway-Route"].join("-").toLowerCase(), {
-                apiId: api.id,
-                target: ["integrations", integration.id].join("/"),
-                routeKey: "GET" + " " + "/" + Function.name.toLowerCase(),
-                dependsOn: [integration]
-            });
+                const route = new AWS.apigatewayv2.Apigatewayv2Route(this, [ID, "Gateway-Route"].join("-").toLowerCase(), {
+                    apiId: api.id,
+                    target: ["integrations", integration.id].join("/"),
+                    routeKey: "GET" + " " + "/" + Function.name.toLowerCase(),
+                    dependsOn: [integration]
+                });
+            }
         });
 
         /*** URI to API-Gateway-Lambda Invocation URL */
@@ -655,61 +451,26 @@ class Service extends TerraformStack {
     }
 }
 
-const Application = new App({
-    skipValidation: true, stackTraces: true
-});
-
-const Single = async () => {
-    Assertion.strictEqual(Settings.Functions.length, 1);
-    console.debug("[Debug] Initializing Singleton Deployment Configuration(s) ...");
-    const Function = Settings.Functions.pop();
-
-    if (Function) {
-        const Awaitable = new Promise((resolve) => {
-            const Instance = new Lambda(Function, false);
-            const Deployment = new Stack(Application, Instance.ID, Instance);
-
-            resolve(Deployment);
-        });
-
-        await Awaitable;
-    }
-};
-
-const Iterative = async () => {
-    console.debug("[Debug] Initializing Iterative Deployment Configuration(s) ...");
-
-    const Awaitables: Promise<unknown>[] = [];
-    Settings.Functions.forEach(async ($: string) => {
-        const Awaitable = new Promise((resolve) => {
-            const Function = new Lambda($, false);
-            const Instance = new Stack(Application, Function.ID, Function);
-
-            resolve(Instance);
-        });
-
-        Awaitables.push(Awaitable);
+const Deployment = () => {
+    const Application = new App({
+        skipValidation: false,
+        outdir: "cdktf.out",
+        stackTraces: true
     });
 
-    await Promise.all(Awaitables);
+    return new Promise((resolve) => {
+        const Stack = new SAM();
+
+        new Service(Application, Stack.ID, Stack);
+
+        const Synthesize = () => {
+            Application.synth();
+
+            return true;
+        };
+
+        resolve(Synthesize());
+    });
 };
 
-const System = async () => {
-    console.debug("[Debug] Initializing Service Deployment Configuration(s) ...");
-    const Awaitable = () => {
-        return new Promise((resolve) => {
-            const Stack = new SAM();
-            const Instance = new Service(Application, Stack.ID, Stack);
-
-            resolve(Instance);
-        });
-    }
-
-    await Awaitable();
-};
-
-(Settings.Deployment.Type === "Single") && await Single();
-(Settings.Deployment.Type === "Service") && await System();
-(Settings.Deployment.Type === "Iterative") && await Iterative();
-
-Application.synth();
+await Deployment();
