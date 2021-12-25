@@ -42,13 +42,14 @@
         ]
     },
     "include": [
-        "**/*.ts"
+        "**/*.ts",
+        "*/**/node_modules/@cloud-vault/*.ts",
+        "*/**/node_modules/@cloud-vault/*/*.ts",
+        "*/**/node_modules/@cloud-vault/**/*.ts"
     ],
     "exclude": [
-        "**/*.d.ts",
         "*/**/node_modules",
         "*/**/unit-testing",
-        "*/**/__tests__",
-        "*/**/@Types"
+        "*/**/__tests__"
     ]
 }
