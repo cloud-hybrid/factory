@@ -11,4 +11,4 @@ Subprocess.spawnSync("npm", ["install", "--silent"], { stdio: "inherit", cwd: Pa
 Subprocess.spawnSync("tsc", ["--build"], { stdio: "inherit", cwd: Path.join(CWD, "cli") });
 Subprocess.spawnSync("tsc", ["--build"], { stdio: "inherit", cwd: Path.join(CWD, "cdfk") });
 
-Subprocess.spawnSync("npm", ["install", "."], { stdio: "inherit", cwd: CWD });
+Subprocess.spawnSync("npm", ["install", "--global"], { stdio: "inherit", cwd: CWD });
