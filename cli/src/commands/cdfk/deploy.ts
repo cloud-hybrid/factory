@@ -4,9 +4,13 @@ import Module from "module";
 import Process from "process";
 import Assertion from "assert";
 
+import Utility from "util";
+
 import {Argv} from "@cloud-vault/cli/arguments";
 import {Subprocess} from "@cloud-vault/cli/utilities/subprocess";
 import {Prompt} from "@cloud-vault/cli/utilities/prompt";
+
+const Remove = Utility.promisify(FS.rm);
 
 /*** *Current Module Path* */
 const File: string = import.meta.url.replace("file" + ":" + "//", "");
@@ -16,6 +20,9 @@ const CWD: string = Path.dirname(File);
 
 /*** *Package Directory* */
 const PKG: string = Path.dirname(CWD);
+
+/*** Repository */
+const Repository: string = Path.resolve(CWD, "..", "..", "..", "..");
 
 /*** CDFK Packaged Directory */
 
@@ -68,6 +75,59 @@ function Configuration(Arguments: Argv) {
     ].join("\n"));
 }
 
+
+/***
+ * Recursive Copy Function
+ * -----------------------
+ * *Note* - this will perform *actual, real copies*; symbolic links are resolved to their raw pointer location(s).
+ *
+ * These are important considerations especially when building for reproducible distributions.
+ *
+ * @param source {String} original path
+ * @param target {String} target copy destination
+ *
+ * @constructor
+ *
+ */
+
+function Copy(source: string, target: string) {
+    /*** Exclusions to Avoid Recursive Parsing; i.e. libraries, lambda-layers, or otherwise bundled requirements */
+    const Exclusions = [
+        ".git",
+        ".idea",
+        ".vscode",
+
+        "cdktf.out",
+        "templates"
+    ];
+
+    FS.mkdirSync(target, { recursive: true });
+    FS.readdirSync(source).forEach((element) => {
+        const Directory = FS.lstatSync(Path.join(source, element), {throwIfNoEntry: false})?.isDirectory() || false;
+        const Socket = FS.lstatSync(Path.join(source, element), {throwIfNoEntry: false})?.isSocket() || false;
+
+        try {
+            if (!Socket) {
+                if (!Exclusions.includes(target)) {
+                    FS.mkdirSync(target, {recursive: true});
+                }
+            }
+
+            if (!Directory && !Socket) {
+                if (!Exclusions.includes(source)) {
+                    FS.copyFileSync(Path.join(source, element), Path.join(target, element));
+                }
+            } else if (!Socket) {
+                if (!Exclusions.includes(source)) {
+                    Copy(Path.join(source, element), Path.join(target, element));
+                }
+            }
+        } catch (e) {
+            /// ...
+        }
+    });
+}
+
 /***
  * Module Entry-Point Command
  * ==========================
@@ -89,8 +149,10 @@ const Command = async ($: Argv) => {
     Configuration(Arguments);
 
     Arguments.check(async ($) => {
+        const Original = Process.cwd();
+
         ($?.debug) && console.log(Input($._), JSON.stringify($, null, 4), "\n");
-        ($?.debug) && console.debug("CDFK Target Directory" + ":", CDFK, "\n");
+        ($?.debug) && console.debug("CDFK Target Directory" + ":", Process.cwd(), "\n");
 
         const Continue = async () => await Prompt("Continue? (Y/N)" + ":" + " ");
 
@@ -98,7 +160,27 @@ const Command = async ($: Argv) => {
 
         while (trigger !== "Y" && trigger !== "N") trigger = await Continue().then(($) => $.toUpperCase());
 
-        (trigger === "Y") && await Subprocess("npm run ci-cd", CDFK);
+        (trigger === "Y") && console.log("\n" + "[Log] Writing File Structure ...");
+
+        (trigger === "Y") && Copy(Repository, Path.join(Process.cwd(), "factory"));
+
+        (trigger === "Y") && Copy(Path.join(Process.cwd(), "distribution"), Path.join(Process.cwd(), "factory", "packages", "distribution"));
+
+        (trigger === "Y") && FS.mkdirSync(Path.join(Process.cwd(), "factory", "packages", "distribution"), { recursive: true});
+
+        (trigger === "Y") && Process.chdir(Path.join(Process.cwd(), "factory"));
+
+        (trigger === "Y") && await Subprocess("npm install cdktf-cli --global", Process.cwd());
+
+        (trigger === "Y") && await Subprocess("npm install", Process.cwd());
+
+        (trigger === "Y") && await Subprocess("node Install.js", Process.cwd());
+
+        (trigger === "Y") && await Subprocess("npm install", Process.cwd());
+
+        (trigger === "Y") && await Subprocess("cdktf synth", Path.join(Process.cwd(), "cdfk"));
+
+        (trigger === "Y") && await Subprocess("cdktf deploy --auto-approve", Path.join(Process.cwd(), "cdfk"));
 
         return true;
     }).strict();

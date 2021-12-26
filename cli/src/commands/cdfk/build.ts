@@ -392,8 +392,6 @@ const Command = async ($: Argv) => {
 
         await Distribution(Data);
 
-        // await Subprocess("cdktf get && cdktf synth --disable-plugin-cache-env --disable-logging", CDFK);
-
         return true;
     }).strict();
 };

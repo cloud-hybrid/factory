@@ -1,12 +1,10 @@
 import Process from "process";
 
 import {Header} from "@cloud-vault/cli/header";
-import {Columns} from "@cloud-vault/cli/utilities/tty";
 import {Subprocess} from "@cloud-vault/cli/utilities/subprocess";
 import {Arguments as CLI, Argv} from "@cloud-vault/cli/arguments";
 import {Prompt} from "@cloud-vault/cli/utilities/prompt";
 import {Binary} from "@cloud-vault/cli/utilities/binary";
-import {Initialize} from "./commands/cdfk";
 
 const Main = async () => {
     Process.stdout.write(Header + "\n");

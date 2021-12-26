@@ -10,6 +10,7 @@
 import FS from "fs";
 import Path from "path";
 import Assertion from "assert";
+import Process from "process";
 
 import {Construct} from "constructs";
 
@@ -57,6 +58,10 @@ class Lambda {
 
     public static Attachment = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole";
 
+    /// public static Execution = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole";
+    /// public static RO = "arn:aws:iam::aws:policy/service-role/AWSLambda_ReadOnlyAccess";
+    /// public static XWO = "arn:aws:iam::aws:policy/service-role/AWSXrayWriteOnlyAccess";
+
     public cloud: typeof Configuration.settings["Cloud"] = Configuration.settings["Cloud"];
 
     /*** Common-Name or Service Extension to be used when constructing the Lambda Function Name */
@@ -75,8 +80,6 @@ class Lambda {
 
     constructor(name: string) {
         this.name = Path.parse(name).base;
-
-        console.log(this.name);
 
         Assertion.notStrictEqual(this.name, undefined);
         Assertion.notStrictEqual(this.service, undefined);
@@ -316,11 +319,11 @@ class Service extends TerraformStack {
         });
 
         // const Lambdas: string[] = [];
-        FS.readdirSync(Path.join(Distribution)).forEach(($, iterator) => {
-            if ($ !== "library") {
-                console.debug("[Debug] Lambda Function Initialization" + ":", $);
+        FS.readdirSync(Path.join(Distribution), {withFileTypes: true}).forEach(($, iterator) => {
+            if ($.name !== "library" && $.isDirectory()) {
+                // console.debug("[Debug] Lambda Function Initialization" + ":", $);
 
-                const Function = new Lambda($);
+                const Function = new Lambda($.name);
                 const ID = Function.name.split("_").map(($) => {
                     return $.toString()[0].toUpperCase() + $.toString().slice(1);
                 }).join("-");
@@ -343,48 +346,49 @@ class Service extends TerraformStack {
                 /*** Lambda Execution Role */
                 const role = new AWS.iam.IamRole(this, [ID, "Execution-Role"].join("-").toLowerCase(), {
                     name: [ID, "Execution-Role"].join("-"),
+                    description: "Lambda Execution Role",
                     assumeRolePolicy: String(Function.policy),
-                    lifecycle: {
-                        createBeforeDestroy: false
-                    }
+                    lifecycle: {createBeforeDestroy: false}
                 });
 
                 /*** Lambda Layer (Dependencies) */
                 const Layers: string[] = [];
-                FS.readdirSync(Path.join(Distribution, "library")).forEach(($, iterator) => {
-                    const Name = $.split("_").map(($) => {
-                        return $.toString()[0].toUpperCase() + $.toString().slice(1);
-                    }).join("-");
+                FS.readdirSync(Path.join(Distribution, "library"), {withFileTypes: true}).forEach(($, iterator) => {
+                    if ($.isDirectory()) {
+                        const Name = $.name.split("_").map(($) => {
+                            return $.toString()[0].toUpperCase() + $.toString().slice(1);
+                        }).join("-");
 
-                    const Directory = Path.join(Distribution, "library");
+                        const Directory = Path.join(Distribution, "library");
 
-                    /*** Lambda-Layer Artifact(s) */
-                    const asset = new TerraformAsset(this, [ID, Name, "Layer-Asset"].join("-").toLowerCase(), {
-                        type: AssetType.ARCHIVE,
-                        path: Path.join(Directory, $)
-                    });
+                        /*** Lambda-Layer Artifact(s) */
+                        const asset = new TerraformAsset(this, [ID, Name, "Layer-Asset"].join("-").toLowerCase(), {
+                            type: AssetType.ARCHIVE,
+                            path: Path.join(Directory, $.name)
+                        });
 
-                    /*** Upload Lambda Artifact(s) --> S3 */
-                    const archive = new AWS.s3.S3BucketObject(this, [ID, Name, "Layer-Archive"].join("-").toLowerCase(), {
-                        source: asset.path,
-                        bucket: bucket.bucket,
-                        key: [ID, Name, "Layer-Archive.zip"].join("-")
-                    });
+                        /*** Upload Lambda Artifact(s) --> S3 */
+                        const archive = new AWS.s3.S3BucketObject(this, [ID, Name, "Layer-Archive"].join("-").toLowerCase(), {
+                            source: asset.path,
+                            bucket: bucket.bucket,
+                            key: [ID, Name, "Layer-Archive.zip"].join("-")
+                        });
 
-                    /*** Upload Lambda-Layer Artifact(s) --> S3 */
-                    const layer = new AWS.lambdafunction.LambdaLayerVersion(this, [ID, Name, "Layer"].join("-").toLowerCase(), {
-                        layerName: Name,
-                        description: "...",
-                        s3Bucket: bucket.bucket,
-                        s3Key: archive.key,
-                    });
+                        /*** Upload Lambda-Layer Artifact(s) --> S3 */
+                        const layer = new AWS.lambdafunction.LambdaLayerVersion(this, [ID, Name, "Layer"].join("-").toLowerCase(), {
+                            layerName: Name,
+                            description: "...",
+                            s3Bucket: bucket.bucket,
+                            s3Key: archive.key,
+                        });
 
-                    Layers.push(layer.arn);
+                        Layers.push(layer.arn);
+                    }
                 });
 
                 /*** Lambda Function */
                 const lambda = new AWS.lambdafunction.LambdaFunction(this, ID.toLowerCase(), {
-                    functionName: $,
+                    functionName: $.name,
                     handler: Function.handler,
                     runtime: Function.runtime,
                     s3Bucket: bucket.bucket,
@@ -402,7 +406,7 @@ class Service extends TerraformStack {
                 });
 
                 /*** Managed Policy Permitting Lambda Write Access to CloudWatch */
-                const policy = new AWS.iam.IamRolePolicyAttachment(this, [ID, "Managed-Policy"].join("-").toLowerCase(), {
+                const policy = new AWS.iam.IamRolePolicyAttachment(this, [ID, "Execution-Role-Managed-Policy"].join("-").toLowerCase(), {
                     policyArn: Lambda.Attachment,
                     role: role.name
                 });

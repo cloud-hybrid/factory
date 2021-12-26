@@ -10,6 +10,7 @@
 import FS from "fs";
 import Path from "path";
 import Module from "module";
+import Process from "process";
 
 import Assertion from "assert";
 
@@ -23,7 +24,7 @@ const Repository: string = Path.join(PKG, "..");
 
 /*** Distribution Folder */
 
-const Distribution: string = Path.join(Repository, "packages", "distribution");
+const Distribution: string = Path.join(Process.cwd(), "..", "packages", "distribution");
 
 /*** ESM Compatability & JSON Importer */
 const Import: NodeRequire = Module.createRequire(import.meta.url);

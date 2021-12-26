@@ -36,6 +36,7 @@ function* Packages(directory: string): Generator {
     /*** Exclusions to Avoid Recursive Parsing; i.e. libraries, lambda-layers, or otherwise bundled requirements */
     const Exclusions = [
         "library",
+        "factory",
         "node_modules",
 
         ".git",
@@ -58,6 +59,7 @@ function* Packages(directory: string): Generator {
 function* Library(directory: string): Generator {
     /*** Exclusions to Avoid Recursive Parsing; i.e. libraries, lambda-layers, or otherwise bundled requirements */
     const Exclusions = [
+        "factory",
         "node_modules",
 
         ".git",
@@ -222,9 +224,9 @@ async function Distribution(data: Package[]) {
         Assertion.strictEqual($.Directory, CWD, "Process Directory Drift");
 
         /// Cleanse Directories if Applicable
-        await Remove(Path.join($.Directory, "node_modules"), {recursive: true, force: true});
-        await Remove(Path.join($.Directory, "nodejs"), {recursive: true, force: true});
-        await Remove($.Distribution, {recursive: true, force: true});
+        await Remove(Path.join($.Directory, "node_modules"), {recursive: true, force: true, maxRetries: 5});
+        await Remove(Path.join($.Directory, "nodejs"), {recursive: true, force: true, maxRetries: 5});
+        await Remove($.Distribution, {recursive: true, force: true, maxRetries: 5});
 
         /// Install only Production-based Lambda Dependencies
         await Subprocess("npm install --production", $.Directory);
@@ -307,7 +309,7 @@ const Command = async ($: Argv) => {
     Configuration(Arguments);
 
     if (FS.existsSync(Path.join(Process.cwd(), "distribution"))) {
-        await Remove(Path.join(Process.cwd(), "distribution"), {recursive: true});
+        await Remove(Path.join(Process.cwd(), "distribution"), {recursive: true, force: true, maxRetries: 5});
     }
 
     Arguments.check(async ($) => {
