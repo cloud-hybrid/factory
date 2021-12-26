@@ -22,4 +22,15 @@ When lower level constructs -- in this context **repositories** -- become capabl
 infrastructure-related requirements, a large portion of development overhead and maintenance can be eliminated.
 However, rarely without overhead. 
 
-Luckily, this is where `@cloud-vault/factory` comes into play.
+`@cloud-vault/factory` aims to facilitate potential overhead.
+
+### Opinionated Defaults ###
+
+An ***opinionated default*** can be any additional or non-default attribute that assists defining a cloud
+resource. For example, in Azure, GCP, and AWS, resources can have *Tags*. Through
+key-value assignment, a subset of resources can all be attributed an **Environment** *key* with a `Development`
+value.
+
+While seemingly of little value, parsers or API scrappers can use these tags to filter through applicable
+resources. Billing, security auditing, and patch-groups are all but some benefits administrators can
+gain from assigning tag-related opinionated defaults.
