@@ -164,4 +164,5 @@ Programmatic logic can then be easily abstracted according to repository-to-dire
 ## Local Development ##
 
 In order to test changes to `@cloud-vault/factory` globally, ensure to run the `node Install.js` script located
-at the repository's root.
+at the repository's root *at least once*. Subsequent runs should be automatic (via `tsc`). To run the `tsc` compiler in 
+`--watch` mode, execute the `npm run compile` command(s) (applicable to sub-packages `cli` & `cdfk`).
