@@ -56,8 +56,7 @@ interface Package {
     Layer: boolean;
 }
 
-//@ts-ignore
-function* Walk(directory: string) {
+function* Walk(directory: string): Generator {
     const Files = FS.readdirSync(directory, {withFileTypes: true});
     for (const file of Files) {
         if (!Exclusions.includes(file.name)) {
@@ -70,8 +69,7 @@ function* Walk(directory: string) {
     }
 }
 
-//@ts-ignore
-function* Parse(directory: string) {
+function* Parse(directory: string): Generator {
     const Files = FS.readdirSync(directory, {withFileTypes: true});
     for (const file of Files) {
         if (file.isDirectory()) {
@@ -147,8 +145,8 @@ function Layer(source: string, target: string) {
  *
  */
 
-function Locate(files: string[]) {
-    const Data = [];
+function Locate(files: string[] | any) {
+    const Data: string[] = [];
 
     for (const file in files) {
         const Target = files[file];
