@@ -21,6 +21,10 @@ const PKG: string = Path.dirname(CWD);
 
 const Repository: string = Path.join(PKG, "..");
 
+/*** Distribution Folder */
+
+const Distribution: string = Path.join(Repository, "packages", "distribution");
+
 /*** ESM Compatability & JSON Importer */
 const Import: NodeRequire = Module.createRequire(import.meta.url);
 
@@ -71,4 +75,4 @@ class Configuration {
     }
 }
 
-export {CWD, PKG, Repository, Settings, Configuration, Import};
+export {CWD, PKG, Repository, Distribution, Settings, Configuration, Import};
