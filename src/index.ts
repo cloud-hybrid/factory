@@ -2,6 +2,6 @@
 
 const Package = await import("./cli/interface.js");
 
-export { Package };
+export {Package};
 
 export default await Package.Main();

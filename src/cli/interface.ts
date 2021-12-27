@@ -11,6 +11,7 @@ const Main = async () => {
     const Arguments = async () => {
         const Commands = {
             cwd: async (input: Argv) => (await import("../commands/environment/cwd.js")).CWD(input),
+            environment: async (input: Argv) => (await import("../commands/environment/configuration.js")).Configuration(input),
             input: async (input: Argv) => (await import("../commands/test-input.js")).Input(input),
             version: (await import("../commands/version.js")).Version,
 
@@ -40,10 +41,26 @@ const Main = async () => {
 
             .showHelpOnFail(true, "[Error]: Invalid Input")
 
-            /*** Current Working Directory */
-            .command("cwd", "Current Working Directory", (
+            /*** Runtime Environment */
+            .command("environment", "Runtime Environment Command(s)", (
                 async ($: Argv) => {
-                    return await Commands.cwd($);
+                    const Length = (await $.argv)["_"].length;
+
+                    (Length <= 1) && $.help("help", "Display Usage Guide").default("help", true);
+
+                    /*** NPM Configuration */
+                    $.command("npm-configuration", "NPM Runtime Environment Variable(s)", (
+                        async ($: Argv) => await Commands.environment($)
+                    ));
+
+                    /*** Current Working Directory */
+                    $.command("cwd", "Current Working Directory", (
+                        async ($: Argv) => {
+                            return await Commands.cwd($);
+                        })
+                    );
+
+                    /// (Length === 1) && $.command("environment", "Runtime Environment Command(s)").help();
                 }))
 
             /*** Test-Input */
@@ -55,6 +72,10 @@ const Main = async () => {
             /*** CDFK Configuration */
             .command("ci-cd", "(WIP) Construct Development Factory Kit", (
                 async ($: Argv) => {
+                    const Length = (await $.argv)["_"].length;
+
+                    (Length <= 1) && $.help("help", "Display Usage Guide").default("help", true);
+
                     $.command("initialize", "(WIP) Package Initialization", (
                         async ($: Argv) => {
                             return await Commands.factory.initialize($);
@@ -80,6 +101,7 @@ const Main = async () => {
                     /// ));
                 }))
 
+            .showHelpOnFail(true, "Error Parsing CLI Input(s)")
             .parseAsync();
     }
 
