@@ -16,14 +16,14 @@ const Main = async () => {
 
             factory: {
                 deploy: async (input: Argv) => await Factory.Deploy(input),
-                build: async (input: Argv) => await Factory.Build(input),
                 initialize: async (input: Argv) => await Factory.Initialize(input),
-                configuration: async (input: Argv) => await Factory.Configuration(input),
+                /// build: async (input: Argv) => await Factory.Build(input),
+                /// configuration: async (input: Argv) => await Factory.Configuration(input),
             }
         };
 
         return await CLI(Process.argv.splice(2))
-            .scriptName("factory").wrap(80)
+            .scriptName("factory").wrap(120)
 
             /*** Version */
             .version(...Commands.version)
@@ -53,31 +53,31 @@ const Main = async () => {
                 }))
 
             /*** CDFK Configuration */
-            .command("cdfk", "(WIP) Construct Development Factory Kit", (
+            .command("ci-cd", "(WIP) Construct Development Factory Kit", (
                 async ($: Argv) => {
-                    $.command("initialize", "(WIP) CDFK Package Initialization", (
+                    $.command("initialize", "(WIP) Package Initialization", (
                         async ($: Argv) => {
                             return await Commands.factory.initialize($);
                         }
                     ));
 
-                    $.command("build", "(WIP) Synthesize Target Resource(s)", (
-                        async ($: Argv) => {
-                            return await Commands.factory.build($);
-                        }
-                    ));
+                    /// $.command("build", "(WIP) Synthesize Target Resource(s)", (
+                    ///     async ($: Argv) => {
+                    ///         return await Commands.factory.build($);
+                    ///     }
+                    /// ));
 
-                    $.command("deploy", "(WIP) CDFK Stack Deployment", (
+                    $.command("deploy", "(WIP) Stack Deployment", (
                         async ($: Argv) => {
                             return await Commands.factory.deploy($);
                         }
                     ));
 
-                    $.command("configuration", "(WIP) Construct Factory Configuration", (
-                        async ($: Argv) => {
-                            return await Commands.factory.configuration($);
-                        }
-                    ));
+                    /// $.command("configuration", "(WIP) Construct Factory Configuration", (
+                    ///     async ($: Argv) => {
+                    ///         return await Commands.factory.configuration($);
+                    ///     }
+                    /// ));
                 }))
 
             .parseAsync();

@@ -22,7 +22,7 @@ const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + 
  */
 
 function Configuration(Arguments: Argv) {
-    const Syntax = (command: string) => [command, "? [--json] ? [--file \"FILE\"] ? [--debug] ? [--help]"].join(" ");
+    // const Syntax = (command: string) => [command, "? [--json] ? [--file \"FILE\"] ? [--debug] ? [--help]"].join(" ");
 
     Arguments.hide("version");
     Arguments.help("help", "Display Usage Guide").default("help", false);
@@ -36,18 +36,18 @@ function Configuration(Arguments: Argv) {
     Arguments.option("file", {type: "string"}).alias("file", "f").default("file", null);
     Arguments.describe("file", "Write Current-Working-Directory to [FILE]");
 
-    Arguments.example("Global", Syntax("npx cli cwd"));
-    Arguments.example("Node", Syntax("node cli cwd"));
-    Arguments.example("NPM", Syntax("npm run cli -- cwd"));
+    // Arguments.example("Global", Syntax("npx cli cwd"));
+    // Arguments.example("Node", Syntax("node cli cwd"));
+    // Arguments.example("NPM", Syntax("npm run cli -- cwd"));
 
-    Arguments.usage([
-        "Usage" + ":",
-        "  >>> npm run cli -- cwd",
-        "  >>> npm run cli -- cwd --help",
-        "  >>> npm run cli -- cwd --json",
-        "  >>> npm run cli -- cwd --debug",
-        "  >>> npm run cli -- cwd --file \"Settings.json\""
-    ].join("\n"));
+    // Arguments.usage([
+    //     "Usage" + ":",
+    //     "  >>> npm run cli -- cwd",
+    //     "  >>> npm run cli -- cwd --help",
+    //     "  >>> npm run cli -- cwd --json",
+    //     "  >>> npm run cli -- cwd --debug",
+    //     "  >>> npm run cli -- cwd --file \"Settings.json\""
+    // ].join("\n"));
 }
 
 /***
