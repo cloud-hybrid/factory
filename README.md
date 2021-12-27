@@ -9,7 +9,7 @@
 > ***The Twelve-factor app [...] requires strict separation of config from code. Config varies substantially across deploys, code does not.***
 > - [**III. Config**](https://12factor.net/config), *The 12-Factor Application*
 
-The design philosophies and motivations behind `@cloud-vault/factory` is simple:
+The design philosophies and motivations behind `@cloud-vault/factory` are simple:
 
 - Provide development-lifecycle efficiencies
 - Generate human readable, *universally unique identifiers*
