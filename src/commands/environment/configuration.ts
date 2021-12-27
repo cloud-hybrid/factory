@@ -1,10 +1,14 @@
+import OS from "os";
 import FS from "fs";
-import Process from "process";
-import {Argv} from "yargs";
 import Path from "path";
+import Utility from "util";
+import Module from "module";
+import Process from "process";
 import Assertion from "assert";
 
-interface NPM {
+import {Argv} from "yargs";
+
+interface Global {
     Environment: {
         "NPM-Config-Metrics-Registry": object | null | undefined;
         "NPM-Config-Global-Prefix": object | null | undefined;
@@ -26,13 +30,35 @@ interface NPM {
         "NPM-Config-Prefix": object | null | undefined;
         "NPM-Config-Node-Gyp": object | null | undefined;
         "NPM-Node-Execpath": object | null | undefined;
+
+        "NPM-Package-Config-Environment": object | null | undefined;
+        "NPM-Package-Config-Organization": object | null | undefined;
+        "NPM-Package-Config-Service": object | null | undefined;
+        "NPM-Package-Config-Compliance": object | null | undefined;
+        "NPM-Package-Config-Date": object | null | undefined;
+        "NPM-Package-Config-Common-Name": object | null | undefined;
+        "NPM-Package-Config-Tags": object | null | undefined;
+        "NPM-Package-Config-Name": object | null | undefined;
+
+        "NPM-Package-Config-Injection": object | null | undefined;
+
+        "Node": string | null | undefined;
     }
+}
+
+interface Map {
+    [key: string]: { Variable: string, Value: string }
 }
 
 interface Variable {
     Key: string;
     Value: FS.PathLike | string;
-    Mapping: { [key: string]: Variable }
+    Mapping: Map;
+}
+
+type Runtime = typeof Process.env;
+
+interface Environment extends Runtime {
 }
 
 class Settings {
@@ -72,71 +98,167 @@ class Settings {
     /*** Node.js ABI Path */
     executable: object | null | undefined;
 
-    static readonly mapping: Variable | any = {};
+    /*** Node ABI */
+    node: object | null | undefined;
 
-    constructor($: NPM | null) {
+    /*** Runtime `.env` Injection */
+    injection: object | any | undefined = {
+        $: null,
+        Buffer: null,
+        JSON: null
+    };
+
+    readonly environment: Environment;
+
+    static readonly mapping: { [Key: string]: Variable } = {};
+
+    constructor(dynamic: boolean = false, $?: Global) {
+        Settings.initialize();
+
         this.prefix = $?.Environment["NPM-Config-Global-Prefix"]
-            ?? Settings.mapping["NPM-Config-Global-Prefix"]
+            ?? Settings?.mapping["NPM-Config-Global-Prefix"]
             ?? null;
 
         this.metrics = $?.Environment["NPM-Config-Metrics-Registry"]
-            ?? Settings.mapping["NPM-Config-Metrics-Registry"]
+            ?? Settings?.mapping["NPM-Config-Metrics-Registry"]
             ?? null;
 
         this.proxy = $?.Environment["NPM-Config-Noproxy"]
-            ?? Settings.mapping["NPM-Config-Noproxy"]
+            ?? Settings?.mapping["NPM-Config-Noproxy"]
             ?? null;
 
         this.local = $?.Environment["NPM-Config-Local-Prefix"]
-            ?? Settings.mapping["NPM-Config-Local-Prefix"]
+            ?? Settings?.mapping["NPM-Config-Local-Prefix"]
             ?? null;
 
         this.configuration = $?.Environment["NPM-Config-Globalconfig"]
-            ?? Settings.mapping["NPM-Config-Globalconfig"]
+            ?? Settings?.mapping["NPM-Config-Globalconfig"]
             ?? null;
 
         this.user = $?.Environment["NPM-Config-Userconfig"]
-            ?? Settings.mapping["NPM-Config-Userconfig"]
+            ?? Settings?.mapping["NPM-Config-Userconfig"]
             ?? null;
 
         this.module = $?.Environment["NPM-Config-Init-Module"]
-            ?? Settings.mapping["NPM-Config-Init-Module"]
+            ?? Settings?.mapping["NPM-Config-Init-Module"]
             ?? null;
 
         this.cache = $?.Environment["NPM-Config-Cache"]
-            ?? Settings.mapping["NPM-Config-Cache"]
+            ?? Settings?.mapping["NPM-Config-Cache"]
             ?? null;
 
         this.agent = $?.Environment["NPM-Config-User-Agent"]
-            ?? Settings.mapping["NPM-Config-User-Agent"]
+            ?? Settings?.mapping["NPM-Config-User-Agent"]
             ?? null;
 
         this.resolve = $?.Environment["NPM-Config-Init-Module"]
-            ?? Settings.mapping["NPM-Config-Init-Module"]
+            ?? Settings?.mapping["NPM-Config-Init-Module"]
             ?? null;
 
         this.gyp = $?.Environment["NPM-Config-Node-Gyp"]
-            ?? Settings.mapping["NPM-Config-Node-Gyp"]
+            ?? Settings?.mapping["NPM-Config-Node-Gyp"]
             ?? null;
 
         this.executable = $?.Environment["NPM-Node-Execpath"]
-            ?? Settings.mapping["NPM-Node-Execpath"]
+            ?? Settings?.mapping["NPM-Node-Execpath"]
             ?? null;
+
+        this.injection.$ = $?.Environment["NPM-Package-Config-Injection"]
+            ?? Settings?.mapping["NPM-Package-Config-Injection"]
+            ?? null;
+
+        this.environment = Process.env;
+
+        (dynamic) && Object.keys(this.environment).forEach(($) => {
+            Object.defineProperty(this, Settings.normalize($), {
+                configurable: true,
+                enumerable: true,
+                writable: true,
+                value: this.environment[$]
+            });
+        });
+
+        (this.injection["$"] !== null) && this.inject();
     }
-}
 
-function normalize(input: string) {
-    const $: string = input.replace("npm", "NPM");
+    private inject() {
+        const Target = Path.resolve(this.injection.$?.Value);
+        if (FS.existsSync(Target)) {
+            try {
+                this.injection.JSON = JSON.parse(FS.readFileSync(Target, {encoding: "utf-8"}));
+            } catch (e) {
+                /// ... Unable to Serialize Environment File
+            } finally {
+                this.injection.$ = Object.create({});
+            }
 
-    return [
-        $.split(" ").map(($) => {
-            return $.toString()[0].toUpperCase() + $.toString().slice(1);
-        }).join("-").split("_").map(($) => {
-            return $.toString()[0].toUpperCase() + $.toString().slice(1);
-        }).join("-").split("-").map(($) => {
-            return $.toString()[0].toUpperCase() + $.toString().slice(1);
-        }).join("-")
-    ].join("-");
+            this.injection.Buffer = FS.readFileSync(Target, {encoding: "utf-8"});
+            this.injection.Buffer.split("\n").forEach(($: string) => {
+                if ($.split("=").length === 2) {
+                    const Enumeration = $.split("=");
+                    const Value = Enumeration[1].trim().replace("\"", "").replace("'", "");
+
+                    Object.defineProperty(this.injection.$, Enumeration[0], {
+                        configurable: true,
+                        enumerable: true,
+                        writable: true,
+                        value: Value
+                    });
+
+                    if (Object.keys(this.injection.JSON).length === 0) {
+                        Object.defineProperty(this.injection.JSON, Enumeration[0], {
+                            configurable: true,
+                            enumerable: true,
+                            writable: true,
+                            value: Value
+                        });
+                    }
+                }
+            });
+        } else {
+            Process.stderr.write("[Error] Specified Configuration for Injection Not Found" + "\n" + "\n");
+            Process.stderr.write(" - Please either create an injection file, or remove" + "\n");
+            Process.stderr.write("   the \"injection\" key from the \"package.json\" File's" + "\n");
+            Process.stderr.write("   \"config\" Section." + "\n" + "\n");
+
+            Process.exit(OS.constants.errno.EIO);
+        }
+
+        Object.freeze(this.injection);
+    }
+
+    private static initialize() {
+        const Environment = JSON.parse(JSON.stringify(Process.env, null, 4));
+        Object.keys(Environment).forEach(($) => {
+            const Container: Map = {};
+
+            const Normalization = Settings.normalize($);
+
+            Settings.mapping[Normalization] = {Key: "", Mapping: {}, Value: ""};
+
+            Container[Normalization] = {
+                Variable: $,
+                Value: Environment[$]
+            };
+
+            Settings.mapping[Normalization]["Key"] = $;
+            Settings.mapping[Normalization]["Value"] = Environment[$];
+            Settings.mapping[Normalization]["Mapping"] = Container;
+        });
+    }
+
+    private static normalize(input: string) {
+        const $: string = input.toLowerCase().replace("npm", "NPM");
+        return [
+            $.split(" ").map(($) => {
+                return $.toString()[0]?.toUpperCase() + $.toString()?.slice(1) ?? "";
+            }).join("-").split("_").map(($) => {
+                return $.toString()[0]?.toUpperCase() + $.toString()?.slice(1) ?? "";
+            }).join("-").split("-").map(($) => {
+                return $.toString()[0]?.toUpperCase() + $.toString()?.slice(1) ?? "";
+            }).join("-")
+        ].join("-");
+    }
 }
 
 /*** Debug Console Utility String Generator */
@@ -164,19 +286,6 @@ function Configuration(Arguments: Argv) {
 
     Arguments.option("file", {type: "string"}).alias("file", "f").default("file", null);
     Arguments.describe("file", "Write Current-Working-Directory to [FILE]");
-
-    // Arguments.example("Global", Syntax("npx cli cwd"));
-    // Arguments.example("Node", Syntax("node cli cwd"));
-    // Arguments.example("NPM", Syntax("npm run cli -- cwd"));
-
-    // Arguments.usage([
-    //     "Usage" + ":",
-    //     "  >>> npm run cli -- cwd",
-    //     "  >>> npm run cli -- cwd --help",
-    //     "  >>> npm run cli -- cwd --json",
-    //     "  >>> npm run cli -- cwd --debug",
-    //     "  >>> npm run cli -- cwd --file \"Settings.json\""
-    // ].join("\n"));
 }
 
 /***
@@ -228,7 +337,7 @@ function Output(data: Settings, debug = false) {
         Debug: debug
     }, null, 4), "\n");
 
-    Process.stdout.write("[Log] NPM Environment Configuration" + ":" + " " + JSON.stringify(data, null, 4) + "\n" + "\n");
+    Process.stdout.write("[Log] Environment Configuration" + ":" + " " + JSON.stringify(data, null, 4) + "\n" + "\n");
 
     return {data, debug};
 }
@@ -248,28 +357,10 @@ const Command = async ($: Argv) => {
 
     Configuration(Arguments);
 
-    const Environment = JSON.parse(JSON.stringify(Process.env, null, 4));
-    Object.keys(Environment).forEach(($) => {
-        const Container: { [key: string]: {} } = {};
-
-        if ($.includes("npm")) {
-            Settings.mapping[normalize($)] = {};
-
-            Container[normalize($)] = {
-                Variable: $,
-                Value: Environment[$]
-            };
-
-            Settings.mapping[normalize($)]["Key"] = $;
-            Settings.mapping[normalize($)]["Value"] = Environment[$];
-            Settings.mapping[normalize($)]["Mapping"] = Container;
-        }
-    });
-
     Arguments.check(async ($) => {
         ($?.debug) && console.log(Input($._), JSON.stringify($, null, 4), "\n");
 
-        const Instance = new Settings(null);
+        const Instance = new Settings();
 
         ($?.file) || Output(Instance, !!($?.debug));
         ($?.file) && Write(Instance, String($?.file ?? Path.join(Process.cwd(), "Configuration.json")), !!($?.debug));
