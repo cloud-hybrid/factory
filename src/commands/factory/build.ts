@@ -233,12 +233,6 @@ async function Distribution(data: Package[]) {
     }
 }
 
-/*** CDFK Packaged Directory */
-const CDFK = Path.join(PKG, "cdfk");
-
-/// --> Runtime Assertion
-Assertion.strictEqual(FS.existsSync(CDFK), true);
-
 /*** Debug Console Utility String Generator */
 const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";
 
@@ -301,8 +295,6 @@ const Command = async ($: Argv) => {
 
         ($?.debug) && console.debug("[Debug] Runtime Location" + ":", import.meta.url, "\n");
         ($?.debug) && console.debug("[Debug] User CWD" + ":", Process.cwd(), "\n");
-        ($?.debug) && console.debug("[Debug] CDFK Target" + ":", CDFK, "\n");
-
         ($?.debug) && console.debug("[Debug] Package" + ":", PKG, "\n");
 
         ($?.debug) && console.debug("[Debug] Directories" + ":", Targets, "\n");

@@ -10,7 +10,9 @@ const License = Colors.dim("BSD-3 License");
 const Generate = () => {
     const Lines: string[] = [];
 
-    (process.env?.npm_command) || Lines.push("");
+    /// Check if NPX is interfacing `factory`
+    (process.env?.npm_lifecycle_event === "npx") && Lines.push("");
+
     Lines.push([Colors.blue("    //\\\\--/"), "  ", Colors.magenta(" //\\\\--/")].join(""));
     Lines.push([Colors.blue("   ╱╱__\\\\/"), "  ", Colors.magenta(" //__\\\\/")].join("") + "   " + Title);
     Lines.push([Colors.blue("  ╱╱\\\\--/"), "  ", Colors.magenta(" //\\\\--/")].join(""));

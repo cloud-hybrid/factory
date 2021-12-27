@@ -60,6 +60,8 @@
     },
     "include": [
         "package.json",
+        "cdktf.json",
+        ".constructs",
         "**/*.ts",
         "./src/schema",
         "./src/schema/lambda",
