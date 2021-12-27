@@ -1,11 +1,12 @@
 {
     "name": "cloud-factory",
     "private": false,
-    "version": "0.2.23",
+    "version": "0.2.24",
     "type": "module",
     "main": "index.js",
     "types": "distribution/src/index.d.ts",
     "license": "BSD 1-Clause License",
+    "author": "Jacob B. Sanders",
     "scripts": {
         "start": "node distribution/src/index.js",
         "constructs": "cdktf get --language typescript --output .constructs",
