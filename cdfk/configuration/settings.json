@@ -1,23 +1,10 @@
 {
-    "TF": true,
-    "CDK": true,
-    "CFN": false,
+    "Organization": "Organization",
+    "Environment": "Development",
+    "Service": "Proof-of-Concept",
     "Cloud": {
         "Provider": "AWS",
-        "Region": "us-east-2"
-    },
-    "Source": "src",
-    "Service": "Proof-of-Concept",
-    "Environment": "Development",
-    "Organization": "Cloud-Vault",
-    "Deployment": {
-        "Type": "Service",
-        "Method": "Single"
-    },
-    "SAM": "service",
-    "Functions": [
-        "lambda-1",
-        "lambda-2",
-        "lambda-3"
-    ]
+        "Region": "us-east-2",
+        "Profile": "default"
+    }
 }

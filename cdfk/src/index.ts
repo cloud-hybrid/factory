@@ -10,7 +10,6 @@
 import FS from "fs";
 import Path from "path";
 import Assertion from "assert";
-import Process from "process";
 
 import {Construct} from "constructs";
 
@@ -34,9 +33,6 @@ class Lambda {
     public readonly directory: string;
     public readonly version: string;
     public readonly source: string;
-
-    protected readonly functions: string[] = Settings.Functions;
-    protected readonly deployment: typeof Settings.Deployment = Settings.Deployment;
 
     public readonly settings: typeof Settings = Settings;
 
@@ -112,14 +108,9 @@ class Lambda {
  */
 
 class SAM {
-    /***  Constructed Resource Name Derived from `Organization` + `Environment` + `Service` ? `Name` */
-    public readonly ID: string;
-
+    public prefix: string;
     /*** SAM Reference to Encapsulating Folder-Name */
-    public name: string = Settings.SAM;
-
-    /*** Common-Name - Constructs Unique SAM Alias or Cloud Resource Name */
-    public readonly service: string = Settings.Service;
+    public name: string;
 
     /*** Opinionated API Gateway-V2 Resource Name */
     public readonly gateway: string = "API-Gateway";
@@ -131,7 +122,6 @@ class SAM {
     public readonly directory?: string | undefined = undefined;
 
     /*** Configuration Setting Specifiying List of Folder(s) that Contain Lambda(s) */
-        // public readonly functions: string[] = Settings.Functions;
     public readonly functions: string[] = [];
 
     /*** AWS Cloud Provider, Derived from Configuration (Settings) File */
@@ -140,9 +130,6 @@ class SAM {
     public readonly environment: typeof Settings.Environment = Settings.Environment;
     /*** Cloud Organization Alias, Derived from Configuration (Settings) File */
     public readonly organization: typeof Settings.Organization = Settings.Organization;
-
-    /*** Deployment Type - *Under Development* */
-    protected readonly deployment: typeof Configuration.settings["Deployment"] = Settings.Deployment;
 
     /***
      * Construct Initializer
@@ -155,20 +142,17 @@ class SAM {
      *
      */
 
-    constructor(name: string = Settings.SAM, service: string = Settings.Service) {
-        this.name = name;
-        this.service = service;
+    constructor() {
+        this.prefix = [Settings.Organization, Settings.Environment].join("-");
+        this.name = [this.prefix, Settings.Service, "Stack"].join("-");
+        this.bucket = this.name.toLowerCase();
 
+        /// Assertion to ensure a distribution target exists
+        /// --> To Generate a Distribution: factory cdfk initialize
+        Assertion.strictEqual(FS.existsSync(Distribution), true, "A CDK Distribution Target Doesn't Exist");
         FS.readdirSync(Distribution).forEach(($) => {
-            /// Don't include library (Lambda-Layers)
-            if ($ !== "library") {
-                this.functions.push(Path.join(Distribution, $))
-            }
+            ($ !== "library") && this.functions.push(Path.join(Distribution, $))
         });
-
-        this.bucket = ["SAM", this.service, this.name].join("-").toLowerCase();
-
-        this.ID = [this.organization, this.environment, "SAM", this.service].join("-");
     }
 
     /***
@@ -266,38 +250,45 @@ class SAM {
 }
 
 class Service extends TerraformStack {
-    constructor($: Construct, ID: string, settings: SAM) {
-        super($, ID);
+    readonly prefix: string;
+    readonly identifier: string;
+
+    constructor($: Construct, settings: SAM) {
+        super($, settings.name);
+
+        this.prefix = settings.prefix;
+        this.identifier = settings.name;
 
         /*** Cloud Provider (AWS) */
-        const provider = new AWS.AwsProvider(this, [ID, "AWS-Provider"].join("-").toLowerCase(), {
+        const provider = new AWS.AwsProvider(this, [this.identifier, "AWS-Provider"].join("-").toLowerCase(), {
             region: settings.cloud["Region"]
         });
 
         /*** Unique S3 Bucket Containing Lambda Artifact(s) */
-        const bucket = new AWS.s3.S3Bucket(this, [ID, "S3-Bucket"].join("-").toLowerCase(), {
-            bucketPrefix: settings.bucket
+        const bucket = new AWS.s3.S3Bucket(this, [this.identifier, "S3-Bucket"].join("-").toLowerCase(), {
+            bucket: settings.bucket
         });
 
         /*** Logging Group */
-        const group = new AWS.cloudwatch.CloudwatchLogGroup(this, [ID, "Log-Group"].join("-").toLowerCase(), {
-            name: [settings.ID, "Log-Group"].join("-")
+        const group = new AWS.cloudwatch.CloudwatchLogGroup(this, [this.identifier, "Log-Group"].join("-").toLowerCase(), {
+            name: [this.identifier, "Log-Group"].join("-")
         });
 
         /*** Logging Stream(s) */
-        const stream = new AWS.cloudwatch.CloudwatchLogStream(this, [ID, "Log-Stream"].join("-").toLowerCase(), {
-            name: [settings.ID, "Log-Stream"].join("-"),
+        const stream = new AWS.cloudwatch.CloudwatchLogStream(this, [this.identifier, "Log-Stream"].join("-").toLowerCase(), {
+            name: [this.identifier, "Log-Stream"].join("-"),
             logGroupName: group.name
         });
 
         /*** API Gateway */
-        const api = new AWS.apigatewayv2.Apigatewayv2Api(this, [ID, "Gateway"].join("-").toLowerCase(), {
-            name: [ID, settings.gateway].join("-"),
+        const api = new AWS.apigatewayv2.Apigatewayv2Api(this, [this.identifier, "Gateway"].join("-").toLowerCase(), {
+            name: [this.identifier, settings.gateway].join("-"),
+            description: "API Gateway V2 Resource for" + " " + this.identifier,
             protocolType: "HTTP"
         });
 
         /*** API Gateway-V2 Stage Configuration */
-        const stage = new AWS.apigatewayv2.Apigatewayv2Stage(this, [ID, "Environment-Stage"].join("-").toLowerCase(), {
+        const stage = new AWS.apigatewayv2.Apigatewayv2Stage(this, [this.identifier, "Environment-Stage"].join("-").toLowerCase(), {
             apiId: api.id,
             name: settings.environment.toLowerCase(),
             autoDeploy: true,
@@ -320,13 +311,20 @@ class Service extends TerraformStack {
 
         // const Lambdas: string[] = [];
         FS.readdirSync(Path.join(Distribution), {withFileTypes: true}).forEach(($, iterator) => {
+            /// Exclude Lambda Layer Library
             if ($.name !== "library" && $.isDirectory()) {
-                // console.debug("[Debug] Lambda Function Initialization" + ":", $);
-
                 const Function = new Lambda($.name);
-                const ID = Function.name.split("_").map(($) => {
-                    return $.toString()[0].toUpperCase() + $.toString().slice(1);
-                }).join("-");
+
+                const ID = [
+                    this.prefix,
+                    Function.name.split(" ").map(($) => {
+                        return $.toString()[0].toUpperCase() + $.toString().slice(1);
+                    }).join("-").split("_").map(($) => {
+                        return $.toString()[0].toUpperCase() + $.toString().slice(1);
+                    }).join("-").split("-").map(($) => {
+                        return $.toString()[0].toUpperCase() + $.toString().slice(1);
+                    }).join("-")
+                ].join("-");
 
                 /*** Lambda Artifact(s) (Executable) */
                 const asset = new TerraformAsset(this, [ID, "Asset"].join("-").toLowerCase(), {
@@ -355,27 +353,34 @@ class Service extends TerraformStack {
                 const Layers: string[] = [];
                 FS.readdirSync(Path.join(Distribution, "library"), {withFileTypes: true}).forEach(($, iterator) => {
                     if ($.isDirectory()) {
-                        const Name = $.name.split("_").map(($) => {
-                            return $.toString()[0].toUpperCase() + $.toString().slice(1);
-                        }).join("-");
+                        const Name = [
+                            this.identifier,
+                            $.name.split(" ").map(($) => {
+                                return $.toString()[0].toUpperCase() + $.toString().slice(1);
+                            }).join("-").split("_").map(($) => {
+                                return $.toString()[0].toUpperCase() + $.toString().slice(1);
+                            }).join("-").split("-").map(($) => {
+                                return $.toString()[0].toUpperCase() + $.toString().slice(1);
+                            }).join("-")
+                        ].join("-");
 
                         const Directory = Path.join(Distribution, "library");
 
                         /*** Lambda-Layer Artifact(s) */
-                        const asset = new TerraformAsset(this, [ID, Name, "Layer-Asset"].join("-").toLowerCase(), {
+                        const asset = new TerraformAsset(this, [Name, "Layer-Asset"].join("-").toLowerCase(), {
                             type: AssetType.ARCHIVE,
                             path: Path.join(Directory, $.name)
                         });
 
                         /*** Upload Lambda Artifact(s) --> S3 */
-                        const archive = new AWS.s3.S3BucketObject(this, [ID, Name, "Layer-Archive"].join("-").toLowerCase(), {
+                        const archive = new AWS.s3.S3BucketObject(this, [Name, "Layer-Archive"].join("-").toLowerCase(), {
                             source: asset.path,
                             bucket: bucket.bucket,
-                            key: [ID, Name, "Layer-Archive.zip"].join("-")
+                            key: [Name, "Layer-Archive.zip"].join("-")
                         });
 
                         /*** Upload Lambda-Layer Artifact(s) --> S3 */
-                        const layer = new AWS.lambdafunction.LambdaLayerVersion(this, [ID, Name, "Layer"].join("-").toLowerCase(), {
+                        const layer = new AWS.lambdafunction.LambdaLayerVersion(this, [Name, "Layer"].join("-").toLowerCase(), {
                             layerName: Name,
                             description: "...",
                             s3Bucket: bucket.bucket,
@@ -388,7 +393,7 @@ class Service extends TerraformStack {
 
                 /*** Lambda Function */
                 const lambda = new AWS.lambdafunction.LambdaFunction(this, ID.toLowerCase(), {
-                    functionName: $.name,
+                    functionName: [ID, "Lambda"].join("-"),
                     handler: Function.handler,
                     runtime: Function.runtime,
                     s3Bucket: bucket.bucket,
@@ -435,7 +440,6 @@ class Service extends TerraformStack {
                     connectionType: "INTERNET",
                     description: [ID, "Gateway-Integration"].join(" "),
                     payloadFormatVersion: "1.0",
-                    // payloadFormatVersion: "2.0", // Invalid JSON
                     integrationUri: lambda.arn
                 });
 
@@ -465,7 +469,7 @@ const Deployment = () => {
     return new Promise((resolve) => {
         const Stack = new SAM();
 
-        new Service(Application, Stack.ID, Stack);
+        new Service(Application, Stack);
 
         const Synthesize = () => {
             Application.synth();

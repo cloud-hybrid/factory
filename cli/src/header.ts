@@ -2,8 +2,8 @@ import Colors from "chalk";
 
 const Year = new Date().getFullYear();
 
-const Title = Colors.bold.underline("CDFK - Construct Factory");
-const Description = Colors.italic("Development Extensions & Utilities");
+const Title = Colors.bold.underline("Construct Factory - CDK");
+const Description = Colors.italic("Deployment Extensions & Utilities");
 const Copyright = Colors.dim("Open Source" + "," + " " + Year);
 const License = Colors.dim("BSD-3 License");
 

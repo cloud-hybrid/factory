@@ -11,4 +11,4 @@ npm install --production
 
 mv node_modules layer/nodejs/node_modules
 
-exit 0
+exit ${?}

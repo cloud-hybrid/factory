@@ -102,7 +102,9 @@ function Copy(source: string, target: string) {
     const Exclusions = [
         ".git",
         ".idea",
-        ".vscode"
+        ".vscode",
+
+        "scripts"
     ];
 
     FS.mkdirSync(target, {recursive: true});
@@ -138,7 +140,9 @@ function Layer(source: string, target: string) {
         ".git",
         ".idea",
         ".vscode",
-        ".DS_Store"
+        ".DS_Store",
+
+        "scripts"
     ];
 
     FS.readdirSync(source).forEach((element) => {
@@ -173,7 +177,7 @@ function Locate(files: string[] | any) {
 
     for (const file in files) {
         const Target = files[file];
-        if (Target.includes("package.json")) {
+        if (Target.includes("package.json") && !Target.includes("scripts")) {
             Data.push(Path.dirname(Target));
         }
     }
@@ -256,6 +260,9 @@ async function Distribution(data: Package[]) {
             JSON.stringify($.Overwrites, null, 4)
         );
 
+        /*** Copy the factory.json Base Configuration file to Distribution */
+
+
         Process.chdir(OWD);
     }
 }
@@ -323,7 +330,15 @@ const Command = async ($: Argv) => {
         ($?.debug) && console.debug("[Debug] File Structure (Packages)" + ":", [...Packages(Process.cwd())], "\n");
         ($?.debug) && console.debug("[Debug] File Structure (Library)" + ":", [...Library(Process.cwd())], "\n");
 
-        const Factory = Import(Path.join(Process.cwd(), "factory.json"));
+        /***
+         * Configuration File Assertion
+         * ----------------------------
+         * ***Note*** - the `factory.json` file is a hard requirement.
+         */
+
+        Assertion.strictEqual(FS.existsSync(Path.join(Process.cwd(), "factory.json")), true, "factory.json Configuration Not Found");
+
+        const Factory: object = Import(Path.join(Process.cwd(), "factory.json"));
 
         ($?.debug) && console.debug("[Debug] Factory Definition (factory.json)" + ":", Factory, "\n");
 
@@ -467,10 +482,12 @@ const Command = async ($: Argv) => {
         await Distribution(Data);
 
         ($?.debug) && console.debug("\n" + "[Debug] Cleaning Layers ...", "\n");
-
         for (const item of Data.filter(($) => $.Layer)) {
             await Remove(Path.join(item.Directory, "nodejs"), { recursive: true });
         }
+
+        ($?.debug) && console.debug("\n" + "[Debug] Writing factory.json Distribution ...", "\n");
+        FS.writeFileSync(Path.join(Process.cwd(), "distribution", "factory.json"), JSON.stringify(Factory));
 
         ($?.debug) && console.debug("[Debug] Initialization Complete", "\n");
 

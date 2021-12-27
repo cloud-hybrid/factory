@@ -162,25 +162,20 @@ const Command = async ($: Argv) => {
 
         (trigger === "Y") && console.log("\n" + "[Log] Writing File Structure ...");
 
-        (trigger === "Y") && Copy(Repository, Path.join(Process.cwd(), "factory"));
+        /// Copy Factory's CDFK Directory to Target Deployable
+        (trigger === "Y") && Copy(Path.join(Repository, "cdfk"), Path.join(Process.cwd(), "factory"));
+        /// Install CDFK Dependencies
+        (trigger === "Y") && await Subprocess("npm install .", Path.join(Process.cwd(), "factory"));
+        /// Compile Down Typescript to Javascript
+        (trigger === "Y") && await Subprocess("tsc", Path.join(Process.cwd(), "factory"));
+
+        (trigger === "Y") && await Remove(Path.join(Process.cwd(), "factory", "packages", "distribution"), { recursive: true, maxRetries: 5, force: true });
 
         (trigger === "Y") && Copy(Path.join(Process.cwd(), "distribution"), Path.join(Process.cwd(), "factory", "packages", "distribution"));
 
-        (trigger === "Y") && FS.mkdirSync(Path.join(Process.cwd(), "factory", "packages", "distribution"), { recursive: true});
+        (trigger === "Y") && await Subprocess("cdktf synth", Path.join(Process.cwd(), "factory"));
 
-        (trigger === "Y") && Process.chdir(Path.join(Process.cwd(), "factory"));
-
-        (trigger === "Y") && await Subprocess("npm install cdktf-cli --global", Process.cwd());
-
-        (trigger === "Y") && await Subprocess("npm install", Process.cwd());
-
-        (trigger === "Y") && await Subprocess("node Install.js", Process.cwd());
-
-        (trigger === "Y") && await Subprocess("npm install", Process.cwd());
-
-        (trigger === "Y") && await Subprocess("cdktf synth", Path.join(Process.cwd(), "cdfk"));
-
-        (trigger === "Y") && await Subprocess("cdktf deploy --auto-approve", Path.join(Process.cwd(), "cdfk"));
+        (trigger === "Y") && await Subprocess("cdktf deploy --auto-approve", Path.join(Process.cwd(), "factory"));
 
         return true;
     }).strict();
