@@ -21,6 +21,31 @@ type Policy = IAM.IamPolicy;
 
 import {Import, Settings, Configuration, Distribution} from "./settings.js";
 
+/***
+ * Cloud Resource Name Normalization
+ * ---------------------------------
+ * Takes any given prefix, a resource name, and generates a machine-readable, normalized string
+ *
+ * @param prefix {string} ex) [Organization]-[Environment]
+ * @param name {string} ex) API-Gateway-V2-Integration
+ *
+ * @returns {string}
+ *
+ */
+
+function normalize(prefix: string, name: string) {
+    return [
+        prefix,
+        name.split(" ").map(($) => {
+            return $.toString()[0].toUpperCase() + $.toString().slice(1);
+        }).join("-").split("_").map(($) => {
+            return $.toString()[0].toUpperCase() + $.toString().slice(1);
+        }).join("-").split("-").map(($) => {
+            return $.toString()[0].toUpperCase() + $.toString().slice(1);
+        }).join("-")
+    ].join("-");
+}
+
 /*** The {@link Lambda} Construct */
 class Lambda {
     public name: string;
@@ -314,17 +339,7 @@ class Service extends TerraformStack {
             /// Exclude Lambda Layer Library
             if ($.name !== "library" && $.isDirectory()) {
                 const Function = new Lambda($.name);
-
-                const ID = [
-                    this.prefix,
-                    Function.name.split(" ").map(($) => {
-                        return $.toString()[0].toUpperCase() + $.toString().slice(1);
-                    }).join("-").split("_").map(($) => {
-                        return $.toString()[0].toUpperCase() + $.toString().slice(1);
-                    }).join("-").split("-").map(($) => {
-                        return $.toString()[0].toUpperCase() + $.toString().slice(1);
-                    }).join("-")
-                ].join("-");
+                const ID = normalize(this.prefix, Function.name);
 
                 /*** Lambda Artifact(s) (Executable) */
                 const asset = new TerraformAsset(this, [ID, "Asset"].join("-").toLowerCase(), {
@@ -353,17 +368,7 @@ class Service extends TerraformStack {
                 const Layers: string[] = [];
                 FS.readdirSync(Path.join(Distribution, "library"), {withFileTypes: true}).forEach(($) => {
                     if ($.isDirectory()) {
-                        const Name = [
-                            this.identifier,
-                            $.name.split(" ").map(($) => {
-                                return $.toString()[0].toUpperCase() + $.toString().slice(1);
-                            }).join("-").split("_").map(($) => {
-                                return $.toString()[0].toUpperCase() + $.toString().slice(1);
-                            }).join("-").split("-").map(($) => {
-                                return $.toString()[0].toUpperCase() + $.toString().slice(1);
-                            }).join("-")
-                        ].join("-");
-
+                        const Name = normalize(this.identifier, $.name);
                         const Directory = Path.join(Distribution, "library");
 
                         /*** Lambda-Layer Artifact(s) */
