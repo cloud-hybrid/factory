@@ -1,10 +1,10 @@
-# Construct Factory - `@cloud-vault/factory` #
+# Construct Factory - `cloud-factory` #
 
 > *Constructs are classes which define a “piece of system state”. Constructs can be composed together to form higher-level building blocks which represent more complex state. Constructs are often used to represent the desired state of cloud applications. For example, in the AWS CDK, which is used to define the desired state for AWS infrastructure using CloudFormation, the lowest-level construct represents a resource definition in a CloudFormation template. These resources are composed to represent higher-level logical units of a cloud application, etc.*
 
 ## Task Board ##
 
-- [ ] Refactor Packaging Structure for `npx @cloud-vault/factory` Command Capabilities
+- [x] Refactor Packaging Structure for `npx cloud-factory` Command Capabilities
 
 ---
 
@@ -13,7 +13,7 @@
 > ***The Twelve-factor app [...] requires strict separation of config from code. Config varies substantially across deploys, code does not.***
 > - [**III. Config**](https://12factor.net/config), *The 12-Factor Application*
 
-The design philosophies and motivations behind `@cloud-vault/factory` are simple:
+The design philosophies and motivations behind `cloud-factory` are simple:
 
 - Provide development-lifecycle efficiencies
 - Generate human readable, *universally unique identifiers*
@@ -23,7 +23,7 @@ The design philosophies and motivations behind `@cloud-vault/factory` are simple
 
 ### Overview ###
 
-At a high level, `@cloud-vault/factory` receives a set of repositories as **input**, executes **directory translations** and potentially compile(s) code,
+At a high level, `cloud-factory` receives a set of repositories as **input**, executes **directory translations** and potentially compile(s) code,
 and **outputs** a *distribution*. The distribution is composed of an opinionated structure that later fulfills deployment requirements. Through analysis of
 repository layout(s) & dependencies, a series of constructs, or cloud resources, are dynamically composed into a
 singular stack -- the stack becomes the deployable.
@@ -188,7 +188,7 @@ as its value:
 }
 ```
 
-For example, let the aforementioned JSON snippet represent a lambda function; `@cloud-vault/factory` will 
+For example, let the aforementioned JSON snippet represent a lambda function; `cloud-factory` will 
 instead use `*/*/get-users` as the API-Gateway-V2 integration endpoint instead of the much longer,
 undesired `cloud-technology-http-api-get-users` value.
 
@@ -204,9 +204,9 @@ undesired `cloud-technology-http-api-get-users` value.
 
 ## Local Development ##
 
-In order to test changes to `@cloud-vault/factory` globally, ensure to run the `node Install.js` script located
+In order to test changes to `cloud-factory` globally, ensure to run the `node Install.js` script located
 at the repository's root prior to executing `factory cdfk deploy`. The goal is to ensure of `npx`, or otherwise *global*
-cli usage, and because `@cloud-vault/factory` needs to be compiled, the global installation candidate needs to reflect what's
+cli usage, and because `cloud-factory` needs to be compiled, the global installation candidate needs to reflect what's
 local during development. 
 
 To run the `tsc` compiler in `--watch` mode, execute the `npm run compile` command(s) (applicable to sub-packages `cli` & `cdfk`).
