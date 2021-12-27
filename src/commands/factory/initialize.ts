@@ -267,12 +267,6 @@ async function Distribution(data: Package[]) {
     }
 }
 
-/*** CDFK Packaged Directory */
-const CDFK = Path.join(PKG, "cdfk");
-
-/// --> Runtime Assertion
-Assertion.strictEqual(FS.existsSync(CDFK), true);
-
 /*** Debug Console Utility String Generator */
 const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";
 
@@ -288,7 +282,7 @@ const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + 
  */
 
 function Configuration(Arguments: Argv) {
-    const Syntax = (command: string) => [command, "? [--debug] ? [--help]"].join(" ");
+    // const Syntax = (command: string) => [command, "? [--debug] ? [--help]"].join(" ");
 
     Arguments.hide("version");
     Arguments.help("help", "Display Usage Guide").default("help", false);

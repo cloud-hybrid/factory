@@ -24,13 +24,6 @@ const PKG: string = Path.dirname(CWD);
 /*** Repository */
 const Repository: string = Path.resolve(CWD, "..", "..", "..", "..");
 
-/*** CDFK Packaged Directory */
-
-const CDFK = Path.resolve(CWD, "..", "..", "..", "..", "cdfk");
-
-/// --> Runtime Assertion
-Assertion.strictEqual(FS.existsSync(CDFK), true);
-
 /***
  *  JSON Capable Importer
  *

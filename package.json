@@ -1,15 +1,17 @@
 {
     "name": "@cloud-vault/factory",
     "private": false,
-    "version": "0.2.2",
+    "version": "0.2.9",
     "type": "module",
     "main": "index.js",
     "types": "distribution/src/index.d.ts",
     "scripts": {
-        "setup": "node Install.js",
-        "install": "tsc",
+        "start": "node distribution/src/index.js",
+        "constructs": "cdktf get --language typescript --output .constructs",
+        "postinstall": "tsc",
         "upload": "npm publish --access public",
         "reinstall": "npm update && npm install --global --force",
+        "prepare": "rm -r -f .idea",
         "prepublishOnly": "npm install",
         "rm-distribution": "rm -r -f ./distribution",
         "rm-js": "find ./src -type f -name \"*.js\" -prune -exec rm -rf '{}' +",
@@ -19,6 +21,9 @@
     },
     "dependencies": {
         "@cdktf/provider-aws": "^3.0.1",
+        "@types/aws-lambda": "latest",
+        "@types/node": "latest",
+        "@types/yargs": "latest",
         "ajv": "^8.8.2",
         "ajv-formats": "^3.0.0-rc.0",
         "cdktf": "^0.8.3",
@@ -26,17 +31,18 @@
         "chalk": "^5.0.0",
         "constructs": "^10.0.12",
         "typescript": "^4.5.4",
-        "yargs": "^17.3.0",
-        "@types/aws-lambda": "latest",
-        "@types/node": "latest",
-        "@types/yargs": "latest"
+        "yargs": "^17.3.0"
     },
     "devDependencies": {
+        "@swc/helpers": "^0.3.2",
+        "@swc/core": "^1.2.123",
         "@typescript-eslint/eslint-plugin": "^5.7.0",
         "@typescript-eslint/experimental-utils": "^5.7.0",
         "@typescript-eslint/parser": "^5.8.0",
         "@typescript-eslint/scope-manager": "^5.7.0",
         "@typescript-eslint/typescript-estree": "^5.7.0",
+        "regenerator-runtime": "^0.13.9",
+        "ts-node": "^10.4.0",
         "typescript-eslint-language-service": "^5.0.0"
     },
     "eslintConfig": {
