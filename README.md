@@ -80,12 +80,13 @@ With the following example structure:
 └── cloud-resource-2
 ```
 
-However, also take note that the following example is *no different* compared to the first example:
+However, also take note that the following example's `cloud-resource-2` is *no different* compared to the first example:
 
 ```
 .
+├── ...
 ├── arbitrary-folder-name
-│    └──cloud-resource-1
+│    └──cloud-resource-2
 │        ├── LICENSE
 │        ├── README.md
 │        ├── package.json
@@ -93,7 +94,7 @@ However, also take note that the following example is *no different* compared to
 │            └── index.js
 ```
 
-`@cloud-technology/factory` will transform the `cloud-resource-1` directory using the same translations in both examples
+`@cloud-technology/factory` will transform the `cloud-resource-2` directory using the same translations in both examples
 when the distribution gets compiled:
 
 ```
