@@ -16,4 +16,7 @@ cdktf.out
 
 .DS_Store
 
-!Entry-Point.js
+distribution
+
+*.tgz
+*.zip
