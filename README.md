@@ -153,13 +153,13 @@ Lastly, *define a `factory.json` file*:
 }
 ```
 
-**Note**: awknowledge the git-clone target directories:
+**Note**: acknowledge the git-clone target directories:
 - `./simple-response`
 - `./library/http-responses`
 
 Arbitrary directories *that are **not** under `library`* are assumed to be deployable cloud resource(s).
 
-Arbitrary directories *that are under `library`* are assumed to be the deployable cloud resource-related ***dependencies***.
+Arbitrary directories *that are under `library`* are assumed to be deployable cloud resource-related ***dependencies***.
 
 ### Overwrites ###
 
