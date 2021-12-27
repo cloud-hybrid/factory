@@ -4,9 +4,6 @@ import Module from "module";
 /*** *Current Working Directory* */
 const CWD: string = Path.dirname(import.meta.url.replace("file" + ":" + "/", ""));
 
-/*** *Package Directory* */
-const PKG: string = Path.dirname(CWD);
-
 /***
  *  JSON Capable Importer
  *
@@ -15,7 +12,6 @@ const PKG: string = Path.dirname(CWD);
  */
 
 const Import = Module.createRequire(CWD);
-
 const Package = Import("../../package.json");
 
 // Package Version
