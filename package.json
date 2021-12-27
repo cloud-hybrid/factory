@@ -1,26 +1,77 @@
 {
     "name": "@cloud-vault/factory",
     "private": false,
-    "version": "0.1.2",
+    "version": "0.1.4",
     "type": "module",
-    "bin": {
-        "factory": "./Entry-Point.js"
-    },
-    "files": [
-        "**/*.js",
-        "**/*.ts",
-        "**/package.json"
-    ],
+    "main": "index.js",
+    "types": "distribution/src/index.d.ts",
     "scripts": {
         "setup": "node Install.js",
         "upload": "npm publish --access public",
         "reinstall": "npm update && npm install --global --force",
+        "rm-distribution": "rm -r -f ./distribution",
+        "rm-js": "find ./src -type f -name \"*.js\" -prune -exec rm -rf '{}' +",
         "rm-locks": "find . -type f -name \"package-lock.json\" -prune -exec rm -rf '{}' +",
-        "rm-node-modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
+        "rm-types": "find ./src -type f -name \"*.d.ts\" -prune -exec rm -rf '{}' +",
+        "rm-node-modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
+        "prepare": "tsc",
+        "package": "npm pack"
     },
     "dependencies": {
-        "@cloud-vault/factory": ".",
-        "@cloud-vault/cli": "./cli",
-        "@cloud-vault/cdfk": "./cdfk"
+        "@cdktf/provider-aws": "^3.0.1",
+        "ajv": "^8.8.2",
+        "ajv-formats": "^3.0.0-rc.0",
+        "cdktf": "^0.8.3",
+        "cdktf-cli": "^0.8.3",
+        "chalk": "^5.0.0",
+        "constructs": "^10.0.12",
+        "typescript": "^4.5.4",
+        "yargs": "^17.3.0"
+    },
+    "devDependencies": {
+        "@types/aws-lambda": "^8.10.88",
+        "@types/node": "latest",
+        "@types/yargs": "^17.0.7",
+        "@typescript-eslint/eslint-plugin": "^5.7.0",
+        "@typescript-eslint/experimental-utils": "^5.7.0",
+        "@typescript-eslint/parser": "^5.8.0",
+        "@typescript-eslint/scope-manager": "^5.7.0",
+        "@typescript-eslint/typescript-estree": "^5.7.0",
+        "typescript-eslint-language-service": "^5.0.0"
+    },
+    "eslintConfig": {
+        "parser": "@typescript-eslint/parser",
+        "plugins": [
+            "@typescript-eslint"
+        ],
+        "extends": [
+            "eslint:recommended",
+            "plugin:@typescript-eslint/eslint-recommended",
+            "plugin:@typescript-eslint/recommended"
+        ],
+        "rules": {
+            "no-case-declarations": 0,
+            "@typescript-eslint/no-explicit-any": 0,
+            "@typescript-eslint/explicit-function-return-type": 0,
+            "@typescript-eslint/no-use-before-define": 0,
+            "@typescript-eslint/no-empty-interface": 0,
+            "@typescript-eslint/explicit-module-boundary-types": 0,
+            "@typescript-eslint/no-empty-function": 0,
+            "@typescript-eslint/no-unused-vars": 0,
+            "@typescript-eslint/no-inferrable-types": 0,
+            "@typescript-eslint/ban-types": 0,
+            "@typescript-eslint/ban-ts-comment": 0,
+            "no-sequences": "error"
+        },
+        "ignorePatterns": [
+            "ci",
+            "dist",
+            "coverage",
+            "distribution",
+            "node_modules"
+        ]
+    },
+    "bin": {
+        "factory": "./index.js"
     }
 }
