@@ -1,8 +1,6 @@
 import OS from "os";
 import FS from "fs";
 import Path from "path";
-import Utility from "util";
-import Module from "module";
 import Process from "process";
 import Assertion from "assert";
 
