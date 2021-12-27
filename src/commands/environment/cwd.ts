@@ -5,7 +5,7 @@ import Assertion from "assert";
 
 import {Argv} from "yargs";
 
-import {Local} from "../../utilities";
+import {Local} from "../../utilities/environment.js";
 
 /*** Debug Console Utility String Generator */
 const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";
