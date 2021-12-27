@@ -1,7 +1,7 @@
 {
     "name": "@cloud-vault/factory",
     "private": false,
-    "version": "0.0.0",
+    "version": "0.1.2",
     "type": "module",
     "bin": {
         "factory": "./Entry-Point.js"
@@ -13,6 +13,7 @@
     ],
     "scripts": {
         "setup": "node Install.js",
+        "upload": "npm publish --access public",
         "reinstall": "npm update && npm install --global --force",
         "rm-locks": "find . -type f -name \"package-lock.json\" -prune -exec rm -rf '{}' +",
         "rm-node-modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
