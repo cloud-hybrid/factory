@@ -1,17 +1,24 @@
-# Construct Factory - `cloud-factory` #
+# `cloud-factory` - Construct Utilities #
 
-> *Constructs are classes which define a “piece of system state”. Constructs can be composed together to form higher-level building blocks which represent more complex state. Constructs are often used to represent the desired state of cloud applications. For example, in the AWS CDK, which is used to define the desired state for AWS infrastructure using CloudFormation, the lowest-level construct represents a resource definition in a CloudFormation template. These resources are composed to represent higher-level logical units of a cloud application, etc.*
+**`cloud-factory` is a commandline application that provides ci-cd capabilities,
+code extensions, and overall utilities for cloud-related management and
+development.**
 
-## Task Board ##
-
-- [x] Refactor Packaging Structure for `npx cloud-factory` Command Capabilities
+In order to begin, open a console capable of running `node.js` (`node`), and issue the following
+command:
+   - `npx cloud-factory@latest --help`
 
 ---
 
 ## Design Philosophy ##
 
-> ***The Twelve-factor app [...] requires strict separation of config from code. Config varies substantially across deploys, code does not.***
-> - [**III. Config**](https://12factor.net/config), *The 12-Factor Application*
+> *Constructs are classes which define a “piece of system state”. Constructs can be composed 
+> together to form higher-level building blocks which represent more complex state. Constructs 
+> are often used to represent the desired state of cloud applications. For example, in the AWS 
+> CDK, which is used to define the desired state for AWS infrastructure using CloudFormation, 
+> the lowest-level construct represents a resource definition in a CloudFormation template. 
+> These resources are composed to represent higher-level logical units of a cloud application, 
+> etc.*
 
 The design philosophies and motivations behind `cloud-factory` are simple:
 
@@ -73,7 +80,7 @@ With the following example structure:
           └── index.js
 ```
 
-`@cloud-technology/factory` takes note of the following directories:
+`cloud-factory` takes note of the following directories:
 
 ```
 .
@@ -98,7 +105,7 @@ However, also take note that the following example's `cloud-resource-2` is *no d
 │            └── index.js
 ```
 
-`@cloud-technology/factory` will transform the `cloud-resource-2` directory using the same translations in both examples
+`cloud-factory` will transform the `cloud-resource-2` directory using the same translations in both examples
 when the distribution gets compiled:
 
 ```
@@ -126,7 +133,7 @@ when the distribution gets compiled:
 ```
 
 The freedom of repository-based folder structuring is just one of the
-abstractions `@cloud-technology/factory` will perform -- therefore limiting deployment and vcs requirements, or otherwise
+abstractions `cloud-factory` will perform -- therefore limiting deployment and vcs requirements, or otherwise
 development-related overhead.
 
 Regardless of any automated or otherwise pipeline'd implementation (deployments can also be performed locally), the design pattern is always the same:
