@@ -9,8 +9,9 @@
     "author": "Jacob B. Sanders",
     "scripts": {
         "start": "node index.js",
+        "build": "tsc",
         "constructs": "cdktf get --language typescript --output .constructs",
-        "postinstall": "tsc",
+        "postinstall": "npm run build",
         "upload": "npm publish --access public",
         "reinstall": "npm update && npm install --global --force",
         "prepare": "rm -r -f .idea && rm -r -f .constructs",
@@ -23,7 +24,6 @@
     },
     "dependencies": {
         "@cdktf/provider-aws": "^3.0.1",
-        "typescript": "^4.5.4",
         "@types/aws-lambda": "latest",
         "@types/node": "latest",
         "@types/yargs": "latest",
@@ -33,11 +33,12 @@
         "cdktf-cli": "^0.8.3",
         "chalk": "^5.0.0",
         "constructs": "^10.0.12",
+        "typescript": "^4.5.4",
         "yargs": "^17.3.0"
     },
     "devDependencies": {
-        "@swc/helpers": "^0.3.2",
         "@swc/core": "^1.2.123",
+        "@swc/helpers": "^0.3.2",
         "@typescript-eslint/eslint-plugin": "^5.7.0",
         "@typescript-eslint/experimental-utils": "^5.7.0",
         "@typescript-eslint/parser": "^5.8.0",
@@ -80,6 +81,6 @@
         ]
     },
     "bin": {
-        "factory": "./index.js"
+        "cloud-factory": "./index.js"
     }
 }

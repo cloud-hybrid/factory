@@ -75,6 +75,9 @@ class Settings {
     /*** Global Configuration */
     configuration: object | null | undefined;
 
+    /*** Relative `package.json` path */
+    package: object | null | undefined;
+
     /*** User Configuration */
     user: object | null | undefined;
 
@@ -127,6 +130,10 @@ class Settings {
 
         this.local = $?.Environment["NPM-Config-Local-Prefix"]
             ?? Settings?.mapping["NPM-Config-Local-Prefix"]
+            ?? null;
+
+        this.package = $?.Environment["NPM-Package-Json"]
+            ?? Settings?.mapping["NPM-Package-Json"]
             ?? null;
 
         this.configuration = $?.Environment["NPM-Config-Globalconfig"]
@@ -362,6 +369,11 @@ const Command = async ($: Argv) => {
 
         ($?.file) || Output(Instance, !!($?.debug));
         ($?.file) && Write(Instance, String($?.file ?? Path.join(Process.cwd(), "Configuration.json")), !!($?.debug));
+
+        (Instance.package === null) && console.warn("[Warning] NPM-Configuration is being ran from a global context.");
+        (Instance.package === null) && console.warn("[Warning] ... Output will not reflect accurate NPM runtime");
+        (Instance.package === null) && console.warn("[Warning] ... configuration(s) or environment.");
+        (Instance.package === null) && console.warn("");
 
         return true;
     }).strict();

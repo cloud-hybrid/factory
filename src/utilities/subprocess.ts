@@ -1,14 +1,13 @@
 import Process from "process";
 import Spawn from "child_process";
 
-
 const Subprocess = async (command: string, directory: string = Process.cwd()) => {
     const Binary = command.split(" ")[0];
     const Arguments = command.split(" ").splice(1);
 
     const Awaitable = new Promise<Spawn.ChildProcessWithoutNullStreams>((resolve, reject) => {
         const Stream = {
-            PID: 0,
+            PID: -1,
             Status: "",
             Signal: ""
         };
@@ -25,7 +24,7 @@ const Subprocess = async (command: string, directory: string = Process.cwd()) =>
             Input: [""],
             Error: [""],
 
-            PID: 0,
+            PID: -1,
             Status: "",
             Signal: ""
         };
@@ -38,7 +37,7 @@ const Subprocess = async (command: string, directory: string = Process.cwd()) =>
 
             // Allocate --> Array Buffer of (n + 1) Bytes
             const Buffer = _;
-            new Array(Buffer[Symbol.iterator]).forEach(
+            Array(Buffer[Symbol.iterator]).forEach(
                 () => Allocation += 1
             );
 
@@ -55,7 +54,7 @@ const Subprocess = async (command: string, directory: string = Process.cwd()) =>
 
             // Allocate an Array Buffer of (n + 1) Bytes
             const Buffer = _;
-            new Array(Buffer[Symbol.iterator]).forEach(
+            Array(Buffer[Symbol.iterator]).forEach(
                 () => Allocation += 1
             );
 
