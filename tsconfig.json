@@ -71,6 +71,7 @@
         "./src/schema/configuration/*.json"
     ],
     "exclude": [
+        ".git",
         "./distribution",
         "./templates",
         "./templates/*",
