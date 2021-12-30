@@ -32,7 +32,7 @@ const Main = async () => {
             .describe("version", "Show Version Number")
 
             /*** Global Usage Text */
-            .usage("Usage: >>> $ cloud-factory [...]")
+            .usage("Usage: $ cloud-factory [...]")
 
             /*** Global Help Command */
             .help("help")
