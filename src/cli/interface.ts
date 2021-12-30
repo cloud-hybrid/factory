@@ -24,7 +24,7 @@ const Main = async () => {
         };
 
         return await CLI(Process.argv.splice(2))
-            .scriptName("factory").wrap(120)
+            .scriptName("cloud-factory").wrap(120)
 
             /*** Version */
             .version(...Commands.version)
@@ -32,7 +32,7 @@ const Main = async () => {
             .describe("version", "Show Version Number")
 
             /*** Global Usage Text */
-            .usage("Usage: npm run start [...]")
+            .usage("Usage: >>> $ cloud-factory [...]")
 
             /*** Global Help Command */
             .help("help")
@@ -49,7 +49,7 @@ const Main = async () => {
                     (Length <= 1) && $.help("help", "Display Usage Guide").default("help", true);
 
                     /*** NPM Configuration */
-                    $.command("npm-configuration", "NPM Runtime Environment Variable(s)", (
+                    $.command("npm-configuration", "NPM Runtime Environment Variable(s) & Configuration", (
                         async ($: Argv) => await Commands.environment($)
                     ));
 
