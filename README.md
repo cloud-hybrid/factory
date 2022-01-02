@@ -22,8 +22,6 @@ command:
 
 The design philosophies and motivations behind `cloud-factory` are simple:
 
-- Provide development-lifecycle efficiencies
-- Generate human readable, *universally unique identifiers*
 - Eliminate drift between deployable(s) across environments
 - Create an agnostic interface to generate and deploy distribution(s)
 - Configure opinionated defaults with zero impact on development teams
