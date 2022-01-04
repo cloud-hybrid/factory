@@ -1,8 +1,16 @@
 .idea
 
 artifacts
+artifacts/*
+artifacts/**
+
 distribution
+distribution/*
+distribution/**
+
 node_modules
+node_modules/*
+node_modules/**
 
 .terraform/*
 
@@ -10,6 +18,8 @@ node_modules
 *.tfstate.*
 
 cdktf.out
+cdktf.out/*
+cdktf.out/**
 
 .DS_Store
 
