@@ -1,1 +1,0 @@
-https://github.com/aws-samples/serverless-patterns
