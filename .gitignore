@@ -1,24 +1,17 @@
+.idea
+
+./distribution
+./node_modules
+./artifacts
 
 **/.terraform/*
 
 *.tfstate
 *.tfstate.*
 
-*.d.ts
-
-node_modules
-
 cdktf.out
 
-.gen
-
-.idea
-
 .DS_Store
-
-.constructs
-
-distribution
 
 *.tgz
 *.zip

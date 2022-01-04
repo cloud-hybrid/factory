@@ -4,18 +4,18 @@
     "version": "0.2.29",
     "type": "module",
     "main": "index.js",
-    "types": "distribution/src/index.d.ts",
+    "types": "distribution",
     "license": "BSD 1-Clause License",
     "author": "Jacob B. Sanders",
     "scripts": {
         "start": "node index.js",
-        "build": "tsc",
-        "watch": "tsc --watch",
+        "install": "npm run build",
+        "build": "[[ -f /usr/local/bin/tsc ]] && /usr/local/bin/tsc || echo \"TSC Not Found\"",
+        "build-layer": "node build-layer.js",
+        "watch": "/usr/local/bin/tsc --watch",
         "constructs": "cdktf get --language typescript --output .constructs",
-        "postinstall": "npm run build",
         "upload": "npm publish --access public",
         "reinstall": "npm update && npm install --global --force",
-        "prepare": "rm -r -f .idea && rm -r -f .constructs",
         "prepublishOnly": "npm install",
         "rm-distribution": "rm -r -f ./distribution",
         "rm-js": "find ./src -type f -name \"*.js\" -prune -exec rm -rf '{}' +",
@@ -23,11 +23,14 @@
         "rm-types": "find ./src -type f -name \"*.d.ts\" -prune -exec rm -rf '{}' +",
         "rm-node-modules": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
     },
+    "peerDependencies": {
+        "typescript": "latest"
+    },
     "dependencies": {
+        "@types/node": "^16.11.18",
         "@cdktf/provider-aws": "^3.0.1",
-        "@types/aws-lambda": "latest",
-        "@types/node": "latest",
-        "@types/yargs": "latest",
+        "@types/aws-lambda": "^8.10.89",
+        "@types/yargs": "^17.0.8",
         "ajv": "^8.8.2",
         "ajv-formats": "^3.0.0-rc.0",
         "cdktf": "^0.8.3",
@@ -35,19 +38,21 @@
         "chalk": "^5.0.0",
         "constructs": "^10.0.12",
         "typescript": "^4.5.4",
-        "yargs": "^17.3.0"
+        "yargs": "^17.3.0",
+        "ts-node": "^10.4.0"
     },
     "devDependencies": {
-        "@swc/core": "^1.2.123",
-        "@swc/helpers": "^0.3.2",
         "@typescript-eslint/eslint-plugin": "^5.7.0",
         "@typescript-eslint/experimental-utils": "^5.7.0",
         "@typescript-eslint/parser": "^5.8.0",
         "@typescript-eslint/scope-manager": "^5.7.0",
         "@typescript-eslint/typescript-estree": "^5.7.0",
+        "cloud-factory": ".",
         "regenerator-runtime": "^0.13.9",
-        "ts-node": "^10.4.0",
         "typescript-eslint-language-service": "^5.0.0"
+    },
+    "exports": {
+        ".": "./index.js"
     },
     "eslintConfig": {
         "parser": "@typescript-eslint/parser",
@@ -82,6 +87,7 @@
         ]
     },
     "bin": {
-        "cloud-factory": "./index.js"
+        "cloud-factory": "./index.js",
+        "build-layer": "./build-layer.js"
     }
 }
