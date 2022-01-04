@@ -1,14 +1,14 @@
 {
     "name": "cloud-factory",
     "private": false,
-    "version": "0.2.33",
+    "version": "0.2.34",
     "type": "module",
     "main": "index.js",
     "types": "distribution",
     "license": "BSD 1-Clause License",
     "author": "Jacob B. Sanders",
     "engines": {
-        "node": "16.x"
+        "node": "^16.x"
     },
     "engineStrict": true,
     "scripts": {
