@@ -13,7 +13,7 @@ In order to begin, open a `node.js` capable console and then run the following c
 
 There exists a few different ways to run `cloud-factory`, depending on the context.
 
-- [**Development Usage**](#npm-development-usage)
+- [**Development Usage**](#development-usage)
 - [**NPX Global Usage**](#npx-global-usage)
 - [**NPM System Usage**](#npm-system-usage)
 
