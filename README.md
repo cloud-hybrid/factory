@@ -174,23 +174,24 @@ then provide a JSON response body containing information about the package, and 
 layer
 
 **Synopsis**
+
 ```bash
-mkdir -p example && cd example
+mkdir -p example && cd "${_}"
 
 git clone https://github.com/cloud-hybrid/lambda-function-concept.git ./test-function
 
 git clone https://github.com/cloud-hybrid/lambda-layer-concept.git ./library/test-layer
 
 cat << "EOF" > factory.json
- {
-     "name": "Concept",
-     "organization": "Cloud-Vault",
-     "environment": "Development"
- }
- EOF
+{
+    "name": "Concept",
+    "organization": "Cloud-Vault",
+    "environment": "Development"
+}
+EOF
 
-npx --yes cloud-factory@latest ci-cd initialize --debug
-npx --yes cloud-factory@latest ci-cd deploy --debug
+npx --yes cloud-factory@latest ci-cd initialize
+npx --yes cloud-factory@latest ci-cd deploy
 ```
 
 ### Overwrites ###
