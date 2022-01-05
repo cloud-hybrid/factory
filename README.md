@@ -1,11 +1,39 @@
 # `cloud-factory` - Construct Utilities #
 
-**`cloud-factory` is a commandline application that provides ci-cd capabilities,
+**A CLI Utility to Manage Software-Defined State**
+
+`cloud-factory` is a commandline application that provides ci-cd capabilities,
 code extensions, and overall utilities for cloud-related management and
-development.**
+development.
 
 In order to begin, open a `node.js` capable console and then run the following command:
    - `npx --yes cloud-factory@latest --help`
+
+---
+
+## Task Board ##
+
+- [ ] **Integrate Remote State**
+   ```javascript
+    // S3 Backend - https://www.terraform.io/docs/backends/types/s3.html
+   new S3Backend(this, {
+      bucket: "mybucket",
+      key: "path/to/my/key",
+      region: "us-east-1",
+   });
+   
+   // S3 Remote State
+   const otherState = new DataTerraformRemoteStateS3(this, "other", {
+      bucket: "myotherbucket",
+      key: "path/to/my/key",
+   });
+   
+   // Reference Remote State
+   new s3.DataAwsS3BucketObject(this, "object", {
+      bucket: "objectbucket",
+      key: otherState.get("bucket_key"),
+   });
+   ```
 
 ---
 
