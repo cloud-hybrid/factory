@@ -14,6 +14,7 @@ In order to begin, open a `node.js` capable console and then run the following c
 ## Task Board ##
 
 - [ ] **Integrate Remote State**
+- Example:
    ```javascript
     // S3 Backend - https://www.terraform.io/docs/backends/types/s3.html
    new S3Backend(this, {
