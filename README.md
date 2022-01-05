@@ -4,79 +4,150 @@
 code extensions, and overall utilities for cloud-related management and
 development.**
 
-In order to begin, open a console capable of running `node.js` (`node`), and issue the following
-command:
+In order to begin, open a `node.js` capable console and then run the following command:
    - `npx --yes cloud-factory@latest --help`
 
 ---
 
 ## Usage ##
 
-### Setup ###
+There exists a few different ways to run `cloud-factory`, depending on the context.
+
+- [**Development Usage**](#npm-development-usage)
+- [**NPX Global Usage**](#npx-global-usage)
+- [**NPM System Usage**](#npm-system-usage)
+
+#### Development Usage ####
+
+While locally developing, the application can be started via the `start` command located in `package.json`:
+
+```bash
+# Start
+npm run start
+
+# Help
+npm run start -- --help
+
+# Environment Sub-Command Example
+npm run start -- environment
+```
+
+**Note**: a `--` is required between the `run-script` command, and CLI input. This is due to limitations around
+`npm`, and parsing input.
+
+### NPX Global Usage ###
+
+Running via `npx` is the preferred method, and runs against the most recently-published `NPM` package.
+
+```bash
+# Start
+npx --yes cloud-factory@latest
+
+# Help
+npx --yes cloud-factory@latest --help
+
+# Environment Sub-Command Example
+npx --yes cloud-factory@latest environment
+```
+
+**Note**: the `--yes` flag is only required to bypass the `install` prompt. Once installed, 
+the `--yes` flag can be optionally included without prompt.
+
+### NPM System Usage ###
+
+`cloud-factory` can optionally be installed globally to any `npm`-capable system.
+
+First, run `npm install --global cloud-factory`. Then, `cloud-factory` can be used
+similar to any other installed executable:
+
+```bash
+# Installation
+npm install --global cloud-factory@latest
+```
+
+```bash
+# Start
+cloud-factory
+
+# Help
+cloud-factory --help
+
+# Environment Sub-Command Example
+cloud-factory environment
+```
+
+## Example(s) - A Lambda Deployment ##
+
+*The following example deploys a __single__ Lambda function*, but includes, implicitly, the following
+resources:
+
+- Lambda Function
+- A Lambda Layer
+- API Gateway
+- X-Ray Enablement
+- Log-Groups
+- SSM Parameter(s)
+
+**Note**, the only requirement would be a Lambda Function, but for the sake of demonstration, the example
+includes a Lambda **Layer**, too.
+
+***All other resources are defined dynamically by `cloud-factory`.***
 
 1. Define and create a new directory
-    - `mkdir -p example-http-service && cd $_`
-2. Clone cloud resource(s)
-    - `git clone https://github.com/cloud-hybrid/lambda-concept-simple-response.git ./simple-response`
-3. If applicable, define a `library` directory to be interfaced for re-use:
-    2. `git clone https://github.com/cloud-hybrid/http-responses-lambda-layer.git ./library/http-responses`
-4. *Define a `factory.json` file*:
-   ```json
-   {
-      "name": "test",
-      "organization": "Cloud-Vault",
-      "environment": "Development"
-   }
+    - `mkdir -p example`
+    - `cd example`
+2. Clone source(s)
+   1. **Lambda Function**
+      - `git clone https://github.com/cloud-hybrid/lambda-function-concept.git ./test-function`
+   2. **Lambda Layer**
+      - `git clone https://github.com/cloud-hybrid/lambda-layer-concept.git ./library/test-layer`
+3. *Define a `factory.json` file*:
+    ```json
+    {
+        "name": "Concept",
+        "organization": "Cloud-Vault",
+        "environment": "Development"
+    }
+    ```
+    - i.e. 
+    ```bash
+    cat << "EOF" > factory.json
+    {
+        "name": "Concept",
+        "organization": "Cloud-Vault",
+        "environment": "Development"
+    }
+    EOF
+    ```
+4. Ensure the current directory takes the following shape:
    ```
-   - i.e. 
+   example
+     ├── factory.json
+     ├── test-function
+     └── library
+         └── test-layer
+   ```
+5. With the current-working-directory set to `example`, run:
    ```bash
-   cat << "EOF" > factory.json
-   {
-      "name": "test",
-      "organization": "Cloud-Vault",
-      "environment": "Development"
-   }
-   EOF
+   npx --yes cloud-factory@latest ci-cd initialize --debug
    ```
-5. Ensure the following output via the `tree` command:
-   ```bash
-   tree
-   
-   # >>> .
-   # >>> ├── factory.json
-   # >>> ├── library
-   # >>> │   └── http-responses
-   # >>> │       ├── LICENSE
-   # >>> │       ├── README.md
-   # >>> │       ├── package-lock.json
-   # >>> │       ├── package.json
-   # >>> │       └── src
-   # >>> │           └── index.js
-   # >>> └── simple-response
-   # >>>     ├── LICENSE
-   # >>>     ├── README.md
-   # >>>     ├── index.js
-   # >>>     ├── package-lock.json
-   # >>>     ├── package.json
-   # >>>     └── src
-   # >>>         └── index.js
-   # >>> 
-   # >>> 5 directories, 12 files
-   ```
-6. Execute `npx --yes cloud-factory@latest ci-cd initialize`
-   - A `./distribution` directory should now exist
-
-**Note**: acknowledge the git-clone target directories:
-- `./simple-response`
-- `./library/http-responses`
-
-Arbitrary directories *that are **not** under `library`* are assumed to be deployable cloud resource(s).
-
-Arbitrary directories *that are under `library`* are assumed to be deployable cloud resource-related ***dependencies***.
+   - Feel free to omit the `--debug` flag. It's only included for verbosity and
+   understanding
+6. Verify that a `distribution` folder was created.
+7. Deploy the lambda function + layer: 
+    ```
+    npx --yes cloud-factory@latest ci-cd deploy --debug
+    ```
+8. Type `"y"` (without quotes) when prompted to confirm the deployment
+9. A hyperlink will be provided upon successful completion. With reference to the example,
+navigating to `https://v41dkt0ik0.execute-api.us-east-2.amazonaws.com/development/test-function` will
+then provide a JSON response body containing information about the package, and the lambda function's
+layer
 
 ### Overwrites ###
 
-***Note - The following section is under heavy, active development.***
+***Note - The following section is under heavy, active development.*** Please refer to the example for 
+usage expectations until otherwise updated.
 
 There exist a few places to define overwrites for certain resource-related attributes ...
 

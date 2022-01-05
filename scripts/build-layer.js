@@ -96,12 +96,12 @@ Subprocess("npm install --production .", Directory);
 /// Copy Layer
 Copy(Directory, Path.join(Directory, "artifacts", "nodejs"));
 
-/// Establish Self-Referencing Symbolic Link
-Subprocess("npm install --production .", Path.join(Directory, "artifacts", "nodejs"));
-
-/// Force Lambda-Layer Inclusion
-FS.mkdirSync(Path.join(Directory, "artifacts", "nodejs", "node_modules", Import(Path.join(Directory, "package.json"))?.name), { recursive: true });
-Copy(Directory, Path.join(Directory, "artifacts", "nodejs", "node_modules", Import(Path.join(Directory, "package.json"))?.name));
-
-/// Establish Self-Referencing, Self-Including Dependencies
-Subprocess("npm install --production .", Path.join(Directory, "artifacts", "nodejs", "node_modules", Import(Path.join(Directory, "package.json"))?.name));
+// /// Establish Self-Referencing Symbolic Link
+// Subprocess("npm install --production .", Path.join(Directory, "artifacts", "nodejs"));
+//
+// /// Force Lambda-Layer Inclusion
+// FS.mkdirSync(Path.join(Directory, "artifacts", "nodejs", "node_modules", Import(Path.join(Directory, "package.json"))?.name), { recursive: true });
+// Copy(Directory, Path.join(Directory, "artifacts", "nodejs", "node_modules", Import(Path.join(Directory, "package.json"))?.name));
+//
+// /// Establish Self-Referencing, Self-Including Dependencies
+// Subprocess("npm install --production .", Path.join(Directory, "artifacts", "nodejs", "node_modules", Import(Path.join(Directory, "package.json"))?.name));

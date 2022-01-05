@@ -25,9 +25,13 @@
         "exactOptionalPropertyTypes": true,
         "forceConsistentCasingInFileNames": true,
         "lib": [
-            "dom",
-            "esnext",
-            "es2019"
+            "DOM",
+            "ESNext",
+            "ES2021",
+            "ES2020",
+            "ES2015.Core",
+            "WebWorker",
+            "ScriptHost"
         ],
         "module": "esnext",
         "moduleResolution": "node",

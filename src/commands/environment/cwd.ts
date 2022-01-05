@@ -3,7 +3,7 @@ import Path from "path";
 import Process from "process";
 import Assertion from "assert";
 
-import {Argv} from "yargs";
+import {Argv} from "../../cli/arguments.js";
 
 import {Local} from "../../utilities/environment.js";
 
@@ -104,7 +104,7 @@ function Output(data: any, serialize = true, debug = false) {
     (serialize) && Process.stdout.write(JSON.stringify(data, null, 4) + "\n" + "\n");
     (serialize) || Process.stdout.write(data + "\n" + "\n");
 
-    return { data, serialize, debug };
+    return {data, serialize, debug};
 }
 
 /***

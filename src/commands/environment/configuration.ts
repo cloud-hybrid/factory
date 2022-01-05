@@ -4,7 +4,7 @@ import Path from "path";
 import Process from "process";
 import Assertion from "assert";
 
-import {Argv} from "yargs";
+import {Argv} from "../../cli/arguments.js";
 
 interface Global {
     Environment: {

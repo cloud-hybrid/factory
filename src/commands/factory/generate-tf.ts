@@ -6,11 +6,11 @@ import Assertion from "assert";
 
 import Utility from "util";
 
-import { Argv } from "../../cli/arguments.js";
-import { Prompt } from "../../utilities/prompt.js";
-import { Subprocess } from "../../utilities/subprocess.js";
+import {Argv} from "../../cli/arguments.js";
+import {Prompt} from "../../utilities/prompt.js";
+import {Subprocess} from "../../utilities/subprocess.js";
 
-import { PWD } from "../../constructs/settings.js";
+import {PWD} from "../../constructs/settings.js";
 
 const Remove = Utility.promisify(FS.rm);
 
@@ -47,7 +47,7 @@ const Exclusions = [
 ];
 
 /*** Debug Console Utility String Generator */
-const Input = ( input: ( string | number )[] ) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";
+const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";
 
 /***
  * Command Configuration, Composition
@@ -60,13 +60,13 @@ const Input = ( input: ( string | number )[] ) => "[Debug] CLI Input" + " " + "(
  *
  */
 
-function Configuration( Arguments: Argv ) {
-    const Syntax = ( command: string ) => [ command, "? [--debug] ? [--help]" ].join(" ");
+function Configuration(Arguments: Argv) {
+    const Syntax = (command: string) => [command, "? [--debug] ? [--help]"].join(" ");
 
     Arguments.hide("version");
     Arguments.help("help", "Display Usage Guide").default("help", false);
 
-    Arguments.option("debug", { type: "boolean" }).alias("debug", "d").default("debug", false);
+    Arguments.option("debug", {type: "boolean"}).alias("debug", "d").default("debug", false);
     Arguments.describe("debug", "Enable Debug Logging");
 
     Arguments.example("Global", Syntax("npx cli factory main"));
@@ -114,7 +114,7 @@ function Copy(source: string, target: string, debug: boolean = false) {
                 (debug) && console.debug("[Debug]" + ":", {
                     Source: Path.join(source, $.name),
                     Target: Path.join(target, $.name),
-                }, "\n");
+                });
             } catch (error) {
                 // ...
             }
@@ -163,7 +163,7 @@ function Dry(source: string, target: string) {
  *
  */
 
-const Command = async ( $: Argv ) => {
+const Command = async ($: Argv) => {
     const Arguments: Argv = $;
 
     console.warn("[Warning] The Current Command is Under Development.");
@@ -173,51 +173,42 @@ const Command = async ( $: Argv ) => {
 
     Configuration(Arguments);
 
-    Arguments.check(async ( $ ) => {
+    Arguments.check(async ($) => {
         try {
             console.log("[Log] Target Directory" + ":", PWD);
             console.log("[Log] Source Directory" + ":", Repository);
 
-            ( $?.debug ) && console.log(Input($._), JSON.stringify($, null, 4), "\n");
-            ( $?.debug ) && console.debug("Current Directory" + ":", Process.cwd(), "\n");
+            ($?.debug) && console.log(Input($._), JSON.stringify($, null, 4), "\n");
+            ($?.debug) && console.debug("Current Directory" + ":", Process.cwd(), "\n");
 
-            const Continue = async () => await Prompt("Continue? (Y/N)" + ":" + " ");
+            console.log("\n" + "[Log] Writing File Structure ...", "\n");
 
-            let trigger: string = await Continue().then(( $ ) => $.toUpperCase());
+            await Remove(Path.join(Process.cwd(), "factory"), {force: true, recursive: true});
 
-            while (trigger !== "Y" && trigger !== "N") trigger = await Continue().then(( $ ) => $.toUpperCase());
-
-            ( trigger === "Y" ) && console.log("\n" + "[Log] Writing File Structure ...", "\n");
-
-            ( trigger === "Y" ) && await Remove(Path.join(Process.cwd(), "factory"), { maxRetries: 5, force: true, recursive: true });
-
-            ( trigger === "Y" ) && ( $?.debug ) && Dry(Repository, Path.join(Process.cwd(), "factory"));
-
-            Process.stdout.write("\n");
+            ($?.debug) && Dry(Repository, Path.join(Process.cwd(), "factory"));
 
             // @ts-ignore
-            ( trigger === "Y" ) && Copy(Repository, Path.join(Process.cwd(), "factory"), $?.debug);
+            Copy(Repository, Path.join(Process.cwd(), "factory"), $?.debug);
 
             /// Install Dependencies
-            ( trigger === "Y" ) && await Subprocess("npm install --global", Path.join(Process.cwd(), "factory"));
-            ( trigger === "Y" ) && await Subprocess("npm install typescript --global", Path.join(Process.cwd(), "factory"));
-            ( trigger === "Y" ) && await Subprocess("npm install cdktf@latest --global", Path.join(Process.cwd(), "factory"));
+            await Subprocess("npm install --global", Path.join(Process.cwd(), "factory"));
+            await Subprocess("npm install typescript --global", Path.join(Process.cwd(), "factory"));
+            await Subprocess("npm install cdktf@latest --global", Path.join(Process.cwd(), "factory"));
 
-            ( trigger === "Y" ) && Copy(Path.join(Process.cwd(), "distribution"), Path.join(Process.cwd(), "factory", "distribution"));
+            Copy(Path.join(Process.cwd(), "distribution"), Path.join(Process.cwd(), "factory", "distribution"));
 
-            ( trigger === "Y" ) && await Subprocess("cdktf get", Path.join(Process.cwd(), "factory", "distribution"));
-            ( trigger === "Y" ) && await Subprocess("cdktf synth", Path.join(Process.cwd(), "factory", "distribution"));
-            ( trigger === "Y" ) && await Subprocess("cdktf deploy --auto-approve", Path.join(Process.cwd(), "factory", "distribution"));
+            await Subprocess("cdktf get", Path.join(Process.cwd(), "factory", "distribution"));
+            await Subprocess("cdktf synth", Path.join(Process.cwd(), "factory", "distribution"));
 
             return true;
         } catch (error) {
-            console.error(error);
+            console.trace(error);
 
             return false;
         }
     }).strict();
 };
 
-export { Command as Deploy };
+export {Command as Generate};
 
-export default { Command };
+export default {Command};
