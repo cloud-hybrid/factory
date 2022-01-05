@@ -173,6 +173,26 @@ navigating to `https://v41dkt0ik0.execute-api.us-east-2.amazonaws.com/developmen
 then provide a JSON response body containing information about the package, and the lambda function's
 layer
 
+**Synopsis**
+```bash
+mkdir -p example && cd example
+
+git clone https://github.com/cloud-hybrid/lambda-function-concept.git ./test-function
+
+git clone https://github.com/cloud-hybrid/lambda-layer-concept.git ./library/test-layer
+
+cat << "EOF" > factory.json
+ {
+     "name": "Concept",
+     "organization": "Cloud-Vault",
+     "environment": "Development"
+ }
+ EOF
+
+npx --yes cloud-factory@latest ci-cd initialize --debug
+npx --yes cloud-factory@latest ci-cd deploy --debug
+```
+
 ### Overwrites ###
 
 ***Note - The following section is under heavy, active development.*** Please refer to the example for 
