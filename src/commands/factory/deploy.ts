@@ -181,33 +181,44 @@ const Command = async ( $: Argv ) => {
             ( $?.debug ) && console.log(Input($._), JSON.stringify($, null, 4), "\n");
             ( $?.debug ) && console.debug("Current Directory" + ":", Process.cwd(), "\n");
 
-            const Continue = async () => await Prompt("Continue? (Y/N)" + ":" + " ");
+            // const Continue = async () => await Prompt("Continue? (Y/N)" + ":" + " ");
+            //
+            // let trigger: string = await Continue().then(( $ ) => $.toUpperCase());
+            //
+            // while (trigger !== "Y" && trigger !== "N") trigger = await Continue().then(( $ ) => $.toUpperCase());
 
-            let trigger: string = await Continue().then(( $ ) => $.toUpperCase());
+            //( trigger === "Y" ) &&
+            console.log("\n" + "[Log] Writing File Structure ...", "\n");
 
-            while (trigger !== "Y" && trigger !== "N") trigger = await Continue().then(( $ ) => $.toUpperCase());
+            // ( trigger === "Y" ) &&
+            await Remove(Path.join(Process.cwd(), "factory"), { maxRetries: 5, force: true, recursive: true });
 
-            ( trigger === "Y" ) && console.log("\n" + "[Log] Writing File Structure ...", "\n");
-
-            ( trigger === "Y" ) && await Remove(Path.join(Process.cwd(), "factory"), { maxRetries: 5, force: true, recursive: true });
-
-            ( trigger === "Y" ) && ( $?.debug ) && Dry(Repository, Path.join(Process.cwd(), "factory"));
+            // ( trigger === "Y" ) && ( $?.debug ) &&
+            Dry(Repository, Path.join(Process.cwd(), "factory"));
 
             Process.stdout.write("\n");
 
+            // ( trigger === "Y" ) && Copy(Repository, Path.join(Process.cwd(), "factory"), $?.debug);
+
             // @ts-ignore
-            ( trigger === "Y" ) && Copy(Repository, Path.join(Process.cwd(), "factory"), $?.debug);
+            Copy(Repository, Path.join(Process.cwd(), "factory"), $?.debug);
 
             /// Install Dependencies
-            ( trigger === "Y" ) && await Subprocess("npm install --global", Path.join(Process.cwd(), "factory"));
-            ( trigger === "Y" ) && await Subprocess("npm install typescript --global", Path.join(Process.cwd(), "factory"));
-            ( trigger === "Y" ) && await Subprocess("npm install cdktf@latest --global", Path.join(Process.cwd(), "factory"));
+            // ( trigger === "Y" ) && await Subprocess("npm install --global", Path.join(Process.cwd(), "factory"));
+            // ( trigger === "Y" ) && await Subprocess("npm install typescript --global", Path.join(Process.cwd(), "factory"));
+            // ( trigger === "Y" ) && await Subprocess("npm install cdktf@latest --global", Path.join(Process.cwd(), "factory"));
+            // ( trigger === "Y" ) && Copy(Path.join(Process.cwd(), "distribution"), Path.join(Process.cwd(), "factory", "distribution"));
+            // ( trigger === "Y" ) && await Subprocess("cdktf get", Path.join(Process.cwd(), "factory", "distribution"));
+            // ( trigger === "Y" ) && await Subprocess("cdktf synth", Path.join(Process.cwd(), "factory", "distribution"));
+            // ( trigger === "Y" ) && await Subprocess("cdktf deploy --auto-approve", Path.join(Process.cwd(), "factory", "distribution"));
 
-            ( trigger === "Y" ) && Copy(Path.join(Process.cwd(), "distribution"), Path.join(Process.cwd(), "factory", "distribution"));
-
-            ( trigger === "Y" ) && await Subprocess("cdktf get", Path.join(Process.cwd(), "factory", "distribution"));
-            ( trigger === "Y" ) && await Subprocess("cdktf synth", Path.join(Process.cwd(), "factory", "distribution"));
-            ( trigger === "Y" ) && await Subprocess("cdktf deploy --auto-approve", Path.join(Process.cwd(), "factory", "distribution"));
+            await Subprocess("npm install --global", Path.join(Process.cwd(), "factory"));
+            await Subprocess("npm install typescript --global", Path.join(Process.cwd(), "factory"));
+            await Subprocess("npm install cdktf@latest --global", Path.join(Process.cwd(), "factory"));
+            Copy(Path.join(Process.cwd(), "distribution"), Path.join(Process.cwd(), "factory", "distribution"));
+            await Subprocess("cdktf get", Path.join(Process.cwd(), "factory", "distribution"));
+            await Subprocess("cdktf synth", Path.join(Process.cwd(), "factory", "distribution"));
+            await Subprocess("cdktf deploy --auto-approve", Path.join(Process.cwd(), "factory", "distribution"));
 
             return true;
         } catch (error) {

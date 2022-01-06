@@ -156,16 +156,7 @@ class SAM {
     /*** Cloud Organization Alias, Derived from Configuration (Settings) File */
     public readonly organization: typeof Settings.Organization = Settings.Organization;
 
-    /***
-     * Construct Initializer
-     * =====================
-     *
-     * @param name {String}
-     * @param service {String}
-     *
-     * @returns {Instantiation}
-     *
-     */
+    /*** Construct Initializer */
 
     constructor() {
         this.prefix = [Settings.Organization, Settings.Environment].join("-");

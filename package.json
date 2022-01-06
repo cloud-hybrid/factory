@@ -1,7 +1,7 @@
 {
     "name": "cloud-factory",
     "private": false,
-    "version": "0.3.38",
+    "version": "0.3.41",
     "type": "module",
     "main": "index.js",
     "description": "A CLI Utility to Manage Software-Defined State",
@@ -12,7 +12,6 @@
     "engines": {
         "node": "^16.x"
     },
-    "engineStrict": true,
     "scripts": {
         "start": "node index.js",
         "install": "npm run build",

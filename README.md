@@ -189,9 +189,11 @@ cat << "EOF" > factory.json
     "environment": "Development"
 }
 EOF
+cloud-factory ci-cd initialize
+cloud-factory ci-cd deploy
 
-npx --yes cloud-factory@latest ci-cd initialize
-npx --yes cloud-factory@latest ci-cd deploy
+# npx --yes cloud-factory@latest ci-cd initialize
+# npx --yes cloud-factory@latest ci-cd deploy
 ```
 
 ### Overwrites ###
