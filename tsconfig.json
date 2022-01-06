@@ -73,6 +73,7 @@
         "./src/schema/*.json",
         "./src/schema/lambda/*.json",
         "./src/schema/configuration/*.json",
+        "./unit-testing/**/*.json",
         "./scripts"
     ],
     "exclude": [
