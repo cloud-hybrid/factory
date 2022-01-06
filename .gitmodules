@@ -1,0 +1,21 @@
+[submodule ".tf/terraform-aws-vpc"]
+	path = .tf/terraform-aws-vpc
+	url = https://github.com/terraform-aws-modules/terraform-aws-vpc.git
+[submodule ".tf/terraform-modules"]
+	path = .tf/terraform-modules
+	url = https://github.com/Pocket/terraform-modules.git
+[submodule ".tf/terraform-aws-lambda"]
+	path = .tf/terraform-aws-lambda
+	url = https://github.com/terraform-aws-modules/terraform-aws-lambda.git
+[submodule ".tf/terraform-aws-apigateway-v2"]
+	path = .tf/terraform-aws-apigateway-v2
+	url = https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2.git
+[submodule ".tf/terraform-aws-route53"]
+	path = .tf/terraform-aws-route53
+	url = https://github.com/terraform-aws-modules/terraform-aws-route53.git
+[submodule ".tf/terraform-aws-s3-bucket"]
+	path = .tf/terraform-aws-s3-bucket
+	url = https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git
+[submodule ".tf/terraform-aws-iam"]
+	path = .tf/terraform-aws-iam
+	url = https://github.com/terraform-aws-modules/terraform-aws-iam.git

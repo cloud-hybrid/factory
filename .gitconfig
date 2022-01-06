@@ -1,0 +1,23 @@
+[core]
+    ignorecase = false
+    credential = --help
+
+[credential]
+    helper = store
+
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+        required = true
+
+[fetch]
+    prune = true
+    parallel = 0
+
+[features]
+    experimental = true
+
+[submodule]
+    recurse = true
+    fetchJobs = 0
