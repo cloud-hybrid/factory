@@ -1,7 +1,7 @@
 {
     "name": "cloud-factory",
     "private": false,
-    "version": "0.3.52",
+    "version": "0.3.53",
     "type": "module",
     "main": "index.js",
     "description": "A CLI Utility to Manage Software-Defined State",
@@ -10,7 +10,7 @@
     "license": "BSD 1-Clause License",
     "author": "Jacob B. Sanders",
     "scripts": {
-        "start": "node --experimental-specifier-resolution index.js",
+        "start": "node --experimental-specifier-resolution node index.js",
         "build": "tsc --pretty",
         "watch": "tsc --watch",
         "upload": "npm publish --access public",
