@@ -8,6 +8,4 @@ const Columns = () => (Device) ? Process.stdout.columns : null;
 
 export { Device, Rows, Columns };
 
-export default {
-    Device, Rows, Columns
-};
+export default Device;
