@@ -1,7 +1,7 @@
 {
     "name": "cloud-factory",
     "private": false,
-    "version": "0.3.45",
+    "version": "0.3.52",
     "type": "module",
     "main": "index.js",
     "description": "A CLI Utility to Manage Software-Defined State",
@@ -9,13 +9,8 @@
     "repository": "git+https://github.com/cloud-hybrid/factory.git",
     "license": "BSD 1-Clause License",
     "author": "Jacob B. Sanders",
-    "engines": {
-        "node": "^16.x"
-    },
-    "engineStrict": true,
     "scripts": {
         "start": "node --experimental-specifier-resolution index.js",
-        "install": "npm run build",
         "build": "tsc --pretty",
         "watch": "tsc --watch",
         "upload": "npm publish --access public",
@@ -25,15 +20,11 @@
         "upgrade": "npm i cdktf@latest cdktf-cli@latest",
         "upgrade-next": "npm i cdktf@next cdktf-cli@next"
     },
-    "peerDependencies": {
-        "typescript": "latest"
-    },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.45.0",
         "@aws-sdk/client-secrets-manager": "^3.45.0",
         "@aws-sdk/credential-providers": "^3.45.0",
         "@aws-sdk/node-config-provider": "^3.40.0",
-        "aws-sdk": "^2.1052.0",
         "ajv": "^8.8.2",
         "ajv-formats": "^3.0.0-rc.0",
         "cdktf": "^0.8.4",
@@ -50,14 +41,6 @@
         "@types/aws-lambda": "^8.10.89",
         "@types/yargs": "^17.0.8",
         "@cdktf/provider-aws": "^3.0.1",
-        "@cdktf/provider-generator": "^0.8.5",
-        "@cdktf/provider-github": "^0.5.136",
-        "@cdktf/provider-null": "^0.4.143",
-        "@cdktf/provider-kubernetes": "^0.5.128",
-        "@cdktf/provider-local": "^0.2.148",
-        "@cdktf/provider-archive": "^0.2.134",
-        "@cdktf/provider-external": "^0.3.138",
-        "@cdktf/provider-tls": "^0.2.146",
         "@typescript-eslint/eslint-plugin": "^5.7.0",
         "@typescript-eslint/experimental-utils": "^5.7.0",
         "@typescript-eslint/parser": "^5.8.0",

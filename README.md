@@ -66,17 +66,17 @@ npm run start -- environment
 
 ### NPX Global Usage ###
 
-Running via `npx` is the preferred method, and runs against the most recently-published `NPM` package.
+`npx` runs against the most recently-published `NPM` package.
 
 ```bash
 # Start
 npx --yes cloud-factory@latest
 
 # Help
-npx --yes cloud-factory@latest --help
+npx --yes cloud-factory@latest ? [--] --help
 
 # Environment Sub-Command Example
-npx --yes cloud-factory@latest environment
+npx --yes cloud-factory@latest ? [--] environment
 ```
 
 **Note**: the `--yes` flag is only required to bypass the `install` prompt. Once installed, 

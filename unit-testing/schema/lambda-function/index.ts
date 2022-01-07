@@ -21,7 +21,7 @@ const Compiler = new AJV({
     validateSchema: true
 });
 
-const Reference: JTDSchemaType<Pointer, {node: Pointer}> = {
+const Reference: JTDSchemaType<Pointer, { node: Pointer }> = {
     definitions: {
         node: {
             properties: {
@@ -34,8 +34,6 @@ const Reference: JTDSchemaType<Pointer, {node: Pointer}> = {
     },
     ref: "node",
 }
-
-const Meta = Import("ajv/dist/refs/json-schema-draft-07.json");
 
 // Compiler.addMetaSchema(Meta);
 
