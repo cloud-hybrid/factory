@@ -5,76 +5,15 @@ import Module from "module";
 import Process from "process";
 import Assertion from "assert";
 
-import {Argv} from "../../cli/arguments.js";
+import {Argv} from "yargs";
+
+import { Distributable } from "../../types/distributable.js"
 
 const Remove = Utility.promisify(FS.rm);
 
 /*** *Current Module Path* */
 const File: string = import.meta.url.replace("file" + ":" + "//", "");
-
 const Import: NodeRequire = Module.createRequire(File);
-
-import { Distributable } from "../../types/distributable.js"
-
-/***
- * File Descriptor
- * ---------------
- * The File Descriptor Type
- *
- * @augments {FS.Dirent}
- *
- */
-
-interface File {
-    name: string;
-    volume: boolean;
-    pipe: boolean;
-    ephemeral: boolean;
-    file: boolean;
-    socket: boolean;
-    link: boolean;
-    directory: boolean;
-}
-
-/***
- * File Descriptor
- * ---------------
- * File Descriptor Implementation
- *
- * @augments {FS.Dirent}
- *
- */
-
-class Descriptor implements File {
-    name: string;
-    volume: boolean;
-    pipe: boolean;
-    ephemeral: boolean;
-    file: boolean;
-    socket: boolean;
-    link: boolean;
-    directory: boolean;
-
-    /***
-     *
-     * @param file {FS.Dirent}
-     * @constructor
-     *
-     */
-
-    constructor(file: FS.Dirent | string) {
-        const $ = (typeof file === "string") ? FS.lstatSync(file, { throwIfNoEntry: true}) : file;
-        this.name = (typeof file === "string") ? file : file.name;
-
-        this.volume = $.isBlockDevice();
-        this.pipe = $.isFIFO();
-        this.ephemeral = $.isCharacterDevice();
-        this.file = $.isFile();
-        this.socket = $.isSocket();
-        this.link = $.isSymbolicLink();
-        this.directory = $.isDirectory();
-    }
-}
 
 /***
  * Lambda Functions
