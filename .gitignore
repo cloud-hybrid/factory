@@ -8,6 +8,14 @@ node_modules
 node_modules/*
 node_modules/**
 
+distribution
+distribution/*
+distribution/**
+
+declarations
+declarations/*
+declarations/**
+
 .terraform/*
 
 *.tfstate
