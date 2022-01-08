@@ -17,11 +17,14 @@ Naming component |  Description
 
 |  Key  |  Description | Example(s) |
 |:---------------:|:---:|:---:|
-| `Business-Unit` | AWS-related parameters & the Account Owner's Functional Units, Departments, Applications, etc., etc. | *AWS*, *[Company-Name]*, *[Contractor]* |
+| `Business-Unit` | AWS-related parameters & the Account Owner's Functional Units, Departments, Applications, etc., etc. | *
+AWS*, *[Company-Name]*, *[Contractor]* |
 | `Prefix` | Subject-Naming Prefix - *Optional* | N/A | 
 | `Environment` | VPC-Isolated Deployment Aliases | *Development*, *Staging*, *UAT*, *Pre*, *Production* |
-| `Category` | Abstract Representation of AWS, Cloud, or other Logical Services, Resources, Parameter(s) | *Database*, *Storage*, *Compute*, *Networking*, *CI-CD*, *Management* |
-| `Service` | Established Service(s) either Consumed or Provided | *PostgreSQL*, *S3*, *DocumentDB*, *EC2*, *CFN*, *Lambda* |
+| `Category` | Abstract Representation of AWS, Cloud, or other Logical Services, Resources, Parameter(s) | *Database*, *
+Storage*, *Compute*, *Networking*, *CI-CD*, *Management* |
+| `Service` | Established Service(s) either Consumed or Provided | *PostgreSQL*, *S3*, *DocumentDB*, *EC2*, *CFN*, *
+Lambda* |
 | `Resource` | Provisioned, Referenced, or otherwise Aliased Resource Name | `CI-Lambda-Stack`, `Unit-Regression-Results`, `Release-Version-Bucket`, `CMS-EC2-AMI` |
 | `Identifier` | Further Derived Key-Name or Abstraction | `Resource-ID`, `Output-Variables`, `JWT-Secret-Token-Hash`, `SSH-Public-Key`, `Default-AWS-Deployment-Region`, `VPC-ID` |
 | `Extenteded-Name` | Dot-Product Associations | `...` |

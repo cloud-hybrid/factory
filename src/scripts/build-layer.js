@@ -1,8 +1,8 @@
+import Spawn from "child_process";
 import FS from "fs";
+import Module from "module";
 import Path from "path";
 import Utility from "util";
-import Module from "module";
-import Spawn from "child_process";
 
 const Process = process;
 
@@ -42,18 +42,16 @@ function Copy(source, target) {
         const File = element?.isFile() || false;
 
         try {
-            if (!Socket && Directory) {
-                if (!Exclusions.includes(element.name)) {
+            if ( !Socket && Directory ) {
+                if ( !Exclusions.includes(element.name) ) {
                     Copy(Path.join(source, element.name), Path.join(target, element.name));
                 }
-            }
-            else {
-                if (File && !Exclusions.includes(element.name)) {
+            } else {
+                if ( File && !Exclusions.includes(element.name) ) {
                     FS.copyFileSync(Path.join(source, element.name), Path.join(target, element.name));
                 }
             }
-        }
-        catch (e) {
+        } catch ( e ) {
             /// ...
         }
     });
@@ -71,9 +69,9 @@ function Copy(source, target) {
  */
 
 const Subprocess = (command, directory = Process.cwd()) => {
-    const Binary = command.split(" ")[0];
+    const Binary = command.split(" ")[ 0 ];
     const Arguments = command.split(" ").splice(1);
-    return Spawn.spawnSync(Binary, [...Arguments], {
+    return Spawn.spawnSync(Binary, [ ...Arguments ], {
         cwd: directory,
         env: Process.env,
         stdio: "inherit"

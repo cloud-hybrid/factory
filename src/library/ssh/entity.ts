@@ -8,7 +8,6 @@
  * @copyright   Cloud-Technology LLC. & Affiliates
  */
 
-
 import OS from "os";
 import Path from "path";
 
@@ -19,10 +18,10 @@ import Path from "path";
  *
  */
 
-const User = {... OS.userInfo()};
+const User = { ... OS.userInfo() };
 
 const Default = {
-    SSH: Path.join(User.homedir, ".ssh", "id_rsa"),
+    SSH: Path.join( User.homedir, ".ssh", "id_rsa" ),
     Username: User.username,
     Bastion: "localhost",
     Alias: "Local-Host",
@@ -58,29 +57,28 @@ const Default = {
 interface Entity {
     /*** Target SSH Configuration Common-Name */
     alias: string;
+
     /*** Target SSH Hostname */
     hostname: string;
+
     /*** Target SSH Username */
     user: string;
+
     /*** System Path Location of Target Remote SSH-Private Key */
     identity: string;
+
     /*** System Path Location of Proxy (Bastion) SSH-Private Key */
     key: string;
+
     /*** Target Bastion Host */
     bastion: string;
 }
 
-const Entry = (configuration: Entity ) => {
-    return [
-        ["Host", configuration.alias].join(" "),
-        ["   ", "Hostname", configuration.hostname].join(" "),
-        ["   ", "User", configuration.user].join(" "),
-        ["   ", "IdentityFile", configuration.identity].join(" "),
-        ["   ", "ConnectTimeout", "15"].join(" "),
-        ["   ", "LogLevel", "QUIET"].join(" "),
-        ["   ", "ProxyCommand", "ssh", configuration.bastion, "-i", configuration.key, "-W", "%h:%p"].join(" "),
-        [""].join()
-    ].join("\n");
+const Entry = (configuration: Entity) => {
+    return [ [ "Host", configuration.alias ].join( " " ), [ "   ", "Hostname", configuration.hostname ].join( " " ), [ "   ", "User", configuration.user ].join(
+        " " ), [ "   ", "IdentityFile", configuration.identity ].join( " " ), [ "   ", "ConnectTimeout", "15" ].join(
+        " " ), [ "   ", "LogLevel", "QUIET" ].join( " " ), [ "   ", "ProxyCommand", "ssh", configuration.bastion, "-i", configuration.key, "-W", "%h:%p" ].join(
+        " " ), [ "" ].join() ].join( "\n" );
 };
 
 /***
@@ -95,22 +93,13 @@ const Entry = (configuration: Entity ) => {
  */
 
 const Bastion = (alias: string, hostname: string, key: string) => {
-    return [
-        ["Host", alias].join(" "),
-        ["   ", "Hostname", hostname].join(" "),
-        ["   ", "User", "ec2-user"].join(" "),
-        ["   ", "IdentityFile", key].join(" "),
-        [""].join()
-    ].join("\n");
+    return [ [ "Host", alias ].join( " " ), [ "   ", "Hostname", hostname ].join( " " ), [ "   ", "User", "ec2-user" ].join(
+        " " ), [ "   ", "IdentityFile", key ].join( " " ), [ "" ].join() ].join( "\n" );
 };
 
 const Overwrite = () => {
-    return [
-        ["Host", "*"].join(" "),
-        ["   ", "StrictHostKeyChecking", "no"].join(" "),
-        ["   ", "UserKnownHostsFile", "/dev/null"].join(" "),
-        [""].join()
-    ].join("\n");
+    return [ [ "Host", "*" ].join( " " ), [ "   ", "StrictHostKeyChecking", "no" ].join( " " ), [ "   ", "UserKnownHostsFile", "/dev/null" ].join(
+        " " ), [ "" ].join() ].join( "\n" );
 };
 
 export { Entry, Overwrite, Bastion, User, Default };

@@ -8,24 +8,24 @@
  */
 
 import FS from "fs";
-import Path from "path";
 import Module from "module";
+import Path from "path";
 import Process from "process";
 
 /*** ESM Resolver for *Current-Working-Directory* */
-const CWD: string = Path.dirname(import.meta.url.replace("file" + ":" + "//", ""));
+const CWD: string = Path.dirname( import.meta.url.replace( "file" + ":" + "//", "" ) );
 
 /*** ESM Resolve for Package Directory relative to Current Working Directory */
-const PKG: string = Path.dirname(CWD);
+const PKG: string = Path.dirname( CWD );
 
 /// Destination Root
-const Target: string = Path.join(PKG, "..");
+const Target: string = Path.join( PKG, ".." );
 
 /*** Distribution Folder */
 const Distribution: string = Target;
 
 /*** ESM Compatability & JSON Importer */
-const Import: NodeRequire = Module.createRequire(import.meta.url);
+const Import: NodeRequire = Module.createRequire( import.meta.url );
 
 /***
  * JSON Configuration
@@ -35,8 +35,11 @@ const Import: NodeRequire = Module.createRequire(import.meta.url);
  *
  */
 
-const Settings: typeof import("../schema/settings.schema.json") = Import(Path.join(Distribution, "src", "schema", "settings.json"));
-const Overwrite: string = Path.join(Process.cwd(), "factory.json");
+const Settings: typeof import("../schema/settings.schema.json") = Import( Path.join( Distribution,
+    "src",
+    "schema",
+    "settings.json" ) );
+const Overwrite: string = Path.join( Process.cwd(), "factory.json" );
 
 /// FS.existsSync(Overwrite) && console.debug("[Debug] Target Overwrite Object" + ":", JSON.parse(FS.readFileSync(Overwrite, { encoding: "utf-8" }).toString().trim()));
 
@@ -49,21 +52,22 @@ const Overwrite: string = Path.join(Process.cwd(), "factory.json");
  */
 
 class Configuration {
-    public environment: string = Settings.Environment
+    public static settings: typeof Settings = Settings;
+
+    public environment: string = Settings.Environment;
+
     public organization: string = Settings.Organization;
 
     public cloud: typeof Settings.Cloud = Settings.Cloud;
 
-    public static settings: typeof Settings = Settings;
-
-    constructor( settings: { organization: string, environment: string, cloud: typeof Settings.Cloud } ) {
+    constructor(settings: { organization: string, environment: string, cloud: typeof Settings.Cloud }) {
         this.environment = settings.environment;
         this.organization = settings.organization;
         this.cloud = settings.cloud;
     }
 }
 
-const PWD = (FS.existsSync(Overwrite)) ? Path.dirname(Overwrite) : Target;
+const PWD = (FS.existsSync( Overwrite )) ? Path.dirname( Overwrite ) : Target;
 
 export { CWD, PKG, Distribution, Settings, Configuration, Import, PWD };
 

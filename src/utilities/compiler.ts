@@ -1,7 +1,7 @@
 import AJV from "ajv";
 import Formats from "ajv-formats";
 
-const Compiler = new AJV({
+const Compiler = new AJV( {
     allErrors: true,
     verbose: false,
     strict: true,
@@ -11,11 +11,10 @@ const Compiler = new AJV({
     validateFormats: true,
     useDefaults: true,
     unevaluated: true,
-    validateSchema: true,
-    /// loadSchema: async (uri = import.meta.url) => await import(uri)
-});
+    validateSchema: true /// loadSchema: async (uri = import.meta.url) => await import(uri)
+} );
 
-Formats(Compiler)
+Formats( Compiler );
 
 export { Compiler };
 

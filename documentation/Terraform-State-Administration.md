@@ -2,8 +2,8 @@
 
 > [Introduced](https://gitlab.com/groups/gitlab-org/-/epics/2673) in GitLab 12.10.
 
-GitLab can be used as a backend for [Terraform](../user/infrastructure/index.md) state
-files. The files are encrypted before being stored. This feature is enabled by default.
+GitLab can be used as a backend for [Terraform](../user/infrastructure/index.md) state files. The files are encrypted
+before being stored. This feature is enabled by default.
 
 The storage location of these files defaults to:
 
@@ -12,13 +12,14 @@ The storage location of these files defaults to:
 
 These locations can be configured using the options described below.
 
-Use [external object storage](https://docs.gitlab.com/charts/advanced/external-object-storage/#lfs-artifacts-uploads-packages-external-diffs-pseudonymizer-terraform-state-dependency-proxy) configuration for [GitLab Helm chart](https://docs.gitlab.com/charts/) installations.
+Use [external object storage](https://docs.gitlab.com/charts/advanced/external-object-storage/#lfs-artifacts-uploads-packages-external-diffs-pseudonymizer-terraform-state-dependency-proxy)
+configuration for [GitLab Helm chart](https://docs.gitlab.com/charts/) installations.
 
 ## Disabling Terraform state
 
-To disable terraform state site-wide, follow the steps below.
-A GitLab administrator may want to disable Terraform state to reduce disk space or if Terraform is not used in your instance.
-To do so, follow the steps below according to your installation's type.
+To disable terraform state site-wide, follow the steps below. A GitLab administrator may want to disable Terraform state
+to reduce disk space or if Terraform is not used in your instance. To do so, follow the steps below according to your
+installation's type.
 
 **In Omnibus installations:**
 
@@ -43,8 +44,8 @@ To do so, follow the steps below according to your installation's type.
 
 ## Using local storage
 
-The default configuration uses local storage. To change the location where
-Terraform state files are stored locally, follow the steps below.
+The default configuration uses local storage. To change the location where Terraform state files are stored locally,
+follow the steps below.
 
 **In Omnibus installations:**
 
@@ -72,9 +73,9 @@ Terraform state files are stored locally, follow the steps below.
 
 ## Using object storage **(FREE SELF)**
 
-Instead of storing Terraform state files on disk, we recommend the use of [one of the supported object
-storage options](object_storage.md#options). This configuration relies on valid credentials to
-be configured already.
+Instead of storing Terraform state files on disk, we recommend the use
+of [one of the supported object storage options](object_storage.md#options). This configuration relies on valid
+credentials to be configured already.
 
 [Read more about using object storage with GitLab](object_storage.md).
 
@@ -130,8 +131,7 @@ See [the available connection settings for different providers](object_storage.m
 
 **In Omnibus installations:**
 
-1. Edit `/etc/gitlab/gitlab.rb` and add the following lines; replacing with
-   the values you want:
+1. Edit `/etc/gitlab/gitlab.rb` and add the following lines; replacing with the values you want:
 
    ```ruby
    gitlab_rails['terraform_state_object_store_enabled'] = true
@@ -164,8 +164,7 @@ See [the available connection settings for different providers](object_storage.m
 
 **In installations from source:**
 
-1. Edit `/home/git/gitlab/config/gitlab.yml` and add or amend the following
-   lines:
+1. Edit `/home/git/gitlab/config/gitlab.yml` and add or amend the following lines:
 
    ```yaml
    terraform_state:

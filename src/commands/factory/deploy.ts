@@ -1,30 +1,28 @@
 import FS from "fs";
-import Path from "path";
 import Module from "module";
+import Path from "path";
 import Process from "process";
-import Assertion from "assert";
 
 import Utility from "util";
 
 import { Argv } from "../../cli/arguments.js";
-import { Prompt } from "../../utilities/prompt.js";
-import { Subprocess } from "../../utilities/subprocess.js";
 
 import { PWD } from "../../constructs/settings.js";
+import { Subprocess } from "../../utilities/subprocess.js";
 
-const Remove = Utility.promisify(FS.rm);
+const Remove = Utility.promisify( FS.rm );
 
 /*** *Current Module Path* */
-const File: string = import.meta.url.replace("file" + ":" + "//", "");
+const File: string = import.meta.url.replace( "file" + ":" + "//", "" );
 
 /*** *Current Working Directory* */
-const CWD: string = Path.dirname(File);
+const CWD: string = Path.dirname( File );
 
 /*** *Package Directory* */
-const PKG: string = Path.dirname(CWD);
+const PKG: string = Path.dirname( CWD );
 
 /*** Repository */
-const Repository: string = Path.resolve(CWD, "..", "..", "..", "..");
+const Repository: string = Path.resolve( CWD, "..", "..", "..", ".." );
 
 /***
  *  JSON Capable Importer
@@ -33,21 +31,14 @@ const Repository: string = Path.resolve(CWD, "..", "..", "..", "..");
  *
  */
 
-const Import = Module.createRequire(PKG);
+const Import = Module.createRequire( PKG );
 
 /*** Exclusions to Avoid Recursive Parsing; i.e. libraries, lambda-layers, or otherwise bundled requirements */
-const Exclusions = [
-    ".git",
-    ".idea",
-    ".vscode",
-    "cdktf.out",
-    "templates",
-    "documentation",
-    "scripts"
-];
+const Exclusions = [ ".git", ".idea", ".vscode", "cdktf.out", "templates", "documentation", "scripts" ];
 
 /*** Debug Console Utility String Generator */
-const Input = ( input: ( string | number )[] ) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";
+const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
+    ", " ).toUpperCase() + ")";
 
 /***
  * Command Configuration, Composition
@@ -60,27 +51,22 @@ const Input = ( input: ( string | number )[] ) => "[Debug] CLI Input" + " " + "(
  *
  */
 
-function Configuration( Arguments: Argv ) {
-    const Syntax = ( command: string ) => [ command, "? [--debug] ? [--help]" ].join(" ");
+function Configuration(Arguments: Argv) {
+    const Syntax = (command: string) => [ command, "? [--debug] ? [--help]" ].join( " " );
 
-    Arguments.hide("version");
-    Arguments.help("help", "Display Usage Guide").default("help", false);
+    Arguments.hide( "version" );
+    Arguments.help( "help", "Display Usage Guide" ).default( "help", false );
 
-    Arguments.option("debug", { type: "boolean" }).alias("debug", "d").default("debug", false);
-    Arguments.describe("debug", "Enable Debug Logging");
+    Arguments.option( "debug", { type: "boolean" } ).alias( "debug", "d" ).default( "debug", false );
+    Arguments.describe( "debug", "Enable Debug Logging" );
 
-    Arguments.example("Global", Syntax("npx cli factory main"));
-    Arguments.example("Node", Syntax("node cli factory main"));
-    Arguments.example("NPM", Syntax("npm run cli -- factory main"));
+    Arguments.example( "Global", Syntax( "npx cli factory main" ) );
+    Arguments.example( "Node", Syntax( "node cli factory main" ) );
+    Arguments.example( "NPM", Syntax( "npm run cli -- factory main" ) );
 
-    Arguments.usage([
-        "Usage" + ":",
-        "  >>> npm run cli -- factory main",
-        "  >>> npm run cli -- factory main --help",
-        "  >>> npm run cli -- factory main --debug"
-    ].join("\n"));
+    Arguments.usage( [ "Usage" + ":", "  >>> npm run cli -- factory main", "  >>> npm run cli -- factory main --help", "  >>> npm run cli -- factory main --debug" ].join(
+        "\n" ) );
 }
-
 
 /***
  * Recursive Copy Function
@@ -98,30 +84,30 @@ function Configuration( Arguments: Argv ) {
  */
 
 function Copy(source: string, target: string, debug: boolean = false) {
-    FS.mkdirSync(target, {recursive: true});
-    FS.readdirSync(source, {withFileTypes: true}).filter(($) => (!Exclusions.includes($.name))).forEach(($) => {
-        const Directory = FS.lstatSync(Path.join(source, $.name), {throwIfNoEntry: true}).isDirectory();
-        const File = FS.lstatSync(Path.join(source, $.name), {throwIfNoEntry: true}).isFile();
+    FS.mkdirSync( target, { recursive: true } );
+    FS.readdirSync( source,
+        { withFileTypes: true } ).filter( ($) => (!Exclusions.includes( $.name )) ).forEach( ($) => {
+        const Directory = FS.lstatSync( Path.join( source, $.name ), { throwIfNoEntry: true } ).isDirectory();
+        const File = FS.lstatSync( Path.join( source, $.name ), { throwIfNoEntry: true } ).isFile();
 
-        if (File) {
+        if ( File ) {
             try {
-                FS.copyFileSync(
-                    Path.join(source, $.name),
-                    Path.join(target, $.name),
-                    FS.constants.COPYFILE_FICLONE
-                );
+                FS.copyFileSync( Path.join( source, $.name ),
+                    Path.join( target, $.name ),
+                    FS.constants.COPYFILE_FICLONE );
 
-                (debug) && console.debug("[Debug]" + ":", {
-                    Source: Path.join(source, $.name),
-                    Target: Path.join(target, $.name),
-                }, "\n");
-            } catch (error) {
+                (debug) && console.debug( "[Debug]" + ":", {
+                    Source: Path.join( source, $.name ), Target: Path.join( target, $.name )
+                }, "\n" );
+            } catch ( error ) {
                 // ...
             }
-        } else if (Directory) {
-            Copy(Path.join(source, $.name), Path.join(target, $.name));
+        } else {
+            if ( Directory ) {
+                Copy( Path.join( source, $.name ), Path.join( target, $.name ) );
+            }
         }
-    });
+    } );
 }
 
 /***
@@ -135,22 +121,25 @@ function Copy(source: string, target: string, debug: boolean = false) {
  */
 
 function Dry(source: string, target: string) {
-    FS.mkdirSync(target, {recursive: true});
-    FS.readdirSync(source, {withFileTypes: true}).filter(($) => (!Exclusions.includes($.name))).forEach(($) => {
-        const Directory = FS.lstatSync(Path.join(source, $.name), {throwIfNoEntry: true}).isDirectory();
-        const File = FS.lstatSync(Path.join(source, $.name), {throwIfNoEntry: true}).isFile();
+    FS.mkdirSync( target, { recursive: true } );
+    FS.readdirSync( source,
+        { withFileTypes: true } ).filter( ($) => (!Exclusions.includes( $.name )) ).forEach( ($) => {
+        const Directory = FS.lstatSync( Path.join( source, $.name ), { throwIfNoEntry: true } ).isDirectory();
+        const File = FS.lstatSync( Path.join( source, $.name ), { throwIfNoEntry: true } ).isFile();
 
-        if (File) {
+        if ( File ) {
             try {
-                console.log(" - " + "Source" + ":" + " " + Path.join(source, $.name));
-                console.log(" - " + "Target" + ":" + " " + Path.join(target, $.name));
-            } catch (error) {
+                console.log( " - " + "Source" + ":" + " " + Path.join( source, $.name ) );
+                console.log( " - " + "Target" + ":" + " " + Path.join( target, $.name ) );
+            } catch ( error ) {
                 // ...
             }
-        } else if (Directory) {
-            Dry(Path.join(source, $.name), Path.join(target, $.name));
+        } else {
+            if ( Directory ) {
+                Dry( Path.join( source, $.name ), Path.join( target, $.name ) );
+            }
         }
-    });
+    } );
 }
 
 /***
@@ -163,23 +152,23 @@ function Dry(source: string, target: string) {
  *
  */
 
-const Command = async ( $: Argv ) => {
+const Command = async ($: Argv) => {
     const Arguments: Argv = $;
 
-    console.warn("[Warning] The Current Command is Under Development.");
-    console.warn("... To view runtime debug logs, provide the \"--debug\" flag", "\n");
+    console.warn( "[Warning] The Current Command is Under Development." );
+    console.warn( "... To view runtime debug logs, provide the \"--debug\" flag", "\n" );
 
     /*** @Task Create No-Prompt Flag to Avoid User Input */
 
-    Configuration(Arguments);
+    Configuration( Arguments );
 
-    Arguments.check(async ( $ ) => {
+    Arguments.check( async ($) => {
         try {
-            console.log("[Log] Target Directory" + ":", PWD);
-            console.log("[Log] Source Directory" + ":", Repository);
+            console.log( "[Log] Target Directory" + ":", PWD );
+            console.log( "[Log] Source Directory" + ":", Repository );
 
-            ( $?.debug ) && console.log(Input($._), JSON.stringify($, null, 4), "\n");
-            ( $?.debug ) && console.debug("Current Directory" + ":", Process.cwd(), "\n");
+            ($?.debug) && console.log( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
+            ($?.debug) && console.debug( "Current Directory" + ":", Process.cwd(), "\n" );
 
             // const Continue = async () => await Prompt("Continue? (Y/N)" + ":" + " ");
             //
@@ -188,20 +177,20 @@ const Command = async ( $: Argv ) => {
             // while (trigger !== "Y" && trigger !== "N") trigger = await Continue().then(( $ ) => $.toUpperCase());
 
             //( trigger === "Y" ) &&
-            console.log("\n" + "[Log] Writing File Structure ...", "\n");
+            console.log( "\n" + "[Log] Writing File Structure ...", "\n" );
 
             // ( trigger === "Y" ) &&
-            await Remove(Path.join(Process.cwd(), "factory"), { maxRetries: 5, force: true, recursive: true });
+            await Remove( Path.join( Process.cwd(), "factory" ), { maxRetries: 5, force: true, recursive: true } );
 
             // ( trigger === "Y" ) && ( $?.debug ) &&
-            Dry(Repository, Path.join(Process.cwd(), "factory"));
+            Dry( Repository, Path.join( Process.cwd(), "factory" ) );
 
-            Process.stdout.write("\n");
+            Process.stdout.write( "\n" );
 
             // ( trigger === "Y" ) && Copy(Repository, Path.join(Process.cwd(), "factory"), $?.debug);
 
             // @ts-ignore
-            Copy(Repository, Path.join(Process.cwd(), "factory"), $?.debug);
+            Copy( Repository, Path.join( Process.cwd(), "factory" ), $?.debug );
 
             /// Install Dependencies
             // ( trigger === "Y" ) && await Subprocess("npm install --global", Path.join(Process.cwd(), "factory"));
@@ -212,21 +201,21 @@ const Command = async ( $: Argv ) => {
             // ( trigger === "Y" ) && await Subprocess("cdktf synth", Path.join(Process.cwd(), "factory", "distribution"));
             // ( trigger === "Y" ) && await Subprocess("cdktf deploy --auto-approve", Path.join(Process.cwd(), "factory", "distribution"));
 
-            await Subprocess("npm install --global", Path.join(Process.cwd(), "factory"));
-            await Subprocess("npm install typescript --global", Path.join(Process.cwd(), "factory"));
-            await Subprocess("npm install cdktf@latest --global", Path.join(Process.cwd(), "factory"));
-            Copy(Path.join(Process.cwd(), "distribution"), Path.join(Process.cwd(), "factory", "distribution"));
-            await Subprocess("cdktf get", Path.join(Process.cwd(), "factory", "distribution"));
-            await Subprocess("cdktf synth", Path.join(Process.cwd(), "factory", "distribution"));
-            await Subprocess("cdktf deploy --auto-approve", Path.join(Process.cwd(), "factory", "distribution"));
+            await Subprocess( "npm install --global", Path.join( Process.cwd(), "factory" ) );
+            await Subprocess( "npm install typescript --global", Path.join( Process.cwd(), "factory" ) );
+            await Subprocess( "npm install cdktf@latest --global", Path.join( Process.cwd(), "factory" ) );
+            Copy( Path.join( Process.cwd(), "distribution" ), Path.join( Process.cwd(), "factory", "distribution" ) );
+            await Subprocess( "cdktf get", Path.join( Process.cwd(), "factory", "distribution" ) );
+            await Subprocess( "cdktf synth", Path.join( Process.cwd(), "factory", "distribution" ) );
+            await Subprocess( "cdktf deploy --auto-approve", Path.join( Process.cwd(), "factory", "distribution" ) );
 
             return true;
-        } catch (error) {
-            console.error(error);
+        } catch ( error ) {
+            console.error( error );
 
             return false;
         }
-    }).strict();
+    } ).strict();
 };
 
 export { Command as Deploy };

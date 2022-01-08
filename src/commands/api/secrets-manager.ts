@@ -1,15 +1,16 @@
 import FS from "fs";
 import Process from "process";
 
-import {Argv} from "yargs";
+import { Argv } from "yargs";
+
+import { Secrets } from "../../library/aws/index.js";
+import { Prompt } from "../../utilities/prompt.js";
 
 import TTY from "../../utilities/tty.js";
 
-import {Secrets} from "../../library/aws/index.js"
-import {Prompt} from "../../utilities/prompt.js";
-
 /*** Debug Console Utility String Generator */
-const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";
+const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
+    ", " ).toUpperCase() + ")";
 
 // /***
 //  * Command Configuration, Composition
@@ -47,30 +48,33 @@ const Command = async ($: Argv) => {
 
     const Function = API.commands?.getSecretValue ?? null;
 
-    Arguments.check(async ($) => {
-        ($?.debug) && (TTY) && console.log(Input($._), JSON.stringify($, null, 4), "\n");
+    Arguments.check( async ($) => {
+        ($?.debug) && (TTY) && console.log( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
 
-        const Resource: string = ($?.name ?? null) ? String($.name) : (await Prompt("Secret" + ":" + " ")).trim();
-        const Secret = (Function) ? await Function({
+        const Resource: string = ($?.name ?? null) ? String( $.name ) : (await Prompt( "Secret" + ":" + " " )).trim();
+        const Secret = (Function) ? await Function( {
             SecretId: Resource
-        }) : null;
+        } ) : null;
 
-        ((TTY) && !($["value-only"]) && !($.file)) && console.log("[Log] API Response" + ":", JSON.stringify(Secret, null, 4));
-        ((TTY) && ($["value-only"]) && !($.file)) && console.log(Secret?.SecretString ?? "", "\n");
+        ((TTY) && !($["value-only"]) && !($.file)) && console.log( "[Log] API Response" + ":",
+            JSON.stringify( Secret, null, 4 ) );
+        ((TTY) && ($["value-only"]) && !($.file)) && console.log( Secret?.SecretString ?? "", "\n" );
 
-        (!(TTY) && !($["value-only"]) && !($.file)) && Process.stdout.write(JSON.stringify(Secret, null, 4));
-        (!(TTY) && ($["value-only"]) && !($.file)) && Process.stdout.write(Secret?.SecretString ?? "");
+        (!(TTY) && !($["value-only"]) && !($.file)) && Process.stdout.write( JSON.stringify( Secret, null, 4 ) );
+        (!(TTY) && ($["value-only"]) && !($.file)) && Process.stdout.write( Secret?.SecretString ?? "" );
 
-        ($.file ?? null) && !($["value-only"]) && FS.writeFileSync(String($.file) ?? "Fatal-Error.log", JSON.stringify(Secret, null, 4));
-        ($.file ?? null) && ($["value-only"]) && FS.writeFileSync(String($.file) ?? "Fatal-Error.log", Secret?.SecretString ?? "");
+        ($.file ?? null) && !($["value-only"]) && FS.writeFileSync( String( $.file ) ?? "Fatal-Error.log",
+            JSON.stringify( Secret, null, 4 ) );
+        ($.file ?? null) && ($["value-only"]) && FS.writeFileSync( String( $.file ) ?? "Fatal-Error.log",
+            Secret?.SecretString ?? "" );
 
         return true;
-    }).strict();
+    } ).strict();
 };
 
-export {Command as Get};
+export { Command as Get };
 
-export default {Command};
+export default { Command };
 
 //
 // Debugging & Local Testing

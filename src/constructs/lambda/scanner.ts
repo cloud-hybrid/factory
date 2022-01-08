@@ -7,26 +7,25 @@
  * @copyright   Cloud-Technology LLC. & Affiliates
  */
 
-import FS from "fs";
-import Path from "path";
-import Module from "module";
-
 import Assertion from "assert";
+import FS from "fs";
+import Module from "module";
+import Path from "path";
 
 /*** ESM Resolver for *Current-Working-Directory* */
-const CWD: string = Path.dirname(import.meta.url.replace("file" + ":" + "//", ""));
+const CWD: string = Path.dirname( import.meta.url.replace( "file" + ":" + "//", "" ) );
 
 /*** ESM Resolver for Package Directory relative to Current Working Directory */
-const PKG: string = Path.dirname(CWD);
+const PKG: string = Path.dirname( CWD );
 
 /*** ESM Resolver for Source Directory relative to the Current Working Directory */
-const Source: string = Path.dirname(PKG);
+const Source: string = Path.dirname( PKG );
 
 /*** ESM Resolver for Schemas Directory relative to the Current Working Directory */
-const Schemas: string = Path.dirname(Source);
+const Schemas: string = Path.dirname( Source );
 
 /*** ESM Compatability & JSON Importer */
-const Import: NodeRequire = Module.createRequire(import.meta.url);
+const Import: NodeRequire = Module.createRequire( import.meta.url );
 
 /// --- --- --- /// --- --- --- /// --- --- --- /// --- --- --- /// --- --- --- /// --- --- --- /// --- --- --- ///
 
@@ -71,6 +70,12 @@ const Requirements = [];
 const Optionals = [];
 
 interface Descriptor {
+    /**
+     * The file name that this `fs.Dirent` object refers to. The type of this
+     * value is determined by the `options.encoding` passed to {@link readdir} or {@link readdirSync}.
+     */
+    name: string;
+
     /***
      * Returns `true` if the `fs.Dirent` object describes a regular file.
      */
@@ -107,12 +112,6 @@ interface Descriptor {
      * Returns `true` if the `fs.Dirent` object describes a socket.
      */
     isSocket(): boolean;
-
-    /**
-     * The file name that this `fs.Dirent` object refers to. The type of this
-     * value is determined by the `options.encoding` passed to {@link readdir} or {@link readdirSync}.
-     */
-    name: string;
 }
 
 /***
@@ -128,9 +127,13 @@ interface Descriptor {
 
 interface Type {
     root: string;
+
     dir: string;
+
     base: string;
+
     ext: string;
+
     name: string;
 
     $: Type[];
@@ -149,21 +152,21 @@ interface Type {
  */
 
 const Directory = (path: string) => {
-    const Resolved = Path.normalize(path);
-    Assertion(FS.existsSync(Resolved));
+    const Resolved = Path.normalize( path );
+    Assertion( FS.existsSync( Resolved ) );
 
     const Data = {
-        ...Path.parse(Resolved), ...{
-            $: FS.readdirSync(Resolved, {withFileTypes: true})
+        ... Path.parse( Resolved ), ... {
+            $: FS.readdirSync( Resolved, { withFileTypes: true } )
         }
     };
 
-    console.debug("[Debug] Directory Type Data" + ":", JSON.stringify({
+    console.debug( "[Debug] Directory Type Data" + ":", JSON.stringify( {
         Resolved, Data
-    }, null, 4), "\n");
+    }, null, 4 ), "\n" );
 
     return Data;
-}
+};
 
 /***
  * Parent Directory Name Resolver
@@ -178,33 +181,33 @@ const Directory = (path: string) => {
  */
 
 const Parent = (path: string) => {
-    const Resolved = Path.dirname(path);
+    const Resolved = Path.dirname( path );
     const Data = {
-        ...Path.parse(Resolved), ...{
-            $: FS.readdirSync(Resolved, {withFileTypes: true})
+        ... Path.parse( Resolved ), ... {
+            $: FS.readdirSync( Resolved, { withFileTypes: true } )
         }
     };
 
-    console.debug("[Debug] Directory Type Data" + ":", JSON.stringify({
+    console.debug( "[Debug] Directory Type Data" + ":", JSON.stringify( {
         Resolved, Data
-    }, null, 4), "\n");
+    }, null, 4 ), "\n" );
 
     return Data;
-}
+};
 
 /*** Expected: ~ factory/cdfk */
-const directory: string = Parent(CWD).dir
+const directory: string = Parent( CWD ).dir;
 
 /*** Expected: ~ factory */
-const Package = Parent(directory);
-Assertion.strictEqual(Package.name, "factory");
+const Package = Parent( directory );
+Assertion.strictEqual( Package.name, "factory" );
 
 /*** Expected: "packages" Directory in Package Folder */
-const Descriptors = Package.$.map(($) => $.name)
-Assertion.strictEqual(Descriptors.includes("packages"), true);
+const Descriptors = Package.$.map( ($) => $.name );
+Assertion.strictEqual( Descriptors.includes( "packages" ), true );
 
 /*** Expected: "packages" Directory */
-const Packages = Path.join(Path.format(Package), "packages");
-Assertion.strictEqual(FS.existsSync(Packages), true);
+const Packages = Path.join( Path.format( Package ), "packages" );
+Assertion.strictEqual( FS.existsSync( Packages ), true );
 
-console.log(Directory(Packages));
+console.log( Directory( Packages ) );

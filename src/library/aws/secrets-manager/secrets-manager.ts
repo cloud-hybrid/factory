@@ -1,13 +1,14 @@
+import { SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
+
+import { fromIni } from "@aws-sdk/credential-providers";
+import { CredentialProvider } from "@aws-sdk/types";
 import OS from "os";
 
-import {fromIni} from "@aws-sdk/credential-providers";
-import {CredentialProvider} from "@aws-sdk/types";
-import {SecretsManagerClient} from "@aws-sdk/client-secrets-manager";
-
-import { Commands } from "./commands.js"
+import { Commands } from "./commands.js";
 
 interface Credentials {
     accessKeyId: string;
+
     secretAccessKey: string;
 }
 
@@ -33,9 +34,6 @@ interface Credentials {
  */
 
 class Credential {
-    /*** `AWS_PROFILE` environment variable or a default of `default`. */
-    profile: string = "default";
-
     /***
      * Returns information about the currently effective user. On POSIX platforms, this is typically a subset of the
      * password file. The returned object includes the username, uid, gid, shell, and homedir. On Windows, the uid
@@ -49,15 +47,18 @@ class Credential {
 
     static readonly user = OS.userInfo();
 
-    /*** A function that, when invoked, returns a promise that will be fulfilled with a value of type Credential */
-
-    private readonly settings: CredentialProvider;
+    /*** `AWS_PROFILE` environment variable or a default of `default`. */
+    public profile: string = "default";
 
     /*** AWS_ACCESS_KEY_ID */
     public id?: string;
 
     /*** AWS_SECRET_ACCESS_KEY */
     public key?: string;
+
+    /*** A function that, when invoked, returns a promise that will be fulfilled with a value of type Credential */
+
+    private readonly settings: CredentialProvider;
 
     /***
      *
@@ -66,9 +67,9 @@ class Credential {
      */
 
     constructor(profile?: string) {
-        this.settings = fromIni({
+        this.settings = fromIni( {
             profile: profile ?? this.profile
-        });
+        } );
     }
 
     /***
@@ -85,8 +86,7 @@ class Credential {
         this.key = $.secretAccessKey;
 
         return {
-            accessKeyId: this.id,
-            secretAccessKey: this.key
+            accessKeyId: this.id, secretAccessKey: this.key
         };
     }
 }
@@ -127,18 +127,18 @@ class Client extends Credential {
     async instantiate(): Promise<SecretsManagerClient> {
         const $ = await this.initialize();
 
-        const service = new SecretsManagerClient({credentials: $});
+        const service = new SecretsManagerClient( { credentials: $ } );
 
         this.service = service;
 
-        this.commands = Commands(service);
+        this.commands = Commands( service );
 
         return this.service;
     }
 }
 
-interface Service extends SecretsManagerClient {}
+type Service = SecretsManagerClient;
 
-export {Credential, Client};
+export { Credential, Client };
 
 export default Service;

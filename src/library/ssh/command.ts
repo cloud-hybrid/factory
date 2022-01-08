@@ -26,10 +26,7 @@ import FS from "fs";
  */
 
 const Command = (configuration: string | FS.PathLike, alias: string, script: string, data: object) => {
-    const CLI = [
-        "ssh", "-F", configuration, alias,
-        "bash", "-s", "--", "<", script
-    ].join(" ");
+    const CLI = [ "ssh", "-F", configuration, alias, "bash", "-s", "--", "<", script ].join( " " );
 
     const Data = { ... data };
 

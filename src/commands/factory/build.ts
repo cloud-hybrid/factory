@@ -1,31 +1,32 @@
-import FS from "fs";
-import Path from "path";
-import Utility from "util";
-import Module from "module";
-import Process from "process";
 import Assertion from "assert";
+import FS from "fs";
+import Module from "module";
+import Path from "path";
+import Process from "process";
+import Utility from "util";
 
-import {Argv} from "../../cli/arguments.js";
-import {Subprocess} from "../../utilities/subprocess.js";
+import { Argv } from "../../cli/arguments.js";
+import { Subprocess } from "../../utilities/subprocess.js";
 
-const Remove = Utility.promisify(FS.rm);
+const Remove = Utility.promisify( FS.rm );
 
 /*** *Current Module Path* */
-const File: string = import.meta.url.replace("file" + ":" + "//", "");
+const File: string = import.meta.url.replace( "file" + ":" + "//", "" );
 
-const Import: NodeRequire = Module.createRequire(File);
+const Import: NodeRequire = Module.createRequire( File );
 
 /*** *Current Working Directory* */
-const CWD: string = Path.dirname(File);
+const CWD: string = Path.dirname( File );
 
 /*** *Package Directory* */
-const PKG = Path.resolve(CWD, "..", "..", "..", "..");
+const PKG = Path.resolve( CWD, "..", "..", "..", ".." );
 
 /*** Target Workable Directory (packages) */
-const Target = Path.join(PKG, "packages");
+const Target = Path.join( PKG, "packages" );
 
 /*** Packages */
-const Targets = (FS.existsSync(Target)) ? FS.readdirSync(Target, {withFileTypes: true}).filter(($) => $.isDirectory()) : null;
+const Targets = (FS.existsSync( Target )) ? FS.readdirSync( Target,
+    { withFileTypes: true } ).filter( ($) => $.isDirectory() ) : null;
 
 /***
  * Library
@@ -38,44 +39,47 @@ const Targets = (FS.existsSync(Target)) ? FS.readdirSync(Target, {withFileTypes:
  *
  */
 
-const Library = Path.join(PKG, "packages", "library")
+const Library = Path.join( PKG, "packages", "library" );
 
 /*** Exclusions to Avoid Recursive Parsing; i.e. libraries, lambda-layers, or otherwise bundled requirements */
-const Exclusions = [
-    "library",
-    "node_modules"
-]
+const Exclusions = [ "library", "node_modules" ];
 
 interface Package {
     Name: string;
+
     Dependencies: { string: string } | null;
+
     Directory: string,
+
     Version: string | null;
+
     Description: string | null;
+
     Package: string;
+
     Layer: boolean;
 }
 
-function* Walk(directory: string): Generator {
-    const Files = FS.readdirSync(directory, {withFileTypes: true});
-    for (const file of Files) {
-        if (!Exclusions.includes(file.name)) {
-            if (file.isDirectory()) {
-                yield* Walk(Path.join(directory, file.name));
+function * Walk(directory: string): Generator {
+    const Files = FS.readdirSync( directory, { withFileTypes: true } );
+    for ( const file of Files ) {
+        if ( !Exclusions.includes( file.name ) ) {
+            if ( file.isDirectory() ) {
+                yield * Walk( Path.join( directory, file.name ) );
             } else {
-                yield Path.join(directory, file.name);
+                yield Path.join( directory, file.name );
             }
         }
     }
 }
 
-function* Parse(directory: string): Generator {
-    const Files = FS.readdirSync(directory, {withFileTypes: true});
-    for (const file of Files) {
-        if (file.isDirectory()) {
-            yield* Walk(Path.join(directory, file.name));
+function * Parse(directory: string): Generator {
+    const Files = FS.readdirSync( directory, { withFileTypes: true } );
+    for ( const file of Files ) {
+        if ( file.isDirectory() ) {
+            yield * Walk( Path.join( directory, file.name ) );
         } else {
-            yield Path.join(directory, file.name);
+            yield Path.join( directory, file.name );
         }
     }
 }
@@ -95,17 +99,19 @@ function* Parse(directory: string): Generator {
  */
 
 function Copy(source: string, target: string) {
-    FS.mkdirSync(target, {recursive: true});
-    FS.readdirSync(source).forEach((element) => {
-        const Directory = FS.lstatSync(Path.join(source, element), {throwIfNoEntry: true}).isDirectory();
-        const Socket = FS.lstatSync(Path.join(source, element), {throwIfNoEntry: true}).isSocket();
+    FS.mkdirSync( target, { recursive: true } );
+    FS.readdirSync( source ).forEach( (element) => {
+        const Directory = FS.lstatSync( Path.join( source, element ), { throwIfNoEntry: true } ).isDirectory();
+        const Socket = FS.lstatSync( Path.join( source, element ), { throwIfNoEntry: true } ).isSocket();
 
-        if (!Directory && !Socket) {
-            FS.copyFileSync(Path.join(source, element), Path.join(target, element));
-        } else if (!Socket) {
-            Copy(Path.join(source, element), Path.join(target, element));
+        if ( !Directory && !Socket ) {
+            FS.copyFileSync( Path.join( source, element ), Path.join( target, element ) );
+        } else {
+            if ( !Socket ) {
+                Copy( Path.join( source, element ), Path.join( target, element ) );
+            }
         }
-    });
+    } );
 }
 
 /***
@@ -119,20 +125,22 @@ function Copy(source: string, target: string) {
  */
 
 function Layer(source: string, target: string) {
-    FS.statSync(target, {throwIfNoEntry: true});
-    FS.readdirSync(source).forEach((element) => {
-        const Target = Path.join(source, element);
-        const File = FS.lstatSync(Target, {throwIfNoEntry: true}).isFile();
-        const Descriptor = Path.parse(Target);
+    FS.statSync( target, { throwIfNoEntry: true } );
+    FS.readdirSync( source ).forEach( (element) => {
+        const Target = Path.join( source, element );
+        const File = FS.lstatSync( Target, { throwIfNoEntry: true } ).isFile();
+        const Descriptor = Path.parse( Target );
 
-        if (File && Descriptor.ext === ".js") {
-            FS.copyFileSync(Path.format(Descriptor), Path.join(target, Descriptor.base));
-        } else if (Descriptor.base === "package.json") {
-            FS.copyFileSync(Path.format(Descriptor), Path.join(target, Descriptor.base));
+        if ( File && Descriptor.ext === ".js" ) {
+            FS.copyFileSync( Path.format( Descriptor ), Path.join( target, Descriptor.base ) );
         } else {
-            (File) && FS.copyFileSync(Path.format(Descriptor), Path.join(target, Descriptor.base));
+            if ( Descriptor.base === "package.json" ) {
+                FS.copyFileSync( Path.format( Descriptor ), Path.join( target, Descriptor.base ) );
+            } else {
+                (File) && FS.copyFileSync( Path.format( Descriptor ), Path.join( target, Descriptor.base ) );
+            }
         }
-    });
+    } );
 }
 
 /***
@@ -148,10 +156,10 @@ function Layer(source: string, target: string) {
 function Locate(files: string[] | any) {
     const Data: string[] = [];
 
-    for (const file in files) {
+    for ( const file in files ) {
         const Target = files[file];
-        if (Target.includes("package.json")) {
-            Data.push(Path.dirname(Target));
+        if ( Target.includes( "package.json" ) ) {
+            Data.push( Path.dirname( Target ) );
         }
     }
 
@@ -184,10 +192,10 @@ function Locate(files: string[] | any) {
  */
 
 async function Distribution(data: Package[]) {
-    const Directory = Path.join(Target, "distribution");
-    const Layers = Path.join(Directory, "library");
+    const Directory = Path.join( Target, "distribution" );
+    const Layers = Path.join( Directory, "library" );
 
-    for (const $ of data) {
+    for ( const $ of data ) {
         /// Name, Target Directory
         const Name = $.Name;
 
@@ -195,46 +203,49 @@ async function Distribution(data: Package[]) {
         const OWD = Process.cwd();
 
         /// Target Working Directory
-        Process.chdir($.Directory);
+        Process.chdir( $.Directory );
 
         /// Current Working Directory
         const CWD = Process.cwd();
 
         /// Should Never Happen, but Technically is Possible
-        Assertion.strictEqual($.Directory, CWD, "Process Directory Drift");
+        Assertion.strictEqual( $.Directory, CWD, "Process Directory Drift" );
 
         /// Cleanse Directories if Applicable
-        await Remove(Path.join(CWD, "node_modules"), {recursive: true, force: true});
-        await Remove(Path.join(CWD, Name), {recursive: true, force: true});
+        await Remove( Path.join( CWD, "node_modules" ), { recursive: true, force: true } );
+        await Remove( Path.join( CWD, Name ), { recursive: true, force: true } );
 
         /// Install only Production-based Lambda Dependencies
-        await Subprocess("npm install --production");
+        await Subprocess( "npm install --production" );
 
-        if ($.Layer === true) {
+        if ( $.Layer === true ) {
             /// Copy Layer Dependencies
-            Copy(Path.join(CWD, "node_modules"), Path.join(CWD, Name, "nodejs", "node_modules"));
-            await Remove(Path.join(CWD, "node_modules"), {recursive: true, force: true});
+            Copy( Path.join( CWD, "node_modules" ), Path.join( CWD, Name, "nodejs", "node_modules" ) );
+            await Remove( Path.join( CWD, "node_modules" ), { recursive: true, force: true } );
 
             /// Copy the Layer File(s), Shallow
-            Layer(CWD, Path.join(CWD, Name, "nodejs"));
+            Layer( CWD, Path.join( CWD, Name, "nodejs" ) );
 
             /// Copy Layer Folder into the Distribution Library
-            Copy(Path.join(CWD, Name), Path.join(Layers, Name));
-            await Remove(Path.join(CWD, Name), {recursive: true, force: true});
+            Copy( Path.join( CWD, Name ), Path.join( Layers, Name ) );
+            await Remove( Path.join( CWD, Name ), { recursive: true, force: true } );
 
-            Process.chdir(OWD);
-        } else if ($.Layer === false) {
-            /// Copy Lambda Folder into the Distribution Library, Recursively
-            Copy(CWD, Path.join(Directory, Name));
-            await Remove(Path.join(CWD, "node_modules"), {recursive: true});
+            Process.chdir( OWD );
+        } else {
+            if ( $.Layer === false ) {
+                /// Copy Lambda Folder into the Distribution Library, Recursively
+                Copy( CWD, Path.join( Directory, Name ) );
+                await Remove( Path.join( CWD, "node_modules" ), { recursive: true } );
 
-            Process.chdir(OWD);
+                Process.chdir( OWD );
+            }
         }
     }
 }
 
 /*** Debug Console Utility String Generator */
-const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";
+const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
+    ", " ).toUpperCase() + ")";
 
 /***
  * Command Configuration, Composition
@@ -248,24 +259,20 @@ const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + 
  */
 
 function Configuration(Arguments: Argv) {
-    const Syntax = (command: string) => [command, "? [--debug] ? [--help]"].join(" ");
+    const Syntax = (command: string) => [ command, "? [--debug] ? [--help]" ].join( " " );
 
-    Arguments.hide("version");
-    Arguments.help("help", "Display Usage Guide").default("help", false);
+    Arguments.hide( "version" );
+    Arguments.help( "help", "Display Usage Guide" ).default( "help", false );
 
-    Arguments.option("debug", {type: "boolean"}).alias("debug", "d").default("debug", false);
-    Arguments.describe("debug", "Enable Debug Logging");
+    Arguments.option( "debug", { type: "boolean" } ).alias( "debug", "d" ).default( "debug", false );
+    Arguments.describe( "debug", "Enable Debug Logging" );
 
-    Arguments.example("Global", Syntax("npx cli cdfk build"));
-    Arguments.example("Node", Syntax("node cli cdfk build"));
-    Arguments.example("NPM", Syntax("npm run cli -- cdfk build"));
+    Arguments.example( "Global", Syntax( "npx cli cdfk build" ) );
+    Arguments.example( "Node", Syntax( "node cli cdfk build" ) );
+    Arguments.example( "NPM", Syntax( "npm run cli -- cdfk build" ) );
 
-    Arguments.usage([
-        "Usage" + ":",
-        "  >>> npm run cli -- cdfk build",
-        "  >>> npm run cli -- cdfk build --help",
-        "  >>> npm run cli -- cdfk build --debug"
-    ].join("\n"));
+    Arguments.usage( [ "Usage" + ":", "  >>> npm run cli -- cdfk build", "  >>> npm run cli -- cdfk build --help", "  >>> npm run cli -- cdfk build --debug" ].join(
+        "\n" ) );
 }
 
 /***
@@ -281,53 +288,48 @@ function Configuration(Arguments: Argv) {
 const Command = async ($: Argv) => {
     const Arguments: Argv = $;
 
-    console.warn("[Warning] The Current Command is Under Development.");
-    console.warn("... To view runtime debug logs, provide the \"--debug\" flag", "\n");
+    console.warn( "[Warning] The Current Command is Under Development." );
+    console.warn( "... To view runtime debug logs, provide the \"--debug\" flag", "\n" );
 
-    Configuration(Arguments);
+    Configuration( Arguments );
 
-    if (FS.existsSync(Path.join(Target, "distribution"))) {
-        await Remove(Path.join(Target, "distribution"), {recursive: true});
+    if ( FS.existsSync( Path.join( Target, "distribution" ) ) ) {
+        await Remove( Path.join( Target, "distribution" ), { recursive: true } );
     }
 
-    Arguments.check(async ($) => {
-        ($?.debug) && console.debug(Input($._), JSON.stringify($, null, 4), "\n");
+    Arguments.check( async ($) => {
+        ($?.debug) && console.debug( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
 
-        ($?.debug) && console.debug("[Debug] Runtime Location" + ":", import.meta.url, "\n");
-        ($?.debug) && console.debug("[Debug] User CWD" + ":", Process.cwd(), "\n");
-        ($?.debug) && console.debug("[Debug] Package" + ":", PKG, "\n");
+        ($?.debug) && console.debug( "[Debug] Runtime Location" + ":", import.meta.url, "\n" );
+        ($?.debug) && console.debug( "[Debug] User CWD" + ":", Process.cwd(), "\n" );
+        ($?.debug) && console.debug( "[Debug] Package" + ":", PKG, "\n" );
 
-        ($?.debug) && console.debug("[Debug] Directories" + ":", Targets, "\n");
+        ($?.debug) && console.debug( "[Debug] Directories" + ":", Targets, "\n" );
 
         const Files = [];
-        for (const filePath of Walk(Path.join(PKG, "packages"))) {
-            Files.push(filePath);
+        for ( const filePath of Walk( Path.join( PKG, "packages" ) ) ) {
+            Files.push( filePath );
         }
 
         /*** Recursively Searched Folder(s) w/package.json Files */
-        const Dependencies = Locate(Files);
+        const Dependencies = Locate( Files );
 
-        ($?.debug) && console.debug("[Debug] Located Target Dependencies" + ":", Dependencies, "\n");
+        ($?.debug) && console.debug( "[Debug] Located Target Dependencies" + ":", Dependencies, "\n" );
 
         const Data: {
-            Name: string;
-            Dependencies: { string: string } | null;
-            Directory: string, Version: string | null;
-            Description: string | null;
-            Package: string;
-            Layer: boolean;
+            Name: string; Dependencies: { string: string } | null; Directory: string, Version: string | null; Description: string | null; Package: string; Layer: boolean;
         }[] = [];
 
-        Dependencies.forEach((Target) => {
+        Dependencies.forEach( (Target) => {
             /// Import the package.json File as an Object via Node-Require Import
-            const Package = Import(Path.join(Target, "package.json"));
+            const Package = Import( Path.join( Target, "package.json" ) );
 
-            ($?.debug) && console.log("[Debug] Package" + ":", Package, "\n");
+            ($?.debug) && console.log( "[Debug] Package" + ":", Package, "\n" );
 
             /// Scan package.json for its Package-Name -- Stripping the Organization if applicable
-            const Expression = RegExp("(@.*/)?(.*)", "i");
+            const Expression = RegExp( "(@.*/)?(.*)", "i" );
 
-            const Name = Expression.exec(Package.name)?.pop() || "";
+            const Name = Expression.exec( Package.name )?.pop() || "";
 
             // Acquire Dependencies.
             //
@@ -335,33 +337,33 @@ const Command = async ($: Argv) => {
             // dependencies are found to be in two or more, a lambda-layer or hoisted dependencies list can be
             // built.
 
-            Data.push({
+            Data.push( {
                 Name,
                 Dependencies: Package?.dependencies || null,
                 Directory: Target,
                 Version: Package?.version || null,
                 Description: Package?.description || null,
-                Package: Path.join(Target, "package.json"),
+                Package: Path.join( Target, "package.json" ),
                 Layer: false
-            });
-        });
+            } );
+        } );
 
         const Requirements = [];
-        for (const filePath of Parse(Library)) {
-            Requirements.push(filePath);
+        for ( const filePath of Parse( Library ) ) {
+            Requirements.push( filePath );
         }
 
-        const Layers = Locate(Requirements);
-        Layers.forEach((Target) => {
+        const Layers = Locate( Requirements );
+        Layers.forEach( (Target) => {
             /// Import the package.json File as an Object via Node-Require Import
-            const Package = Import(Path.join(Target, "package.json"));
+            const Package = Import( Path.join( Target, "package.json" ) );
 
-            ($?.debug) && console.log("[Debug] Package" + ":", Package, "\n");
+            ($?.debug) && console.log( "[Debug] Package" + ":", Package, "\n" );
 
             /// Scan package.json for its Package-Name -- Stripping the Organization if applicable
-            const Expression = RegExp("(@.*/)?(.*)", "i");
+            const Expression = RegExp( "(@.*/)?(.*)", "i" );
 
-            const Name = Expression.exec(Package.name)?.pop() || "";
+            const Name = Expression.exec( Package.name )?.pop() || "";
 
             // Acquire Dependencies.
             //
@@ -369,25 +371,25 @@ const Command = async ($: Argv) => {
             // dependencies are found to be in two or more, a lambda-layer or hoisted dependencies list can be
             // built.
 
-            Data.push({
+            Data.push( {
                 Name,
                 Dependencies: Package?.dependencies,
                 Directory: Target,
                 Version: Package?.version || null,
                 Description: Package?.description || null,
-                Package: Path.join(Target, "package.json"),
+                Package: Path.join( Target, "package.json" ),
                 Layer: true
-            });
-        });
+            } );
+        } );
 
-        ($?.debug) && console.log("[Debug] Data" + ":", Data, "\n");
+        ($?.debug) && console.log( "[Debug] Data" + ":", Data, "\n" );
 
-        await Distribution(Data);
+        await Distribution( Data );
 
         return true;
-    }).strict();
+    } ).strict();
 };
 
-export {Command as Build};
+export { Command as Build };
 
-export default {Command};
+export default { Command };

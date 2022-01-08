@@ -63,6 +63,18 @@
             }
         ]
     },
+    "exclude": [
+        ".git",
+        ".tf",
+        "./distribution",
+        "./templates",
+        "./templates/*",
+        "./templates/**",
+        "**/*.d.ts",
+        "*/**/unit-testing",
+        "./scripts/*.js",
+        "./artifacts"
+    ],
     "include": [
         "package.json",
         "cdktf.json",
@@ -75,18 +87,7 @@
         "./src/schema/lambda/*.json",
         "./src/schema/configuration/*.json",
         "./unit-testing/**/*.json",
-        "./scripts"
-    ],
-    "exclude": [
-        ".git",
-        ".tf",
-        "./distribution",
-        "./templates",
-        "./templates/*",
-        "./templates/**",
-        "**/*.d.ts",
-        "*/**/unit-testing",
-        "./scripts/*.js",
-        "./artifacts"
+        "./scripts",
+        "./templates"
     ]
 }

@@ -24,8 +24,8 @@ import Path from "path";
  *
  */
 
-const URI = () => Path.normalize(import.meta.url).replace("file" + ":", "");
-const Directory = () => Path.dirname(URI());
+const URI = () => Path.normalize( import.meta.url ).replace( "file" + ":", "" );
+const Directory = () => Path.dirname( URI() );
 
 /***
  * Compatability Replacement for `require` (Commonjs)
@@ -40,7 +40,7 @@ const Directory = () => Path.dirname(URI());
  *
  */
 
-const Import = Module.createRequire(URI());
+const Import = Module.createRequire( URI() );
 
 /***
  *
@@ -53,13 +53,13 @@ const Import = Module.createRequire(URI());
  */
 
 const Modify = (key: string) => {
-    return new Promise((resolve) => {
+    return new Promise( (resolve) => {
         try {
-            FS.chmod(key, 0o400, resolve);
+            FS.chmod( key, 0o400, resolve );
         } finally {
             /*** */
         }
-    });
+    } );
 };
 
 /***
@@ -73,13 +73,13 @@ const Modify = (key: string) => {
  */
 
 const Unlock = (key: string) => {
-    return new Promise((resolve) => {
+    return new Promise( (resolve) => {
         try {
-            FS.chmod(key, 0o777, resolve);
+            FS.chmod( key, 0o777, resolve );
         } finally {
             /*** */
         }
-    });
+    } );
 };
 
 export { Modify, Unlock };

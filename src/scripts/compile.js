@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import Path from "path";
 import Spawn from "child_process";
+import Path from "path";
 
 const Process = process;
 

@@ -8,9 +8,9 @@
  * @copyright   Cloud-Technology LLC. & Affiliates
  */
 
-import Utility from "util";
-import Input from "readline";
 import Process from "process";
+import Input from "readline";
+import Utility from "util";
 
 /***
  * Asynchronous CLI Prompt
@@ -25,25 +25,27 @@ import Process from "process";
 
 const Prompt = (query: string) => {
     // eslint-disable-next-line no-async-promise-executor
-    const Data: Promise<string> = new Promise(async (resolve, reject) => {
+    const Data: Promise<string> = new Promise( async (resolve, reject) => {
         let $: unknown = "";
 
-        const Interface = Input.createInterface({
-            input: Process.openStdin(),
-            output: Process.stdout
-        });
+        const Interface = Input.createInterface( {
+            input: Process.openStdin(), output: Process.stdout
+        } );
 
-        const prompt = Utility.promisify(Interface.question).bind(Interface);
+        const prompt = Utility.promisify( Interface.question ).bind( Interface );
 
         try {
-            $ = await prompt(query);
-        } catch ( _ ) { reject(_); }
-        finally { Interface.close(); }
+            $ = await prompt( query );
+        } catch ( _ ) {
+            reject( _ );
+        } finally {
+            Interface.close();
+        }
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        resolve($);
-    });
+        resolve( $ );
+    } );
 
     return Data;
 };

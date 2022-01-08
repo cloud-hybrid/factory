@@ -1,14 +1,14 @@
+import Spawn from "child_process";
 import FS from "fs";
+import Module from "module";
 import Path from "path";
 import Utility from "util";
-import Module from "module";
-import Spawn from "child_process";
 
 const Process = process;
 
-const File = import.meta.url.replace("file" + ":" + "//", "");
+const File = import.meta.url.replace( "file" + ":" + "//", "" );
 
-const Import = Module.createRequire(File);
+const Import = Module.createRequire( File );
 
 /***
  * Recursive Copy Function
@@ -24,37 +24,30 @@ const Import = Module.createRequire(File);
  *
  */
 
-function Copy( source: string, target: string ) {
+function Copy(source: string, target: string) {
     /*** Exclusions to Avoid Recursive Parsing; i.e. libraries, lambda-layers, or otherwise bundled requirements */
-    const Exclusions = [
-        ".git",
-        ".idea",
-        ".vscode",
-        "artifacts",
-        "cdktf.out",
-        "templates"
-    ];
+    const Exclusions = [ ".git", ".idea", ".vscode", "artifacts", "cdktf.out", "templates" ];
 
-    FS.mkdirSync(target, { recursive: true });
-    FS.readdirSync(source, { withFileTypes: true }).forEach(( element ) => {
+    FS.mkdirSync( target, { recursive: true } );
+    FS.readdirSync( source, { withFileTypes: true } ).forEach( (element) => {
         const Directory = element?.isDirectory() || false;
         const Socket = element?.isSocket() || false;
         const File = element?.isFile() || false;
 
         try {
-            if (!Socket && Directory) {
-                if (!Exclusions.includes(element.name)) {
-                    Copy(Path.join(source, element.name), Path.join(target, element.name));
+            if ( !Socket && Directory ) {
+                if ( !Exclusions.includes( element.name ) ) {
+                    Copy( Path.join( source, element.name ), Path.join( target, element.name ) );
                 }
             } else {
-                if (File && !Exclusions.includes(element.name)) {
-                    FS.copyFileSync(Path.join(source, element.name), Path.join(target, element.name));
+                if ( File && !Exclusions.includes( element.name ) ) {
+                    FS.copyFileSync( Path.join( source, element.name ), Path.join( target, element.name ) );
                 }
             }
-        } catch (e) {
+        } catch ( e ) {
             /// ...
         }
-    });
+    } );
 }
 
 /***
@@ -68,32 +61,30 @@ function Copy( source: string, target: string ) {
  *
  */
 
-const Subprocess = ( command: string, directory: string = Process.cwd() ) => {
-    const Binary = command.split(" ")[ 0 ];
-    const Arguments = command.split(" ").splice(1);
-    return Spawn.spawnSync(Binary, [ ...Arguments ], {
-        cwd: directory,
-        env: Process.env,
-        stdio: "inherit"
-    });
+const Subprocess = (command: string, directory: string = Process.cwd()) => {
+    const Binary = command.split( " " )[0];
+    const Arguments = command.split( " " ).splice( 1 );
+    return Spawn.spawnSync( Binary, [ ... Arguments ], {
+        cwd: directory, env: Process.env, stdio: "inherit"
+    } );
 };
 
 const Main = async () => {
     const Directory = Process.cwd();
 
-    console.debug("[Debug] Directory" + ":", Directory);
+    console.debug( "[Debug] Directory" + ":", Directory );
 
-    const Remove = Utility.promisify(FS.rm);
+    const Remove = Utility.promisify( FS.rm );
 
-    await Remove(Path.join(Directory, "artifacts"), { recursive: true, force: true });
+    await Remove( Path.join( Directory, "artifacts" ), { recursive: true, force: true } );
 
-    FS.mkdirSync(Path.join(Directory, "artifacts"), { recursive: true });
-    FS.mkdirSync(Path.join(Directory, "artifacts", "nodejs"), { recursive: true });
+    FS.mkdirSync( Path.join( Directory, "artifacts" ), { recursive: true } );
+    FS.mkdirSync( Path.join( Directory, "artifacts", "nodejs" ), { recursive: true } );
 
-    Subprocess("npm install --production .", Directory);
+    Subprocess( "npm install --production .", Directory );
 
     /// Copy Layer
-    Copy(Directory, Path.join(Directory, "artifacts", "nodejs"));
+    Copy( Directory, Path.join( Directory, "artifacts", "nodejs" ) );
 
     // /// Establish Self-Referencing Symbolic Link
     // Subprocess("npm install --production .", Path.join(Directory, "artifacts", "nodejs"));

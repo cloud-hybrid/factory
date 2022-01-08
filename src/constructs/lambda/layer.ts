@@ -7,28 +7,28 @@
  * @copyright   Cloud-Technology LLC. & Affiliates
  */
 
-import FS from "fs";
-import Path from "path";
-import Module from "module";
-
 import Assertion from "assert";
+import FS from "fs";
+import Module from "module";
+import Path from "path";
 
 /*** ESM Resolver for *Current-Working-Directory* */
-const CWD: string = Path.dirname(import.meta.url.replace("file" + ":" + "//", ""));
+const CWD: string = Path.dirname( import.meta.url.replace( "file" + ":" + "//", "" ) );
 
 /*** ESM Resolver for Package Directory relative to Current Working Directory */
-const PKG: string = Path.dirname(CWD);
+const PKG: string = Path.dirname( CWD );
 
 /*** ESM Resolver for Source Directory relative to the Current Working Directory */
-const Source: string = Path.dirname(PKG);
+const Source: string = Path.dirname( PKG );
 
 /*** ESM Resolver for Schemas Directory relative to the Current Working Directory */
-const Schemas: string = Path.dirname(Source);
+const Schemas: string = Path.dirname( Source );
 
 /*** ESM Compatability & JSON Importer */
-const Import: NodeRequire = Module.createRequire(import.meta.url);
+const Import: NodeRequire = Module.createRequire( import.meta.url );
 
-const Schema: typeof import("../../schema/lambda/layer.schema.json") = Import(Path.join(Schemas, "layer.schema.json"))
+const Schema: typeof import("../../schema/lambda/layer.schema.json") = Import( Path.join( Schemas,
+    "layer.schema.json" ) );
 
 class Layer {
     /*** The importable package name of the lambda-layer as resolved from lambda function source code. */
@@ -59,16 +59,16 @@ class Layer {
      *      with runtime assertions further than that of a regular expression. `value` is an S3-Uri or Local File-System Location of source code.
      */
 
-    constructor (name: string, description: string, uri: {type: "s3"|"local", value: string}) {
+    constructor(name: string, description: string, uri: { type: "s3" | "local", value: string }) {
         this.name = name;
         this.description = description;
 
         // @todo S3 existence check + string regular expression validation
 
-        if (uri.type === "local") {
-            Assertion.strictEqual(FS.existsSync(Path.resolve(uri.value)), true);
+        if ( uri.type === "local" ) {
+            Assertion.strictEqual( FS.existsSync( Path.resolve( uri.value ) ), true );
         }
 
-        this.uri = Path.resolve(uri.value);
+        this.uri = Path.resolve( uri.value );
     }
 }

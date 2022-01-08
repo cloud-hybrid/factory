@@ -4,14 +4,6 @@ artifacts
 artifacts/*
 artifacts/**
 
-distribution
-distribution/*
-distribution/**
-
-declarations
-declarations/*
-declarations/**
-
 node_modules
 node_modules/*
 node_modules/**

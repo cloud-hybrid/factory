@@ -7,58 +7,68 @@
  * @copyright   Cloud-Technology LLC. & Affiliates
  */
 
+import { Construct } from "constructs";
+import Module from "module";
 import OS from "os";
 import Path from "path";
-import Module from "module";
 
 import Error from "../../errors/schema.js";
 
-import {Compiler} from "../../utilities/compiler.js";
-
-import {Construct} from "constructs";
+import { Compiler } from "../../utilities/compiler.js";
 
 /// --- --- --- /// --- --- --- /// --- --- --- /// --- --- --- /// --- --- --- /// --- --- --- /// --- --- --- ///
 
 /*** ESM Resolver for *Current-Working-Directory* */
-const CWD: string = Path.dirname(import.meta.url.replace("file" + ":" + "//", ""));
+const CWD: string = Path.dirname( import.meta.url.replace( "file" + ":" + "//", "" ) );
 
 /*** ESM Resolver for Source` Directory relative to Current Working Directory */
-const Source: string = Path.dirname(CWD);
+const Source: string = Path.dirname( CWD );
 
 /*** ESM Resolver for Package Directory relative to the Current Working Directory */
-const PKG: string = Path.dirname(Source);
+const PKG: string = Path.dirname( Source );
 
 /*** ESM Resolver for Schemas Directory relative to the Current Working Directory */
-const Schemas: string = Path.join(PKG, "schema");
+const Schemas: string = Path.join( PKG, "schema" );
 
 /*** ESM Resolver for Configuration File relative to the Current Working Directory */
-const Configuration: string = Path.join(Schemas, "lambda", "function.schema.json");
+const Configuration: string = Path.join( Schemas, "lambda", "function.schema.json" );
 
 /*** ESM Compatability & JSON Importer */
-const Import: NodeRequire = Module.createRequire(import.meta.url);
-const Definition: typeof import("../../schema/lambda/function.schema.json") = Import(Configuration);
-const Compilation = Compiler.compile(Definition);
+const Import: NodeRequire = Module.createRequire( import.meta.url );
+const Definition: typeof import("../../schema/lambda/function.schema.json") = Import( Configuration );
+const Compilation = Compiler.compile( Definition );
 
 /// --- --- --- /// --- --- --- /// --- --- --- /// --- --- --- /// --- --- --- /// --- --- --- /// --- --- --- ///
 
 interface Requirements {
     name: string;
+
     description: string;
+
     uri: string;
 }
 
 interface Configuration {
     name: string;
+
     description: string;
+
     uri: string;
 
     handler?: string | undefined;
+
     Layers?: string[] | undefined;
+
     memory?: number | undefined;
+
     type?: string | undefined;
+
     runtime?: string | undefined;
+
     timeout?: number | undefined;
+
     environment?: { [p: string]: string | undefined } | object | undefined;
+
     tags?: { [p: string]: string | undefined } | object | undefined;
 }
 
@@ -116,8 +126,10 @@ class Lambda extends Construct implements Settings {
      * @param $ { Settings }
      */
 
-    constructor(scope: Construct, id: string, name: string, description: string, uri: string, $: Settings = {name, description, uri}) {
-        super(scope, id);
+    constructor(scope: Construct, id: string, name: string, description: string, uri: string, $: Settings = {
+        name, description, uri
+    }) {
+        super( scope, id );
 
         this.name = name;
         this.description = description;
@@ -125,12 +137,12 @@ class Lambda extends Construct implements Settings {
 
         const Schema = this.validate();
 
-        this.runtime = $?.runtime   || Schema.properties.runtime.default;
-        this.handler = $?.handler   || Schema.properties.handler.default;
-        this.memory = $?.memory     || Schema.properties.memory.default;
-        this.type = $?.type         || Schema.properties.type.default;
-        this.runtime = $?.runtime   || Schema.properties.runtime.default;
-        this.timeout = $?.timeout   || Schema.properties.timeout.default;
+        this.runtime = $?.runtime || Schema.properties.runtime.default;
+        this.handler = $?.handler || Schema.properties.handler.default;
+        this.memory = $?.memory || Schema.properties.memory.default;
+        this.type = $?.type || Schema.properties.type.default;
+        this.runtime = $?.runtime || Schema.properties.runtime.default;
+        this.timeout = $?.timeout || Schema.properties.timeout.default;
 
         // @ts-ignore
         this.environment = $?.Environment || Schema.properties.environment.default;
@@ -140,33 +152,28 @@ class Lambda extends Construct implements Settings {
         this.confirm();
     }
 
+    public confirm() {
+        this.validate();
+    }
+
     private validate() {
-        Compilation(this);
+        Compilation( this );
 
         // @ts-ignore
         const $: typeof Definition = Compilation.schema;
 
-        if (Compilation?.errors) {
-            throw new Error(
-                {
-                    name: "Lambda-Schema-Error",
-                    message: JSON.stringify({
-                        Error: Compilation.errors.map(($) => $),
-                        // Instance: this
-                    }, null, 4)
-                }, OS.constants.signals.SIGTERM,
-                this.constructor
-            );
+        if ( Compilation?.errors ) {
+            throw new Error( {
+                name: "Lambda-Schema-Error", message: JSON.stringify( {
+                    Error: Compilation.errors.map( ($) => $ ) // Instance: this
+                }, null, 4 )
+            }, OS.constants.signals.SIGTERM, this.constructor );
         }
 
         return $;
     }
-
-    public confirm () {
-        this.validate();
-    }
 }
 
-export {Lambda};
+export { Lambda };
 
 export default Lambda;

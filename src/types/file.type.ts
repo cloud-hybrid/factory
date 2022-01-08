@@ -1,5 +1,3 @@
-import FS from "fs";
-
 /***
  * File Descriptor
  * ---------------
@@ -13,12 +11,19 @@ import FS from "fs";
 
 interface File {
     name?: string | null;
+
     volume?: boolean | null;
+
     pipe?: boolean | null;
+
     ephemeral?: boolean | null;
+
     file?: boolean | null;
+
     socket?: boolean | null;
+
     link?: boolean | null;
+
     directory?: boolean | null;
 }
 

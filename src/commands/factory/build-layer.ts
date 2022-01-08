@@ -1,22 +1,19 @@
-import FS from "fs";
-import Path from "path";
 import Module from "module";
+import Path from "path";
 import Process from "process";
-import Assertion from "assert";
 
 import { Argv } from "../../cli/arguments.js";
 import { Main } from "../../utilities/build-layer.js";
 import { Prompt } from "../../utilities/prompt.js";
-import { Subprocess } from "../../utilities/subprocess.js";
 
 /*** *Current Module Path* */
-const File: string = import.meta.url.replace("file" + ":" + "//", "");
+const File: string = import.meta.url.replace( "file" + ":" + "//", "" );
 
 /*** *Current Working Directory* */
-const CWD: string = Path.dirname(File);
+const CWD: string = Path.dirname( File );
 
 /*** *Package Directory* */
-const PKG: string = Path.dirname(CWD);
+const PKG: string = Path.dirname( CWD );
 
 /***
  *  JSON Capable Importer
@@ -25,10 +22,11 @@ const PKG: string = Path.dirname(CWD);
  *
  */
 
-const Import = Module.createRequire(PKG);
+const Import = Module.createRequire( PKG );
 
 /*** Debug Console Utility String Generator */
-const Input = ( input: ( string | number )[] ) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";
+const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
+    ", " ).toUpperCase() + ")";
 
 /***
  * Command Configuration, Composition
@@ -41,14 +39,14 @@ const Input = ( input: ( string | number )[] ) => "[Debug] CLI Input" + " " + "(
  *
  */
 
-function Configuration( Arguments: Argv ) {
-    const Syntax = ( command: string ) => [ command, "? [--debug] ? [--help]" ].join(" ");
+function Configuration(Arguments: Argv) {
+    const Syntax = (command: string) => [ command, "? [--debug] ? [--help]" ].join( " " );
 
-    Arguments.hide("version");
-    Arguments.help("help", "Display Usage Guide").default("help", false);
+    Arguments.hide( "version" );
+    Arguments.help( "help", "Display Usage Guide" ).default( "help", false );
 
-    Arguments.option("debug", { type: "boolean" }).alias("debug", "d").default("debug", false);
-    Arguments.describe("debug", "Enable Debug Logging");
+    Arguments.option( "debug", { type: "boolean" } ).alias( "debug", "d" ).default( "debug", false );
+    Arguments.describe( "debug", "Enable Debug Logging" );
 }
 
 /***
@@ -61,29 +59,29 @@ function Configuration( Arguments: Argv ) {
  *
  */
 
-const Command = async ( $: Argv ) => {
+const Command = async ($: Argv) => {
     const Arguments: Argv = $;
 
-    console.warn("[Warning] The Current Command is Under Development.");
-    console.warn("... To view runtime debug logs, provide the \"--debug\" flag", "\n");
+    console.warn( "[Warning] The Current Command is Under Development." );
+    console.warn( "... To view runtime debug logs, provide the \"--debug\" flag", "\n" );
 
-    Configuration(Arguments);
+    Configuration( Arguments );
 
-    Arguments.check(async ( $ ) => {
-        ( $?.debug ) && console.debug(Input($._), JSON.stringify($, null, 4), "\n");
+    Arguments.check( async ($) => {
+        ($?.debug) && console.debug( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
 
-        const Directory = Path.resolve(Process.cwd());
+        const Directory = Path.resolve( Process.cwd() );
 
-        const Continue = async () => await Prompt("Continue? (Y/N)" + ":" + " ");
+        const Continue = async () => await Prompt( "Continue? (Y/N)" + ":" + " " );
 
-        let trigger: string = await Continue().then(( $ ) => $.toUpperCase());
+        let trigger: string = await Continue().then( ($) => $.toUpperCase() );
 
-        while (trigger !== "Y" && trigger !== "N") trigger = await Continue().then(( $ ) => $.toUpperCase());
+        while ( trigger !== "Y" && trigger !== "N" ) trigger = await Continue().then( ($) => $.toUpperCase() );
 
-        ( trigger === "Y" ) && await Main();
+        (trigger === "Y") && await Main();
 
         return true;
-    }).strict();
+    } ).strict();
 };
 
 export { Command as Layer };

@@ -13,12 +13,19 @@ import Type from "./descriptor.type";
 
 class Descriptor implements Type {
     name: string;
+
     volume: boolean;
+
     pipe: boolean;
+
     ephemeral: boolean;
+
     file: boolean;
+
     socket: boolean;
+
     link: boolean;
+
     directory: boolean;
 
     /***
@@ -29,7 +36,7 @@ class Descriptor implements Type {
      */
 
     constructor(file: FS.Dirent | string) {
-        const $ = (typeof file === "string") ? FS.lstatSync(file, { throwIfNoEntry: true}) : file;
+        const $ = (typeof file === "string") ? FS.lstatSync( file, { throwIfNoEntry: true } ) : file;
         this.name = (typeof file === "string") ? file : file.name;
 
         this.volume = $.isBlockDevice();

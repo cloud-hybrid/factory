@@ -1,13 +1,9 @@
-import FS from "fs";
-import Path from "path";
 import Module from "module";
+import Path from "path";
 import Process from "process";
-import Assertion from "assert";
 
-import {Argv} from "../../cli/arguments.js";
-import {Main} from "../../utilities/build-layer.js";
-import {Prompt} from "../../utilities/prompt.js";
-import {Subprocess} from "../../utilities/subprocess.js";
+import { Argv } from "../../cli/arguments.js";
+import { Prompt } from "../../utilities/prompt.js";
 
 /***
  *
@@ -18,26 +14,26 @@ import {Subprocess} from "../../utilities/subprocess.js";
  *
  */
 
-const Case = (input: string, options: { condense: boolean } | null | undefined = {condense: true}) => {
-    if (typeof input !== "string") throw new TypeError("Input Parameter Expected String-Type");
+const Case = (input: string, options: { condense: boolean } | null | undefined = { condense: true }) => {
+    if ( typeof input !== "string" ) throw new TypeError( "Input Parameter Expected String-Type" );
 
     return input.trim()
-        .replace(/_/g, "-")
-        .replace(/([a-z])([A-Z])/g, "$1-$2")
-        .replace(/\W/g, ($) => /[À-ž]/.test($) ? $ : "-")
-        .replace(/^-+|-+$/g, "")
-        .replace(/-{2,}/g, ($) => options && options.condense ? '-' : $)
+        .replace( /_/g, "-" )
+        .replace( /([a-z])([A-Z])/g, "$1-$2" )
+        .replace( /\W/g, ($) => /[À-ž]/.test( $ ) ? $ : "-" )
+        .replace( /^-+|-+$/g, "" )
+        .replace( /-{2,}/g, ($) => options && options.condense ? "-" : $ )
         .toLowerCase();
 };
 
 /*** *Current Module Path* */
-const File: string = import.meta.url.replace("file" + ":" + "//", "");
+const File: string = import.meta.url.replace( "file" + ":" + "//", "" );
 
 /*** *Current Working Directory* */
-const CWD: string = Path.dirname(File);
+const CWD: string = Path.dirname( File );
 
 /*** *Package Directory* */
-const PKG: string = Path.dirname(CWD);
+const PKG: string = Path.dirname( CWD );
 
 /***
  *  JSON Capable Importer
@@ -46,10 +42,11 @@ const PKG: string = Path.dirname(CWD);
  *
  */
 
-const Import = Module.createRequire(PKG);
+const Import = Module.createRequire( PKG );
 
 /*** Debug Console Utility String Generator */
-const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace(",", ", ").toUpperCase() + ")";
+const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
+    ", " ).toUpperCase() + ")";
 
 /***
  * Command Configuration, Composition
@@ -63,13 +60,13 @@ const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + 
  */
 
 function Configuration(Arguments: Argv) {
-    const Syntax = (command: string) => [command, "? [--debug] ? [--help]"].join(" ");
+    const Syntax = (command: string) => [ command, "? [--debug] ? [--help]" ].join( " " );
 
-    Arguments.hide("version");
-    Arguments.help("help", "Display Usage Guide").default("help", false);
+    Arguments.hide( "version" );
+    Arguments.help( "help", "Display Usage Guide" ).default( "help", false );
 
-    Arguments.option("debug", {type: "boolean"}).alias("debug", "d").default("debug", false);
-    Arguments.describe("debug", "Enable Debug Logging");
+    Arguments.option( "debug", { type: "boolean" } ).alias( "debug", "d" ).default( "debug", false );
+    Arguments.describe( "debug", "Enable Debug Logging" );
 }
 
 /***
@@ -85,25 +82,25 @@ function Configuration(Arguments: Argv) {
 const Command = async ($: Argv) => {
     const Arguments: Argv = $;
 
-    Configuration(Arguments);
+    Configuration( Arguments );
 
-    Arguments.check(async ($) => {
-        ($?.debug) && console.debug(Input($._), JSON.stringify($, null, 4), "\n");
+    Arguments.check( async ($) => {
+        ($?.debug) && console.debug( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
 
-        const Directory = Path.resolve(Process.cwd());
+        const Directory = Path.resolve( Process.cwd() );
 
-        const Parameter = async () => await Prompt("Input" + ":" + " ");
+        const Parameter = async () => await Prompt( "Input" + ":" + " " );
 
-        let truthy: string = await Parameter().then(($) => Case($));
+        let truthy: string = await Parameter().then( ($) => Case( $ ) );
 
-        while (truthy.trim().length === 0) truthy = await Parameter().then(($) => Case($));
+        while ( truthy.trim().length === 0 ) truthy = await Parameter().then( ($) => Case( $ ) );
 
-        Process.stdout.write("\n" + truthy + "\n");
+        Process.stdout.write( "\n" + truthy + "\n" );
 
         return true;
-    }).strict();
+    } ).strict();
 };
 
-export {Command as Train};
+export { Command as Train };
 
-export default {Command};
+export default { Command };

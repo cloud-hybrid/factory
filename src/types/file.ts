@@ -1,4 +1,4 @@
-import {default as Type} from "./file.type.js";
+import { default as Type } from "./file.type.js";
 
 /***
  * File Type

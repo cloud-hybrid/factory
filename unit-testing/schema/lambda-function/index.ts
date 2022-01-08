@@ -1,14 +1,14 @@
-import AJV, {ValidateFunction} from "ajv";
+import AJV, { ValidateFunction } from "ajv";
+
+import { JTDSchemaType } from "ajv/lib/types/jtd-schema";
 
 import Module from "module";
 
-import {JTDSchemaType} from "ajv/lib/types/jtd-schema";
+const Import: NodeRequire = Module.createRequire( import.meta.url );
 
-const Import: NodeRequire = Module.createRequire(import.meta.url);
+type Pointer = { val: number; next?: Pointer }
 
-type Pointer = {val: number; next?: Pointer}
-
-const Compiler = new AJV({
+const Compiler = new AJV( {
     allErrors: true,
     verbose: false,
     strict: false,
@@ -19,30 +19,31 @@ const Compiler = new AJV({
     useDefaults: true,
     unevaluated: true,
     validateSchema: true
-});
+} );
 
 const Reference: JTDSchemaType<Pointer, { node: Pointer }> = {
     definitions: {
         node: {
             properties: {
-                val: {type: "float64"},
+                val: { type: "float64" }
             },
             optionalProperties: {
-                next: {ref: "node"},
-            },
-        },
+                next: { ref: "node" }
+            }
+        }
     },
-    ref: "node",
-}
+    ref: "node"
+};
 
 // Compiler.addMetaSchema(Meta);
 
-const $ = Import("./index.json");
+const $ = Import( "./index.json" );
 type Schema = typeof $;
-const validate: ValidateFunction<Schema> = Compiler.compile($);
+const validate: ValidateFunction<Schema> = Compiler.compile( $ );
 
 class Constructor {
     readonly schema: typeof $;
+
     readonly pointers: typeof $.$defs;
 
     constructor() {
@@ -51,18 +52,18 @@ class Constructor {
     }
 }
 
-console.log(validate({
+console.log( validate( {
     name: "test",
     description: "...",
     uri: "./index.js"
-}));
+} ) );
 
-console.log(validate.errors);
+console.log( validate.errors );
 
-console.log(validate({
+console.log( validate( {
     name: "test"
-}));
+} ) );
 
-console.log(validate.errors);
+console.log( validate.errors );
 
 export default Constructor;

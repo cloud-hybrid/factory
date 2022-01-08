@@ -6,4 +6,4 @@ export * from "./platform.js";
 export * from "./subprocess.js";
 export * from "./environment.js";
 export * from "./flatten.js";
-export * from "./cast.js"
+export * from "./cast.js";

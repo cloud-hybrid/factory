@@ -1,0 +1,12 @@
+{
+    "name": "@cloud-vault/http-responses-lambda-layer",
+    "version": "0.0.1",
+    "description": "Lambda Layer for HTTP-based Response Code(s)",
+    "main": "src/index.js",
+    "scripts": {},
+    "repository": "git+https://github.com/cloud-hybrid/http-responses-lambda-layer.git",
+    "author": "Jacob B. Sanders",
+    "dependencies": {
+        "@cloud-vault/http-responses-lambda-layer": "cloud-hybrid/http-responses-lambda-layer#Development"
+    }
+}

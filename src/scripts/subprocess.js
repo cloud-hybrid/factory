@@ -14,16 +14,16 @@ const Process = process;
  */
 
 const Subprocess = (command, directory = Process.cwd()) => {
-    const Binary = command.split(" ")[0];
+    const Binary = command.split(" ")[ 0 ];
     const Arguments = command.split(" ").splice(1);
 
-    return Spawn.spawnSync(Binary, [...Arguments], {
+    return Spawn.spawnSync(Binary, [ ...Arguments ], {
         cwd: directory,
         env: Process.env,
         stdio: "inherit"
     });
 };
 
-export {Subprocess};
+export { Subprocess };
 
 export default Subprocess;

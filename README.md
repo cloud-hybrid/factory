@@ -2,12 +2,12 @@
 
 **A CLI Utility to Manage Software-Defined State**
 
-`cloud-factory` is a commandline application that provides ci-cd capabilities,
-code extensions, and overall utilities for cloud-related management and
-development.
+`cloud-factory` is a commandline application that provides ci-cd capabilities, code extensions, and overall utilities
+for cloud-related management and development.
 
 In order to begin, open a `node.js` capable console and then run the following command:
-   - `npx --yes cloud-factory@latest --help`
+
+- `npx --yes cloud-factory@latest --help`
 
 ---
 
@@ -79,15 +79,15 @@ npx --yes cloud-factory@latest ? [--] --help
 npx --yes cloud-factory@latest ? [--] environment
 ```
 
-**Note**: the `--yes` flag is only required to bypass the `install` prompt. Once installed, 
-the `--yes` flag can be optionally included without prompt.
+**Note**: the `--yes` flag is only required to bypass the `install` prompt. Once installed, the `--yes` flag can be
+optionally included without prompt.
 
 ### NPM System Usage ###
 
 `cloud-factory` can optionally be installed globally to any `npm`-capable system.
 
-First, run `npm install --global cloud-factory`. Then, `cloud-factory` can be used
-similar to any other installed executable:
+First, run `npm install --global cloud-factory`. Then, `cloud-factory` can be used similar to any other installed
+executable:
 
 ```bash
 # Installation
@@ -107,8 +107,7 @@ cloud-factory environment
 
 ## Example(s) - A Lambda Deployment ##
 
-*The following example deploys a __single__ Lambda function*, but includes, implicitly, the following
-resources:
+*The following example deploys a __single__ Lambda function*, but includes, implicitly, the following resources:
 
 - Lambda Function
 - A Lambda Layer
@@ -117,8 +116,8 @@ resources:
 - Log-Groups
 - SSM Parameter(s)
 
-**Note**, the only requirement would be a Lambda Function, but for the sake of demonstration, the example
-includes a Lambda **Layer**, too.
+**Note**, the only requirement would be a Lambda Function, but for the sake of demonstration, the example includes a
+Lambda **Layer**, too.
 
 ***All other resources are defined dynamically by `cloud-factory`.***
 
@@ -126,10 +125,10 @@ includes a Lambda **Layer**, too.
     - `mkdir -p example`
     - `cd example`
 2. Clone source(s)
-   1. **Lambda Function**
-      - `git clone https://github.com/cloud-hybrid/lambda-function-concept.git ./test-function`
-   2. **Lambda Layer**
-      - `git clone https://github.com/cloud-hybrid/lambda-layer-concept.git ./library/test-layer`
+    1. **Lambda Function**
+        - `git clone https://github.com/cloud-hybrid/lambda-function-concept.git ./test-function`
+    2. **Lambda Layer**
+        - `git clone https://github.com/cloud-hybrid/lambda-layer-concept.git ./library/test-layer`
 3. *Define a `factory.json` file*:
     ```json
     {
@@ -138,7 +137,7 @@ includes a Lambda **Layer**, too.
         "environment": "Development"
     }
     ```
-    - i.e. 
+    - i.e.
     ```bash
     cat << "EOF" > factory.json
     {
@@ -160,18 +159,16 @@ includes a Lambda **Layer**, too.
    ```bash
    npx --yes cloud-factory@latest ci-cd initialize --debug
    ```
-   - Feel free to omit the `--debug` flag. It's only included for verbosity and
-   understanding
+    - Feel free to omit the `--debug` flag. It's only included for verbosity and understanding
 6. Verify that a `distribution` folder was created.
-7. Deploy the lambda function + layer: 
+7. Deploy the lambda function + layer:
     ```
     npx --yes cloud-factory@latest ci-cd deploy --debug
     ```
 8. Type `"y"` (without quotes) when prompted to confirm the deployment
-9. A hyperlink will be provided upon successful completion. With reference to the example,
-navigating to `https://v41dkt0ik0.execute-api.us-east-2.amazonaws.com/development/test-function` will
-then provide a JSON response body containing information about the package, and the lambda function's
-layer
+9. A hyperlink will be provided upon successful completion. With reference to the example, navigating
+   to `https://v41dkt0ik0.execute-api.us-east-2.amazonaws.com/development/test-function` will then provide a JSON
+   response body containing information about the package, and the lambda function's layer
 
 **Synopsis**
 
@@ -198,15 +195,14 @@ cloud-factory ci-cd deploy
 
 ### Overwrites ###
 
-***Note - The following section is under heavy, active development.*** Please refer to the example for 
-usage expectations until otherwise updated.
+***Note - The following section is under heavy, active development.*** Please refer to the example for usage
+expectations until otherwise updated.
 
 There exist a few places to define overwrites for certain resource-related attributes ...
 
 #### `package.json` ####
 
-Individual repository's `package.json` can define a root-level key "`factory`", assigning an object
-as its value:
+Individual repository's `package.json` can define a root-level key "`factory`", assigning an object as its value:
 
 ```json
 {
@@ -220,8 +216,8 @@ as its value:
 }
 ```
 
-For example, let the aforementioned JSON snippet represent a lambda function; `cloud-factory` will 
-instead use `*/*/get-users` as the API-Gateway-V2 integration endpoint instead of the much longer,
+For example, let the aforementioned JSON snippet represent a lambda function; `cloud-factory` will instead
+use `*/*/get-users` as the API-Gateway-V2 integration endpoint instead of the much longer,
 undesired `cloud-technology-http-api-get-users` value.
 
 #### `factory.json` (Repository Specific) ####
@@ -236,12 +232,12 @@ undesired `cloud-technology-http-api-get-users` value.
 
 ## Design Philosophy ##
 
-> *Constructs are classes which define a “piece of system state”. Constructs can be composed 
-> together to form higher-level building blocks which represent more complex state. Constructs 
-> are often used to represent the desired state of cloud applications. For example, in the AWS 
-> CDK, which is used to define the desired state for AWS infrastructure using CloudFormation, 
-> the lowest-level construct represents a resource definition in a CloudFormation template. 
-> These resources are composed to represent higher-level logical units of a cloud application, 
+> *Constructs are classes which define a “piece of system state”. Constructs can be composed
+> together to form higher-level building blocks which represent more complex state. Constructs
+> are often used to represent the desired state of cloud applications. For example, in the AWS
+> CDK, which is used to define the desired state for AWS infrastructure using CloudFormation,
+> the lowest-level construct represents a resource definition in a CloudFormation template.
+> These resources are composed to represent higher-level logical units of a cloud application,
 > etc.*
 
 The design philosophies and motivations behind `cloud-factory` are simple:
@@ -252,13 +248,13 @@ The design philosophies and motivations behind `cloud-factory` are simple:
 
 ### Overview ###
 
-At a high level, `cloud-factory` receives a set of repositories as **input**, executes **directory translations** and potentially compile(s) code,
-and **outputs** a *distribution*. The distribution is composed of an opinionated structure that later fulfills deployment requirements. Through analysis of
-repository layout(s) & dependencies, a series of constructs, or cloud resources, are dynamically composed into a
-singular stack -- the stack becomes the deployable.
+At a high level, `cloud-factory` receives a set of repositories as **input**, executes **directory translations** and
+potentially compile(s) code, and **outputs** a *distribution*. The distribution is composed of an opinionated structure
+that later fulfills deployment requirements. Through analysis of repository layout(s) & dependencies, a series of
+constructs, or cloud resources, are dynamically composed into a singular stack -- the stack becomes the deployable.
 
-When lower level constructs -- **repositories** -- become capable of implicitly defining
-infrastructure-related requirements, a large portion of development overhead and maintenance can be eliminated.
+When lower level constructs -- **repositories** -- become capable of implicitly defining infrastructure-related
+requirements, a large portion of development overhead and maintenance can be eliminated.
 
 ### Opinionated Defaults ###
 
@@ -327,8 +323,8 @@ However, also take note that the following example's `cloud-resource-2` is *no d
 │            └── index.js
 ```
 
-`cloud-factory` will transform the `cloud-resource-2` directory using the same translations in both examples
-when the distribution gets compiled:
+`cloud-factory` will transform the `cloud-resource-2` directory using the same translations in both examples when the
+distribution gets compiled:
 
 ```
 .
@@ -354,12 +350,13 @@ when the distribution gets compiled:
           └── ...
 ```
 
-The freedom of repository-based folder structuring is just one of the
-abstractions `cloud-factory` will perform -- therefore limiting deployment and vcs requirements, or otherwise
-development-related overhead.
+The freedom of repository-based folder structuring is just one of the abstractions `cloud-factory` will perform --
+therefore limiting deployment and vcs requirements, or otherwise development-related overhead.
 
-Regardless of any automated or otherwise pipeline'd implementation (deployments can also be performed locally), the design pattern is always the same:
-   - *Clone in a remote repository to an arbitrary ci environment*
+Regardless of any automated or otherwise pipeline'd implementation (deployments can also be performed locally), the
+design pattern is always the same:
+
+- *Clone in a remote repository to an arbitrary ci environment*
 
 Programmatic logic can then be easily abstracted according to repository-to-directory mapping(s).
 

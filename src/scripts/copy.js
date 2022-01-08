@@ -32,22 +32,22 @@ function Copy(source, target) {
         const Socket = FS.lstatSync(Path.join(source, element), { throwIfNoEntry: false })?.isSocket() || false;
 
         try {
-            if (!Socket) {
-                if (!Exclusions.includes(target)) {
+            if ( !Socket ) {
+                if ( !Exclusions.includes(target) ) {
                     FS.mkdirSync(target, { recursive: true });
                 }
             }
 
-            if (!Directory && !Socket) {
-                if (!Exclusions.includes(source)) {
+            if ( !Directory && !Socket ) {
+                if ( !Exclusions.includes(source) ) {
                     FS.copyFileSync(Path.join(source, element), Path.join(target, element));
                 }
-            } else if (!Socket) {
-                if (!Exclusions.includes(source)) {
+            } else if ( !Socket ) {
+                if ( !Exclusions.includes(source) ) {
                     Copy(Path.join(source, element), Path.join(target, element));
                 }
             }
-        } catch (e) {
+        } catch ( e ) {
             /// ...
         }
     });
@@ -68,7 +68,7 @@ function Layer(source, target) {
         const Target = Path.join(source, element);
         const Descriptor = Path.parse(Target);
 
-        if (Descriptor.base === "package.json") {
+        if ( Descriptor.base === "package.json" ) {
             FS.copyFileSync(Path.format(Descriptor), Path.join(target, Descriptor.base));
         }
     });

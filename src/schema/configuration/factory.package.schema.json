@@ -528,7 +528,7 @@
                             "type": "array",
                             "description": "... [flags]",
                             "anyOf": [
-                                { },
+                                {},
                                 {
                                     "const": "--recursive"
                                 },
@@ -594,7 +594,7 @@
                             "type": "array",
                             "description": "... [flags]",
                             "anyOf": [
-                                { },
+                                {},
                                 {
                                     "type": "array",
                                     "const": [
@@ -667,7 +667,7 @@
                             "type": "array",
                             "description": "... [flags]",
                             "anyOf": [
-                                { },
+                                {},
                                 {
                                     "const": "--no-prompt"
                                 },
