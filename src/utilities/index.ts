@@ -1,5 +1,6 @@
 export * from "./index.js";
 export * from "./tty.js";
+export * from "./colors.js";
 export * from "./abi-check.js";
 export * from "./prompt.js";
 export * from "./platform.js";

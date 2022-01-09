@@ -13,6 +13,9 @@ In order to begin, open a `node.js` capable console and then run the following c
 
 ## Task Board ##
 
+- [ ] **Extend** `@cloud-hybrid/delta`'s `api` Package to include:
+  - [CDK ECS Fargate Service w/Local Image](https://github.com/aws-samples/aws-cdk-examples/tree/master/typescript/ecs/fargate-service-with-local-image)
+- [ ] **Test Web-Socket(s)** via `ws` & Development-Dependency `wscat`
 - [ ] **Integrate Remote State**
     - Example:
      ```javascript

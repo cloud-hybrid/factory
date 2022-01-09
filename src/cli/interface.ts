@@ -1,6 +1,7 @@
+import Chalk from "chalk";
 import Process from "process";
-
-import TTY from "../utilities/tty.js";
+import Colors from "../utilities/colors.js";
+import TTY, { Columns } from "../utilities/tty.js";
 import { Arguments as CLI, Argv } from "./arguments.js";
 
 import { Header } from "./header.js";
@@ -12,6 +13,8 @@ const API = await import("../commands/api/index.js");
 
 const Main = async () => {
     (TTY) && Process.stdout.write( Header + "\n" );
+
+    const script = "cloud-factory";
 
     const Arguments = async () => {
         const Commands = {
@@ -25,8 +28,6 @@ const Main = async () => {
                 deploy: async (input: Argv) => await Factory.Deploy( input ),
                 initialize: async (input: Argv) => await Factory.Initialize( input ),
                 "build-layer": async (input: Argv) => await Factory.Layer( input )
-                /// build: async (input: Argv) => await Factory.Build(input),
-                /// configuration: async (input: Argv) => await Factory.Configuration(input),
             },
             case: {
                 "train-case": async (input: Argv) => await Casing.Train( input ),
@@ -38,140 +39,109 @@ const Main = async () => {
             }
         };
 
+        /*** CLI Arguments, Options, and Sub-Command Inclusions */
         return await CLI( Process.argv.splice( 2 ) )
-            .scriptName( "cloud-factory" ).wrap( 120 )
+            .scriptName( script ).wrap( Columns() )
 
-            /*** Version */
-            .version( ... Commands.version )
-            .alias( "version", "v" )
-            .describe( "version", "Show Version Number" )
+            .command( "generate-auto-completion", Colors( "Blue", "Generate a CLI Options Auto-Completion Script" ), (async ($: Argv) => {
+                $.showCompletionScript();
+            }) )
 
-            /*** Global Usage Text */
-            .usage( "Usage: $ cloud-factory [...]" )
+            .command( "secrets-manager", Colors( "Blue", "AWS Secrets Management API" ), (async ($: Argv) => {
+                const name = "secrets-manager";
+                const commands = [
+                    "get"
+                ];
 
-            /*** Global Help Command */
-            .help( "help" )
-            .alias( "help", "h" )
-            .describe( "help", "Display Additional Information & Usage Command(s)" )
+                $.strict().strictOptions().strictCommands();
 
-            .showHelpOnFail( true, "[Error]: Invalid Input" )
+                $.demandCommand().showHelpOnFail( true );
 
-            .command( "secrets-manager", "Secrets Management Interface", (async ($: Argv) => {
-                $.hide( "version" );
-                $.help( "help", "Display Usage Guide" ).default( "help", false );
-                $.option( "debug", { type: "boolean" } ).alias( "debug", "d" ).default( "debug", false ).describe(
-                    "debug",
-                    "Enable Debug Logging" );
-                $.option( "name", { type: "string" } ).alias( "name", "n" ).describe( "name",
-                    "Secret Resource Name" ).default( "name", null );
-                $.option( "file", { type: "string" } ).alias( "file", "f" ).describe( "file",
-                    "Write Output to File Handler" ).default( "file", null );
-                $.option( "value-only", { type: "boolean" } ).alias( "value-only", "x" ).describe( "value-only",
-                    "Retrieve Only the Secret-Value vs API Response" ).default( "value-only", false );
+                /*** Namespace'd Usage Command + Description */
+                $.usage( "Usage:" + " " + script + " " + name + " " + "[--help] Sub-Command ? [--Flag(s)]" );
 
-                const Length = (await $.argv)["_"].length;
-                (Length <= 1) && $.default( "help", true );
+                /*** Namespace'd Example(s) */
+                $.example( "Get Secret (Prompt)", name + " " + commands[0] + " " + "? [--help] ? [--Flag(s)]" );
 
-                $.command( "get",
-                    "Index AWS Secret from Secrets-Manager Service",
-                    (async ($: Argv) => await Commands.secrets["get-secret"]( $ )) );
+                $.command( commands[0], "Index AWS Secret from Secrets-Manager Service", (
+                    async ($: Argv) => {
+                        /*** Namespace'd Example(s) */
+                        $.example( "API Response (Prompt)", name + " " + commands[0] );
+                        $.example( "Print Secret (Prompt)", name + " " + commands[0] + " " + "--value-only" );
+                        $.example( "Create Secret File (No-Prompt)", name + " " + commands[0] + " " + "--name \"Organization-Secret\" --file \"Output.json\" --value-only" );
+
+                        $.option( "name", { type: "string" } ).alias( "name", "n" ).describe( "name", Colors( "Bright-White", "Secret Resource Name (Required, Prompt)" ) ).default( "name", null );
+                        $.option( "file", { type: "string" } ).alias( "file", "f" ).describe( "file", Colors( "Bright-White", "Write Output to File Handler" ) ).default( "file", null );
+                        $.option( "value-only", { type: "boolean" } ).alias( "value-only", "x" ).describe( "value-only", Colors( "Bright-White", "Retrieve Only the Secret-Value - No API Response" ) ).default( "value-only", false );
+
+                        await Commands.secrets["get-secret"]( $ );
+                    })
+                );
             }) )
 
             /*** String Manipulation */
-            .command( "string", "String Function(s)", (async ($: Argv) => {
-                $.hide( "version" );
-                $.help( "help", "Display Usage Guide" ).default( "help", false );
-                $.option( "debug", { type: "boolean" } ).alias( "debug", "d" ).default( "debug", false ).describe(
-                    "debug",
-                    "Enable Debug Logging" );
+            .command( "string", Colors( "Blue", "String Regular-Expression Function(s)" ), (
+                async ($: Argv) => {
+                    $.command( "train-case", "Train-Case String Manipulation", (
+                        async ($: Argv) => await Commands.case["train-case"]( $ ))
+                    );
 
-                const Length = (await $.argv)["_"].length;
-                (Length <= 1) && $.default( "help", true );
-
-                $.command( "train-case",
-                    "Train-Case String Manipulation",
-                    (async ($: Argv) => await Commands.case["train-case"]( $ )) );
-
-                $.command( "screaming-train-case",
-                    "Screaming-Train-Case String Manipulation",
-                    (async ($: Argv) => await Commands.case["screaming-train-case"]( $ )) );
-            }) )
+                    $.command( "screaming-train-case", "Screaming-Train-Case String Manipulation", (
+                        async ($: Argv) => await Commands.case["screaming-train-case"]( $ ))
+                    );
+                })
+            )
 
             /*** Runtime Environment */
-            .command( "environment", "Runtime Environment Command(s)", (async ($: Argv) => {
-                $.hide( "version" );
-                $.help( "help", "Display Usage Guide" ).default( "help", false );
-                $.option( "debug", { type: "boolean" } ).alias( "debug", "d" ).default( "debug", false ).describe(
-                    "debug",
-                    "Enable Debug Logging" );
+            .command( "environment", Colors( "Blue", "Runtime Environment Information" ), (
+                async ($: Argv) => {
 
-                const Length = (await $.argv)["_"].length;
-                (Length <= 1) && $.default( "help", true );
+                    /*** NPM Configuration */
+                    $.command( "npm-configuration", "NPM Runtime Environment Variable(s) & Configuration", (
+                        async ($: Argv) => await Commands.environment( $ ))
+                    );
 
-                /*** NPM Configuration */
-                $.command( "npm-configuration",
-                    "NPM Runtime Environment Variable(s) & Configuration",
-                    (async ($: Argv) => await Commands.environment( $ )) );
-
-                /*** Current Working Directory */
-                $.command( "cwd", "Current Working Directory", (async ($: Argv) => {
-                    return await Commands.cwd( $ );
-                }) );
-
-                /// (Length === 1) && $.command("environment", "Runtime Environment Command(s)").help();
-            }) )
+                    /*** Current Working Directory */
+                    $.command( "cwd", "Current Working Directory", (
+                        async ($: Argv) => await Commands.cwd( $ ))
+                    );
+                }) )
 
             /*** Test-Input */
-            .command( "test-input", "Arbitrary User-Input (Testing Purposes Only)", (async ($: Argv) => {
-                $.hide( "version" );
-                $.help( "help", "Display Usage Guide" ).default( "help", false );
-                $.option( "debug", { type: "boolean" } ).alias( "debug", "d" ).default( "debug", false ).describe(
-                    "debug",
-                    "Enable Debug Logging" );
-
-                const Length = (await $.argv)["_"].length;
-                (Length <= 1) && $.default( "help", true );
-
-                return await Commands.input( $ );
-            }) )
+            .command( "test-input", Colors( "Red", "Arbitrary User-Input (Testing Purposes Only)" ), (
+                async ($: Argv) => {
+                    return await Commands.input( $ );
+                }) )
 
             /*** CDFK Configuration */
-            .command( "ci-cd", "(WIP) Construct Development Factory Kit", (async ($: Argv) => {
-                $.hide( "version" );
-                $.help( "help", "Display Usage Guide" ).default( "help", false );
-                $.option( "debug", { type: "boolean" } ).alias( "debug", "d" ).default( "debug", false ).describe(
-                    "debug",
-                    "Enable Debug Logging" );
+            .command( "ci-cd", Colors( "Yellow", "(Under Development) CI-CD Utilities" ), (
+                async ($: Argv) => {
+                    $.command( "initialize", "Package Initialization", (
+                        async ($: Argv) => await Commands.factory.initialize( $ ))
+                    );
 
-                const Length = (await $.argv)["_"].length;
-                (Length <= 1) && $.default( "help", true );
+                    $.command( "deploy", "Stack Deployment", (
+                        async ($: Argv) => await Commands.factory.deploy( $ ))
+                    );
 
-                $.command( "initialize", "(WIP) Package Initialization", (async ($: Argv) => {
-                    return await Commands.factory.initialize( $ );
-                }) );
+                    $.command( "build-layer", "Build a Lambda Layer", (
+                        async ($: Argv) => await Commands.factory["build-layer"]( $ ))
+                    );
+                })
+            )
 
-                /// $.command("build", "(WIP) Synthesize Target Resource(s)", (
-                ///     async ($: Argv) => {
-                ///         return await Commands.factory.build($);
-                ///     }
-                /// ));
+            /*** Version - Hide unless Explicitly Invoked*/
+            .version( [ ... Commands.version ].join( " " ) ).alias( "version", "v" ).describe( "version", Colors( "Green", "Show Version Number" ) ).hide( "version" )
 
-                $.command( "deploy", "(WIP) Stack Deployment", (async ($: Argv) => {
-                    return await Commands.factory.deploy( $ );
-                }) );
+            /*** Global Usage Text */
+            .usage( Chalk.italic( "Usage:" + " " + script + " " + "? [--version] { Command } ? [--Flag(s)]" ) )
 
-                $.command( "build-layer", "(WIP) Build a Lambda Layer", (async ($: Argv) => {
-                    return await Commands.factory["build-layer"]( $ );
-                }) );
+            /*** Global Help Command */
+            .help( "help" ).alias( "help", "h" ).describe( "help", Colors( "Green", "Display Additional Information & Usage Command(s)" ) ).showHelpOnFail( true, Colors( "Red", "Error Parsing CLI Input(s)" ) )
 
-                /// $.command("configuration", "(WIP) Construct Factory Configuration", (
-                ///     async ($: Argv) => {
-                ///         return await Commands.factory.configuration($);
-                ///     }
-                /// ));
-            }) )
+            /*** Global Debug Optional */
+            .option( "debug", { type: "boolean" } ).alias( "debug", "d" ).default( "debug", false ).describe( "debug", Colors( "Green", "Enable Verbose Logging - Primarily for Development Purposes" ) )
 
-            .showHelpOnFail( true, "Error Parsing CLI Input(s)" )
             .parseAsync();
     };
 

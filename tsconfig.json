@@ -40,7 +40,7 @@
         "removeComments": false,
         "skipLibCheck": true,
         "strict": true,
-        "target": "ES2021",
+        "target": "ES2018",
         "composite": true,
         "diagnostics": true,
         "importHelpers": false,

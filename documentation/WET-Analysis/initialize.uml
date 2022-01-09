@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JavaScript-modules-diagram</ID>
+  <OriginalElement>/Users/io/Next/factory/src/commands/factory/initialize.ts</OriginalElement>
+  <nodes>
+    <node x="29.5" y="552.5">/Users/io/Library/Caches/JetBrains/IntelliJIdea2021.3/javascript/typings/node/16.11.19/node_modules/@types/node/assert.d.ts</node>
+    <node x="29.5" y="288.5">/Users/io/Next/factory/src/types/distributable.ts#Distributable#313;</node>
+    <node x="336.5" y="630.5">/Users/io/Library/Caches/JetBrains/IntelliJIdea2021.3/javascript/typings/node/16.11.19/node_modules/@types/node/fs.d.ts</node>
+    <node x="-10.5" y="-8.5">/Users/io/Next/factory/src/commands/factory/initialize.ts#Argv#176;/Users/io/Next/factory/src/commands/factory/initialize.ts#Assertion#7;/Users/io/Next/factory/src/commands/factory/initialize.ts#Distributable#207;/Users/io/Next/factory/src/commands/factory/initialize.ts#FS#39;/Users/io/Next/factory/src/commands/factory/initialize.ts#Module#60;/Users/io/Next/factory/src/commands/factory/initialize.ts#Path#89;/Users/io/Next/factory/src/commands/factory/initialize.ts#Process#114;/Users/io/Next/factory/src/commands/factory/initialize.ts#Utility#145;</node>
+    <node x="29.5" y="474.5">/Users/io/Library/Caches/JetBrains/IntelliJIdea2021.3/javascript/typings/node/16.11.19/node_modules/@types/node/module.d.ts</node>
+    <node x="29.5" y="630.5">/Users/io/Library/Caches/JetBrains/IntelliJIdea2021.3/javascript/typings/node/16.11.19/node_modules/@types/node/path.d.ts</node>
+    <node x="29.5" y="396.5">/Users/io/Library/Caches/JetBrains/IntelliJIdea2021.3/javascript/typings/node/16.11.19/node_modules/@types/node/process.d.ts</node>
+    <node x="360.5" y="552.5">/Users/io/Library/Caches/JetBrains/IntelliJIdea2021.3/javascript/typings/node/16.11.19/node_modules/@types/node/util.d.ts</node>
+    <node x="362.5" y="288.5">Argv;</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="/Users/io/Next/factory/src/commands/factory/initialize.ts#Argv#176;/Users/io/Next/factory/src/commands/factory/initialize.ts#Assertion#7;/Users/io/Next/factory/src/commands/factory/initialize.ts#Distributable#207;/Users/io/Next/factory/src/commands/factory/initialize.ts#FS#39;/Users/io/Next/factory/src/commands/factory/initialize.ts#Module#60;/Users/io/Next/factory/src/commands/factory/initialize.ts#Path#89;/Users/io/Next/factory/src/commands/factory/initialize.ts#Process#114;/Users/io/Next/factory/src/commands/factory/initialize.ts#Utility#145;" target="/Users/io/Library/Caches/JetBrains/IntelliJIdea2021.3/javascript/typings/node/16.11.19/node_modules/@types/node/util.d.ts" relationship="">
+      <point x="20.0" y="128.5" />
+      <point x="160.0" y="264.5" />
+      <point x="504.0" y="264.5" />
+      <point x="-0.0" y="-19.0" />
+    </edge>
+    <edge source="/Users/io/Next/factory/src/commands/factory/initialize.ts#Argv#176;/Users/io/Next/factory/src/commands/factory/initialize.ts#Assertion#7;/Users/io/Next/factory/src/commands/factory/initialize.ts#Distributable#207;/Users/io/Next/factory/src/commands/factory/initialize.ts#FS#39;/Users/io/Next/factory/src/commands/factory/initialize.ts#Module#60;/Users/io/Next/factory/src/commands/factory/initialize.ts#Path#89;/Users/io/Next/factory/src/commands/factory/initialize.ts#Process#114;/Users/io/Next/factory/src/commands/factory/initialize.ts#Utility#145;" target="/Users/io/Next/factory/src/types/distributable.ts#Distributable#313;" relationship="">
+      <point x="46.0" y="128.5" />
+      <point x="0.0" y="-34.0" />
+    </edge>
+    <edge source="/Users/io/Next/factory/src/commands/factory/initialize.ts#Argv#176;/Users/io/Next/factory/src/commands/factory/initialize.ts#Assertion#7;/Users/io/Next/factory/src/commands/factory/initialize.ts#Distributable#207;/Users/io/Next/factory/src/commands/factory/initialize.ts#FS#39;/Users/io/Next/factory/src/commands/factory/initialize.ts#Module#60;/Users/io/Next/factory/src/commands/factory/initialize.ts#Path#89;/Users/io/Next/factory/src/commands/factory/initialize.ts#Process#114;/Users/io/Next/factory/src/commands/factory/initialize.ts#Utility#145;" target="/Users/io/Library/Caches/JetBrains/IntelliJIdea2021.3/javascript/typings/node/16.11.19/node_modules/@types/node/fs.d.ts" relationship="">
+      <point x="10.0" y="128.5" />
+      <point x="150.0" y="274.5" />
+      <point x="358.5" y="274.5" />
+      <point x="-109.5" y="-19.0" />
+    </edge>
+    <edge source="/Users/io/Next/factory/src/commands/factory/initialize.ts#Argv#176;/Users/io/Next/factory/src/commands/factory/initialize.ts#Assertion#7;/Users/io/Next/factory/src/commands/factory/initialize.ts#Distributable#207;/Users/io/Next/factory/src/commands/factory/initialize.ts#FS#39;/Users/io/Next/factory/src/commands/factory/initialize.ts#Module#60;/Users/io/Next/factory/src/commands/factory/initialize.ts#Path#89;/Users/io/Next/factory/src/commands/factory/initialize.ts#Process#114;/Users/io/Next/factory/src/commands/factory/initialize.ts#Utility#145;" target="/Users/io/Library/Caches/JetBrains/IntelliJIdea2021.3/javascript/typings/node/16.11.19/node_modules/@types/node/process.d.ts" relationship="">
+      <point x="-118.5" y="128.5" />
+      <point x="21.5" y="358.5" />
+      <point x="191.0" y="358.5" />
+      <point x="0.0" y="-19.0" />
+    </edge>
+    <edge source="/Users/io/Next/factory/src/commands/factory/initialize.ts#Argv#176;/Users/io/Next/factory/src/commands/factory/initialize.ts#Assertion#7;/Users/io/Next/factory/src/commands/factory/initialize.ts#Distributable#207;/Users/io/Next/factory/src/commands/factory/initialize.ts#FS#39;/Users/io/Next/factory/src/commands/factory/initialize.ts#Module#60;/Users/io/Next/factory/src/commands/factory/initialize.ts#Path#89;/Users/io/Next/factory/src/commands/factory/initialize.ts#Process#114;/Users/io/Next/factory/src/commands/factory/initialize.ts#Utility#145;" target="Argv;" relationship="">
+      <point x="30.0" y="128.5" />
+      <point x="170.0" y="250.5" />
+      <point x="409.0" y="250.5" />
+      <point x="0.0" y="-34.0" />
+    </edge>
+    <edge source="/Users/io/Next/factory/src/commands/factory/initialize.ts#Argv#176;/Users/io/Next/factory/src/commands/factory/initialize.ts#Assertion#7;/Users/io/Next/factory/src/commands/factory/initialize.ts#Distributable#207;/Users/io/Next/factory/src/commands/factory/initialize.ts#FS#39;/Users/io/Next/factory/src/commands/factory/initialize.ts#Module#60;/Users/io/Next/factory/src/commands/factory/initialize.ts#Path#89;/Users/io/Next/factory/src/commands/factory/initialize.ts#Process#114;/Users/io/Next/factory/src/commands/factory/initialize.ts#Utility#145;" target="/Users/io/Library/Caches/JetBrains/IntelliJIdea2021.3/javascript/typings/node/16.11.19/node_modules/@types/node/path.d.ts" relationship="">
+      <point x="-142.5" y="128.5" />
+      <point x="-2.5" y="592.5" />
+      <point x="173.0" y="592.5" />
+      <point x="0.0" y="-19.0" />
+    </edge>
+    <edge source="/Users/io/Next/factory/src/commands/factory/initialize.ts#Argv#176;/Users/io/Next/factory/src/commands/factory/initialize.ts#Assertion#7;/Users/io/Next/factory/src/commands/factory/initialize.ts#Distributable#207;/Users/io/Next/factory/src/commands/factory/initialize.ts#FS#39;/Users/io/Next/factory/src/commands/factory/initialize.ts#Module#60;/Users/io/Next/factory/src/commands/factory/initialize.ts#Path#89;/Users/io/Next/factory/src/commands/factory/initialize.ts#Process#114;/Users/io/Next/factory/src/commands/factory/initialize.ts#Utility#145;" target="/Users/io/Library/Caches/JetBrains/IntelliJIdea2021.3/javascript/typings/node/16.11.19/node_modules/@types/node/module.d.ts" relationship="">
+      <point x="-126.5" y="128.5" />
+      <point x="13.5" y="436.5" />
+      <point x="185.0" y="436.5" />
+      <point x="0.0" y="-19.0" />
+    </edge>
+    <edge source="/Users/io/Next/factory/src/commands/factory/initialize.ts#Argv#176;/Users/io/Next/factory/src/commands/factory/initialize.ts#Assertion#7;/Users/io/Next/factory/src/commands/factory/initialize.ts#Distributable#207;/Users/io/Next/factory/src/commands/factory/initialize.ts#FS#39;/Users/io/Next/factory/src/commands/factory/initialize.ts#Module#60;/Users/io/Next/factory/src/commands/factory/initialize.ts#Path#89;/Users/io/Next/factory/src/commands/factory/initialize.ts#Process#114;/Users/io/Next/factory/src/commands/factory/initialize.ts#Utility#145;" target="/Users/io/Library/Caches/JetBrains/IntelliJIdea2021.3/javascript/typings/node/16.11.19/node_modules/@types/node/assert.d.ts" relationship="">
+      <point x="-134.5" y="128.5" />
+      <point x="5.5" y="514.5" />
+      <point x="185.0" y="514.5" />
+      <point x="0.0" y="-19.0" />
+    </edge>
+  </edges>
+  <settings layout="Compact" zoom="1.0" showDependencies="false" x="318.5" y="330.0" />
+  <SelectedNodes />
+  <Categories>
+    <Category>All</Category>
+  </Categories>
+  <VISIBILITY>Details</VISIBILITY>
+</Diagram>
+

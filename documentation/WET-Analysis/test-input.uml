@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JavaScript-modules-diagram</ID>
+  <OriginalElement>/Users/io/Next/factory/src/commands/test-input.ts</OriginalElement>
+  <nodes>
+    <node x="23.5" y="235.5">Argv;</node>
+    <node x="23.5" y="127.5">/Users/io/Next/factory/src/utilities/prompt.ts#Prompt#434;</node>
+    <node x="-16.5" y="-7.5">/Users/io/Next/factory/src/commands/test-input.ts#Argv#9;/Users/io/Next/factory/src/commands/test-input.ts#Prompt#53;</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="/Users/io/Next/factory/src/commands/test-input.ts#Argv#9;/Users/io/Next/factory/src/commands/test-input.ts#Prompt#53;" target="Argv;" relationship="">
+      <point x="-118.5" y="47.5" />
+      <point x="21.5" y="197.5" />
+      <point x="144.0" y="197.5" />
+      <point x="0.0" y="-34.0" />
+    </edge>
+    <edge source="/Users/io/Next/factory/src/commands/test-input.ts#Argv#9;/Users/io/Next/factory/src/commands/test-input.ts#Prompt#53;" target="/Users/io/Next/factory/src/utilities/prompt.ts#Prompt#434;" relationship="">
+      <point x="22.0" y="47.5" />
+      <point x="0.0" y="-34.0" />
+    </edge>
+  </edges>
+  <settings layout="Compact" zoom="1.0" showDependencies="false" x="142.0" y="148.0" />
+  <SelectedNodes />
+  <Categories>
+    <Category>All</Category>
+  </Categories>
+  <VISIBILITY>Details</VISIBILITY>
+</Diagram>
+
