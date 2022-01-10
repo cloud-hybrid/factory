@@ -29,3 +29,14 @@ cdktf.out/**
 
 *.tgz
 *.zip
+
+.venv
+.eggs
+*.egg-info
+*.whl
+
+.Docker-ID
+
+__pycache__
+
+*.pyc
