@@ -9,7 +9,7 @@ import TTY from "../../utilities/tty.js";
 import { Prompt } from "../await-input.js";
 
 /*** Debug Console Utility String Generator */
-const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",", ", " ).toUpperCase() + ")";
+const Input = (input: ( string | number )[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",", ", " ).toUpperCase() + ")";
 
 /***
  * Module Entry-Point Command
@@ -31,26 +31,26 @@ const Command = async ($: Argv) => {
     const Function = API.commands?.getSecretValue ?? null;
 
     Arguments.check( async ($) => {
-        ($?.debug) && (TTY) && console.log( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
+        ( $?.debug ) && ( TTY ) && console.log( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
 
-        const Resource: string = ($?.name ?? null) ? String( $.name ) : await Prompt( "Secret (Resource Name)" );
+        const Resource: string = ( $?.name ?? null ) ? String( $.name ) : await Prompt( "Secret (Resource Name)" );
 
-        ($?.name ?? null) || Process.stdout.write( "\n" );
+        ( $?.name ?? null ) || Process.stdout.write( "\n" );
 
-        const Response = (Function) ? await Function( {
+        const Response = ( Function ) ? await Function( {
             SecretId: Resource
         } ) : null;
 
         const Data = Response?.SecretString ?? null;
 
-        ((TTY) && !($["value-only"]) && !($.file)) && console.log( "[Log] API Response" + ":", JSON.stringify( Response, null, 4 ) );
-        ((TTY) && ($["value-only"]) && !($.file)) && console.log( (Data) ? JSON.parse( Data ?? "" ) ?? JSON.stringify( Data, null, 4 ) ?? Data : "", "\n" );
+        ( ( TTY ) && !( $[ "value-only" ] ) && !( $.file ) ) && console.log( "[Log] API Response" + ":", JSON.stringify( Response, null, 4 ) );
+        ( ( TTY ) && ( $[ "value-only" ] ) && !( $.file ) ) && console.log( ( Data ) ? JSON.parse( Data ?? "" ) ?? JSON.stringify( Data, null, 4 ) ?? Data : "", "\n" );
 
-        (!(TTY) && !($["value-only"]) && !($.file)) && Process.stdout.write( JSON.stringify( Response, null, 4 ) );
-        (!(TTY) && ($["value-only"]) && !($.file)) && Process.stdout.write( Data ?? "" );
+        ( !( TTY ) && !( $[ "value-only" ] ) && !( $.file ) ) && Process.stdout.write( JSON.stringify( Response, null, 4 ) );
+        ( !( TTY ) && ( $[ "value-only" ] ) && !( $.file ) ) && Process.stdout.write( Data ?? "" );
 
-        ($.file ?? null) && !($["value-only"]) && FS.writeFileSync( String( $.file ) ?? "Fatal-Error.log", JSON.stringify( Response, null, 4 ) );
-        ($.file ?? null) && ($["value-only"]) && FS.writeFileSync( String( $.file ) ?? "Fatal-Error.log", (typeof Data === "string") ? JSON.stringify( JSON.parse( Data ), null, 4 ) : JSON.stringify( Data, null, 4 ) );
+        ( $.file ?? null ) && !( $[ "value-only" ] ) && FS.writeFileSync( String( $.file ) ?? "Fatal-Error.log", JSON.stringify( Response, null, 4 ) );
+        ( $.file ?? null ) && ( $[ "value-only" ] ) && FS.writeFileSync( String( $.file ) ?? "Fatal-Error.log", ( typeof Data === "string" ) ? JSON.stringify( JSON.parse( Data ), null, 4 ) : JSON.stringify( Data, null, 4 ) );
 
         return true;
     } ).strict();

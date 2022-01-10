@@ -80,7 +80,7 @@ class Distributable implements Type {
             cwd: Process.cwd(),
             directory: target,
             base: Path.basename( target ),
-            distribution: (layer) ? Path.join( Process.cwd(),
+            distribution: ( layer ) ? Path.join( Process.cwd(),
                 "distribution",
                 "library",
                 Path.basename( target ) ) : Path.join( Process.cwd(), "distribution", Path.basename( target ) ),
@@ -125,7 +125,7 @@ class Distributable implements Type {
         Distributable.packages.push( Definition );
     }
 
-    static async remove(path: (string), retries: number, force: boolean, recursive: boolean) {
+    static async remove(path: ( string ), retries: number, force: boolean, recursive: boolean) {
         const $ = async () => await Distributable.Remove( path, { recursive, force, maxRetries: retries } );
 
         await $();
@@ -178,9 +178,9 @@ class Distributable implements Type {
 
             if ( $.layer === true ) {
                 const Dependencies = Import( $.definition )?.dependencies;
-                const Count: number = (Dependencies) ? Object.keys( Dependencies ).length : 0;
+                const Count: number = ( Dependencies ) ? Object.keys( Dependencies ).length : 0;
                 if ( Count > 0 ) { /// Install Lambda Layer Dependencies, if Applicable
-                    (debug) && console.debug( "[Debug] Layer Dependencies" + ":", Import( $.definition ), "\n" );
+                    ( debug ) && console.debug( "[Debug] Layer Dependencies" + ":", Import( $.definition ), "\n" );
 
                     /// Install Layer Dependencies, Relative to Original Source
                     await Subprocess( "npm install --production", $.directory );
@@ -204,9 +204,9 @@ class Distributable implements Type {
                 Distributable.copy( $.directory, $.distribution );
 
                 const Dependencies = Import( $.definition )?.dependencies;
-                const Count: number = (Dependencies) ? Object.keys( Dependencies ).length : 0;
+                const Count: number = ( Dependencies ) ? Object.keys( Dependencies ).length : 0;
                 if ( Count > 0 ) { /// Install Lambda Function Dependencies, if Applicable
-                    (debug) && console.debug( "[Debug] Dependencies" + ":", Import( $.definition ) );
+                    ( debug ) && console.debug( "[Debug] Dependencies" + ":", Import( $.definition ) );
 
                     await Subprocess( "npm install --production", $.distribution );
                 }
@@ -216,7 +216,7 @@ class Distributable implements Type {
             await Distributable.remove( Path.join( $.directory, "node_modules" ), 5, true, true );
 
             /*** Establish a `factory.overwrites.json` File in the Distribution Directory if Available */
-            ($.overwrites && Object.keys( $.overwrites ).length > 0) && FS
+            ( $.overwrites && Object.keys( $.overwrites ).length > 0 ) && FS
                 .writeFileSync( Path.join( $.distribution, "factory.overwrites.json" ),
                     JSON.stringify( $.overwrites, null, 4 ) );
 
@@ -245,17 +245,17 @@ class Distributable implements Type {
     static copy(source: string, target: string, debug: boolean = false) {
         FS.mkdirSync( target, { recursive: true } );
         FS.readdirSync( source ).forEach( (element) => {
-            (debug) && console.debug( "\n" + "[Debug] Element Attribute(s)" + ":", element, "\n" );
+            ( debug ) && console.debug( "\n" + "[Debug] Element Attribute(s)" + ":", element, "\n" );
 
             const Directory = FS.lstatSync( Path.join( source, element ), { throwIfNoEntry: true } ).isDirectory();
             const Socket = FS.lstatSync( Path.join( source, element ), { throwIfNoEntry: true } ).isSocket();
             const File = FS.lstatSync( Path.join( source, element ), { throwIfNoEntry: true } ).isFile();
 
             const Partials = Path.parse( source );
-            (debug) && console.debug( "[Debug] Target Partials" + ":", Partials, "\n" );
+            ( debug ) && console.debug( "[Debug] Target Partials" + ":", Partials, "\n" );
 
             const Name = Partials.dir.split( "/" ).pop();
-            (debug) && console.debug( "[Debug] Target Name" + ":", Name );
+            ( debug ) && console.debug( "[Debug] Target Name" + ":", Name );
 
             if ( !Directory && !Socket ) {
                 try {
@@ -291,7 +291,7 @@ class Distributable implements Type {
             const File = FS.lstatSync( Target, { throwIfNoEntry: true } ).isFile();
             const Descriptor = Path.parse( Target );
 
-            (File) && FS.copyFileSync( Path.format( Descriptor ), Path.join( target, Descriptor.base ) );
+            ( File ) && FS.copyFileSync( Path.format( Descriptor ), Path.join( target, Descriptor.base ) );
         } );
     }
 
@@ -305,7 +305,7 @@ class Distributable implements Type {
      */
 
     static async strip(debug: boolean = false) {
-        (debug) && console.debug( "[Debug] Cleaning Layers ...", "\n" );
+        ( debug ) && console.debug( "[Debug] Cleaning Layers ...", "\n" );
 
         for ( const item of Distributable.packages.filter( ($) => $.layer ) ) {
             /// Remove (nodejs) Directories from Source
@@ -315,13 +315,13 @@ class Distributable implements Type {
             const Structure: FS.Dirent[] = FS.readdirSync( item.distribution, { withFileTypes: true } );
 
             /// Filter Results
-            const Targets: Descriptor[] = Structure.filter( ($) => ($.name !== "nodejs") ).map( ($) => new Descriptor( $ ) );
+            const Targets: Descriptor[] = Structure.filter( ($) => ( $.name !== "nodejs" ) ).map( ($) => new Descriptor( $ ) );
 
-            (debug) && console.debug( "[Debug] Distribution Clean-Up Layer Target(s)" + ":", Targets, "\n" );
+            ( debug ) && console.debug( "[Debug] Distribution Clean-Up Layer Target(s)" + ":", Targets, "\n" );
 
             for ( const target of Targets ) {
                 await Distributable.remove( Path.join( item.distribution, target.name ), 5, false, true );
-                (debug) && console.debug( "[Debug] Successfully Removed" + ":", target.name, "\n" );
+                ( debug ) && console.debug( "[Debug] Successfully Removed" + ":", target.name, "\n" );
             }
         }
     }

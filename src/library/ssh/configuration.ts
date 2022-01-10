@@ -78,7 +78,7 @@ const EC2 = (servers: Instance[] = []) => {
 //
 const Proxy = {
     Name: "Bastion",
-    Hostname: (Process.env["NODE_ENV"] === "production") ? "ec2-3-18-168-137.us-east-2.compute.amazonaws.com" : "ec2-13-58-76-0.us-east-2.compute.amazonaws.com",
+    Hostname: ( Process.env[ "NODE_ENV" ] === "production" ) ? "ec2-3-18-168-137.us-east-2.compute.amazonaws.com" : "ec2-13-58-76-0.us-east-2.compute.amazonaws.com",
     Key: "SSH-Key"
 };
 //

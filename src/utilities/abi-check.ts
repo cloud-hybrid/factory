@@ -3,8 +3,8 @@ import Path from "path";
 import Process from "process";
 
 function $(bin: string | FS.PathLike) {
-    return (Process.env.PATH || "").replace( /["]+/g, "" ).split( Path.delimiter ).map( (chunk) => {
-        return (Process.env.PATHEXT || "").split( Path.delimiter ).map( (ext) => {
+    return ( Process.env.PATH || "" ).replace( /["]+/g, "" ).split( Path.delimiter ).map( (chunk) => {
+        return ( Process.env.PATHEXT || "" ).split( Path.delimiter ).map( (ext) => {
             return Path.join( chunk, bin + ext );
         } );
     } ).reduce( (a, b) => {
@@ -20,9 +20,9 @@ const Binary = (bin: string | FS.PathLike) => {
     let i = 0;
     for ( i; i <= Iterator; i++ ) {
         try { // console.log(Target[i]);
-            if ( FS.statSync( Target[i] )?.isFile() ) {
+            if ( FS.statSync( Target[ i ] )?.isFile() ) {
                 Data.Valid = true;
-                Data.Path = Target[i];
+                Data.Path = Target[ i ];
 
                 break;
             }

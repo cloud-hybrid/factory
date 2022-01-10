@@ -25,7 +25,7 @@ const PKG = Path.resolve( CWD, "..", "..", "..", ".." );
 const Target = Path.join( PKG, "packages" );
 
 /*** Packages */
-const Targets = (FS.existsSync( Target )) ? FS.readdirSync( Target,
+const Targets = ( FS.existsSync( Target ) ) ? FS.readdirSync( Target,
     { withFileTypes: true } ).filter( ($) => $.isDirectory() ) : null;
 
 /***
@@ -137,7 +137,7 @@ function Layer(source: string, target: string) {
             if ( Descriptor.base === "package.json" ) {
                 FS.copyFileSync( Path.format( Descriptor ), Path.join( target, Descriptor.base ) );
             } else {
-                (File) && FS.copyFileSync( Path.format( Descriptor ), Path.join( target, Descriptor.base ) );
+                ( File ) && FS.copyFileSync( Path.format( Descriptor ), Path.join( target, Descriptor.base ) );
             }
         }
     } );
@@ -157,7 +157,7 @@ function Locate(files: string[] | any) {
     const Data: string[] = [];
 
     for ( const file in files ) {
-        const Target = files[file];
+        const Target = files[ file ];
         if ( Target.includes( "package.json" ) ) {
             Data.push( Path.dirname( Target ) );
         }
@@ -244,7 +244,7 @@ async function Distribution(data: Package[]) {
 }
 
 /*** Debug Console Utility String Generator */
-const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
+const Input = (input: ( string | number )[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
     ", " ).toUpperCase() + ")";
 
 /***
@@ -298,13 +298,13 @@ const Command = async ($: Argv) => {
     }
 
     Arguments.check( async ($) => {
-        ($?.debug) && console.debug( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
+        ( $?.debug ) && console.debug( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
 
-        ($?.debug) && console.debug( "[Debug] Runtime Location" + ":", import.meta.url, "\n" );
-        ($?.debug) && console.debug( "[Debug] User CWD" + ":", Process.cwd(), "\n" );
-        ($?.debug) && console.debug( "[Debug] Package" + ":", PKG, "\n" );
+        ( $?.debug ) && console.debug( "[Debug] Runtime Location" + ":", import.meta.url, "\n" );
+        ( $?.debug ) && console.debug( "[Debug] User CWD" + ":", Process.cwd(), "\n" );
+        ( $?.debug ) && console.debug( "[Debug] Package" + ":", PKG, "\n" );
 
-        ($?.debug) && console.debug( "[Debug] Directories" + ":", Targets, "\n" );
+        ( $?.debug ) && console.debug( "[Debug] Directories" + ":", Targets, "\n" );
 
         const Files = [];
         for ( const filePath of Walk( Path.join( PKG, "packages" ) ) ) {
@@ -314,7 +314,7 @@ const Command = async ($: Argv) => {
         /*** Recursively Searched Folder(s) w/package.json Files */
         const Dependencies = Locate( Files );
 
-        ($?.debug) && console.debug( "[Debug] Located Target Dependencies" + ":", Dependencies, "\n" );
+        ( $?.debug ) && console.debug( "[Debug] Located Target Dependencies" + ":", Dependencies, "\n" );
 
         const Data: {
             Name: string; Dependencies: { string: string } | null; Directory: string, Version: string | null; Description: string | null; Package: string; Layer: boolean;
@@ -324,7 +324,7 @@ const Command = async ($: Argv) => {
             /// Import the package.json File as an Object via Node-Require Import
             const Package = Import( Path.join( Target, "package.json" ) );
 
-            ($?.debug) && console.log( "[Debug] Package" + ":", Package, "\n" );
+            ( $?.debug ) && console.log( "[Debug] Package" + ":", Package, "\n" );
 
             /// Scan package.json for its Package-Name -- Stripping the Organization if applicable
             const Expression = RegExp( "(@.*/)?(.*)", "i" );
@@ -358,7 +358,7 @@ const Command = async ($: Argv) => {
             /// Import the package.json File as an Object via Node-Require Import
             const Package = Import( Path.join( Target, "package.json" ) );
 
-            ($?.debug) && console.log( "[Debug] Package" + ":", Package, "\n" );
+            ( $?.debug ) && console.log( "[Debug] Package" + ":", Package, "\n" );
 
             /// Scan package.json for its Package-Name -- Stripping the Organization if applicable
             const Expression = RegExp( "(@.*/)?(.*)", "i" );
@@ -382,7 +382,7 @@ const Command = async ($: Argv) => {
             } );
         } );
 
-        ($?.debug) && console.log( "[Debug] Data" + ":", Data, "\n" );
+        ( $?.debug ) && console.log( "[Debug] Data" + ":", Data, "\n" );
 
         await Distribution( Data );
 

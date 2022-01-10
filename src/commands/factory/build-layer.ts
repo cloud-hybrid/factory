@@ -25,7 +25,7 @@ const PKG: string = Path.dirname( CWD );
 const Import = Module.createRequire( PKG );
 
 /*** Debug Console Utility String Generator */
-const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
+const Input = (input: ( string | number )[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
     ", " ).toUpperCase() + ")";
 
 /***
@@ -68,7 +68,7 @@ const Command = async ($: Argv) => {
     Configuration( Arguments );
 
     Arguments.check( async ($) => {
-        ($?.debug) && console.debug( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
+        ( $?.debug ) && console.debug( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
 
         const Directory = Path.resolve( Process.cwd() );
 
@@ -78,7 +78,7 @@ const Command = async ($: Argv) => {
 
         while ( trigger !== "Y" && trigger !== "N" ) trigger = await Continue().then( ($) => $.toUpperCase() );
 
-        (trigger === "Y") && await Main();
+        ( trigger === "Y" ) && await Main();
 
         return true;
     } ).strict();

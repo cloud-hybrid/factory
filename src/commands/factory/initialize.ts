@@ -82,7 +82,7 @@ function Locate(files: string[] | any) {
     const Data: string[] = [];
 
     for ( const file in files ) {
-        const Target = files[file];
+        const Target = files[ file ];
         if ( Target.includes( "package.json" ) && !Target.includes( "scripts" ) ) {
             Data.push( Path.dirname( Target ) );
         }
@@ -92,7 +92,7 @@ function Locate(files: string[] | any) {
 }
 
 /*** Debug Console Utility String Generator */
-const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
+const Input = (input: ( string | number )[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
     ", " ).toUpperCase() + ")";
 
 /***
@@ -134,21 +134,21 @@ const Command = async ($: Argv) => {
 
     Configuration( Arguments );
 
-    Arguments.check( async ($: { [p: string]: unknown, _: (string | number)[], $0: string }) => {
+    Arguments.check( async ($: { [ p: string ]: unknown, _: ( string | number )[], $0: string }) => {
         await Remove( Path.join( Process.cwd(), "distribution" ), { recursive: true, force: true, maxRetries: 5 } );
         await Remove( Path.join( Process.cwd(), "factory" ), { recursive: true, force: true, maxRetries: 5 } );
 
-        $.debug = ($?.debug === true) ? $.debug : false;
+        $.debug = ( $?.debug === true ) ? $.debug : false;
 
-        ($?.debug) && console.debug( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
+        ( $?.debug ) && console.debug( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
 
         const packages = [ ... Packages( Process.cwd() ) ];
         const library = [ ... Library( Process.cwd() ) ];
 
-        ($?.debug) && console.debug( "[Debug] Runtime Location" + ":", import.meta.url, "\n" );
-        ($?.debug) && console.debug( "[Debug] CWD" + ":", Process.cwd(), "\n" );
-        ($?.debug) && console.debug( "[Debug] File Structure (Packages)" + ":", [ packages ], "\n" );
-        ($?.debug) && console.debug( "[Debug] File Structure (Library)" + ":", [ library ], "\n" );
+        ( $?.debug ) && console.debug( "[Debug] Runtime Location" + ":", import.meta.url, "\n" );
+        ( $?.debug ) && console.debug( "[Debug] CWD" + ":", Process.cwd(), "\n" );
+        ( $?.debug ) && console.debug( "[Debug] File Structure (Packages)" + ":", [ packages ], "\n" );
+        ( $?.debug ) && console.debug( "[Debug] File Structure (Library)" + ":", [ library ], "\n" );
 
         /***
          * Configuration File Assertion
@@ -162,30 +162,30 @@ const Command = async ($: Argv) => {
 
         const Factory: object = Import( Path.join( Process.cwd(), "factory.json" ) );
 
-        ($?.debug) && console.debug( "[Debug] Factory Definition (factory.json)" + ":", Factory, "\n" );
+        ( $?.debug ) && console.debug( "[Debug] Factory Definition (factory.json)" + ":", Factory, "\n" );
 
         /*** Recursively Searched Folder(s) w/package.json Files, Excluding Library */
         const Resources = Locate( packages ); // ==> Lambda Functions
 
-        ($?.debug) && console.debug( "[Debug] Target Package(s) (Resources)" + ":", Resources, "\n" );
+        ( $?.debug ) && console.debug( "[Debug] Target Package(s) (Resources)" + ":", Resources, "\n" );
 
         const Share = Locate( library ); // ==> Lambda Layers
 
-        ($?.debug) && console.debug( "[Debug] Target Library (Shared Resources)" + ":", Share, "\n" );
+        ( $?.debug ) && console.debug( "[Debug] Target Library (Shared Resources)" + ":", Share, "\n" );
 
         for ( const Target of Resources ) Distributable.define( Target, false );
         for ( const Target of Share ) Distributable.define( Target, true );
 
-        ($?.debug) && console.debug( "[Debug] Distribution + Package Data" + ":", Distributable.packages, "\n" );
-        ($?.debug) && console.debug( "[Debug] Compiling Distribution(s) ..." + "\n" );
+        ( $?.debug ) && console.debug( "[Debug] Distribution + Package Data" + ":", Distributable.packages, "\n" );
+        ( $?.debug ) && console.debug( "[Debug] Compiling Distribution(s) ..." + "\n" );
 
         // @ts-ignore
         await Distributable.distribute( $.debug );
 
-        ($?.debug) && console.debug( "[Debug] Writing factory.json Distribution ...", "\n" );
+        ( $?.debug ) && console.debug( "[Debug] Writing factory.json Distribution ...", "\n" );
         FS.writeFileSync( Path.join( Process.cwd(), "distribution", "factory.json" ), JSON.stringify( Factory ) );
 
-        ($?.debug) && console.debug( "[Debug] Initialization Complete", "\n" );
+        ( $?.debug ) && console.debug( "[Debug] Initialization Complete", "\n" );
 
         return true;
     } ).strict();

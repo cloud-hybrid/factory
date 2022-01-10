@@ -39,14 +39,14 @@ class Module {
 
     "Bright-White": typeof Color.Bright.White = Color.Bright.White;
 
-    color = (type: Type) => this[type];
+    color = (type: Type) => this[ type ];
 
     string(color: Type, output: string) {
-        return this[color].style( output );
+        return this[ color ].style( output );
     }
 
     write(color: Type, output: string) {
-        Process.stdout.write( this.string(color,  output) + "\n");
+        Process.stdout.write( this.string( color, output ) + "\n" );
     }
 }
 

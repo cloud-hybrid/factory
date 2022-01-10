@@ -8,19 +8,19 @@ const Transform = (linefeed: string[]) => {
 
     linefeed.forEach( ($) => {
         const Split = String( $ ).trim().normalize().split( " " );
-        const Enumeration = Split[0].trim();
-        const Target = Split[1] || null;
+        const Enumeration = Split[ 0 ].trim();
+        const Target = Split[ 1 ] || null;
 
         const Modifications = {
-            Modify: (Enumeration.search( "M" ) !== -1),
-            Add: (Enumeration.search( "A" ) !== -1),
-            Delete: (Enumeration.search( "R" ) !== -1),
-            Rename: (Enumeration.search( "R" ) !== -1)
+            Modify: ( Enumeration.search( "M" ) !== -1 ),
+            Add: ( Enumeration.search( "A" ) !== -1 ),
+            Delete: ( Enumeration.search( "R" ) !== -1 ),
+            Rename: ( Enumeration.search( "R" ) !== -1 )
         };
 
         if ( Modifications.Modify ) Output.Modified = true;
 
-        (Target && Target !== "") && Output.Lines.push( {
+        ( Target && Target !== "" ) && Output.Lines.push( {
             ... Modifications
         } );
     } );

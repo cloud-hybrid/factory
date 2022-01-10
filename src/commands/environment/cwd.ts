@@ -8,7 +8,7 @@ import { Argv } from "../../cli/arguments.js";
 import { Local } from "../../utilities/environment.js";
 
 /*** Debug Console Utility String Generator */
-const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
+const Input = (input: ( string | number )[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
     ", " ).toUpperCase() + ")";
 
 /***
@@ -65,7 +65,7 @@ function Configuration(Arguments: Argv) {
  */
 
 function Write(data: string, target: string, debug = false) {
-    (debug) && console.debug( "[Debug] (Serialize) Input", JSON.stringify( {
+    ( debug ) && console.debug( "[Debug] (Serialize) Input", JSON.stringify( {
         Data: JSON.parse( data ), Target: target, Debug: debug
     }, null, 4 ), "\n" );
 
@@ -94,12 +94,12 @@ function Write(data: string, target: string, debug = false) {
  */
 
 function Output(data: any, serialize = true, debug = false) {
-    (debug) && console.debug( "[Debug] (Output) Input", JSON.stringify( {
+    ( debug ) && console.debug( "[Debug] (Output) Input", JSON.stringify( {
         Data: data, Serialize: serialize, Debug: debug
     }, null, 4 ), "\n" );
 
-    (serialize) && Process.stdout.write( JSON.stringify( data, null, 4 ) + "\n" + "\n" );
-    (serialize) || Process.stdout.write( data + "\n" + "\n" );
+    ( serialize ) && Process.stdout.write( JSON.stringify( data, null, 4 ) + "\n" + "\n" );
+    ( serialize ) || Process.stdout.write( data + "\n" + "\n" );
 
     return { data, serialize, debug };
 }
@@ -131,16 +131,16 @@ const Command = async ($: Argv) => {
     const Serial = JSON.stringify( Data, null, 4 );
 
     Arguments.check( async ($) => {
-        ($?.debug) && console.log( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
+        ( $?.debug ) && console.log( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
 
         const Mapping = {
-            file: ($?.file) ? Write( Serial, String( $?.file ), Boolean( $?.debug ) ) : null,
-            json: ($?.json) ? Output( Data, true, Boolean( $?.debug ) ) : ($?.json === false) ? Output( Local,
+            file: ( $?.file ) ? Write( Serial, String( $?.file ), Boolean( $?.debug ) ) : null,
+            json: ( $?.json ) ? Output( Data, true, Boolean( $?.debug ) ) : ( $?.json === false ) ? Output( Local,
                 false,
                 Boolean( $?.debug ) ) : null
         };
 
-        ($?.debug) && console.dir( Mapping );
+        ( $?.debug ) && console.dir( Mapping );
 
         return true;
     } ).strict();

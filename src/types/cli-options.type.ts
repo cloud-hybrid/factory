@@ -14,16 +14,16 @@ interface Type {
     choices?: Choices | undefined;
 
     /** function, coerce or transform parsed command line values into another value, see `coerce()` */
-    coerce?: ((arg: any) => any) | undefined;
+    coerce?: ( (arg: any) => any ) | undefined;
 
     /** boolean, interpret option as a path to a JSON config file, see `config()` */
     config?: boolean | undefined;
 
     /** function, provide a custom config parsing function, see `config()` */
-    configParser?: ((configPath: string) => object) | undefined;
+    configParser?: ( (configPath: string) => object ) | undefined;
 
     /** string or object, require certain keys not to be set, see `conflicts()` */
-    conflicts?: string | ReadonlyArray<string> | { [key: string]: string | ReadonlyArray<string> } | undefined;
+    conflicts?: string | ReadonlyArray<string> | { [ key: string ]: string | ReadonlyArray<string> } | undefined;
 
     /** boolean, interpret option as a count of boolean flags, see `count()` */
     count?: boolean | undefined;
@@ -62,7 +62,7 @@ interface Type {
     hidden?: boolean | undefined;
 
     /**  string or object, require certain keys to be set, see `implies()` */
-    implies?: string | ReadonlyArray<string> | { [key: string]: string | ReadonlyArray<string> } | undefined;
+    implies?: string | ReadonlyArray<string> | { [ key: string ]: string | ReadonlyArray<string> } | undefined;
 
     /** number, specify how many arguments should be consumed for the option, see `nargs()` */
     nargs?: number | undefined;

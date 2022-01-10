@@ -19,7 +19,7 @@ class Schema extends Error {
 
         // This clips the constructor invocation from the stack trace.
         this.stackTraceLimit = trace;
-        this.captureStackTrace( this, (capture !== null) ? capture : this.constructor );
+        this.captureStackTrace( this, ( capture !== null ) ? capture : this.constructor );
     }
 
     private captureStackTrace(reference: this, namespace: Function) {

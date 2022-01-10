@@ -2,7 +2,7 @@ import { Argv } from "../cli/arguments.js";
 import { Prompt } from "../utilities/prompt.js";
 
 /*** Debug Console Utility String Generator */
-const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
+const Input = (input: ( string | number )[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
     ", " ).toUpperCase() + ")";
 
 /***
@@ -51,8 +51,8 @@ const Command = async ($: Argv) => {
     const Query = await Prompt( "Arbitrary User-Input" + ":" + " " );
 
     Arguments.check( ($: any) => {
-        ($?.debug) && console.log( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
-        ($?.debug) && console.log( "[Debug] User-Input" + ":", Query );
+        ( $?.debug ) && console.log( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
+        ( $?.debug ) && console.log( "[Debug] User-Input" + ":", Query );
 
         return true;
     } ).strict();

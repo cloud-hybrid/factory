@@ -21,6 +21,5 @@ class Radiant extends Base implements Modifier {
     }
 }
 
-
 export { Color, Radiant };
 export default Color;

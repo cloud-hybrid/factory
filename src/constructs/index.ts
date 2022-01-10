@@ -33,11 +33,11 @@ type Policy = IAM.IamPolicy;
 
 function normalize(prefix: string, name: string) {
     return [ prefix, name.split( " " ).map( ($) => {
-        return $.toString()[0].toUpperCase() + $.toString().slice( 1 );
+        return $.toString()[ 0 ].toUpperCase() + $.toString().slice( 1 );
     } ).join( "-" ).split( "_" ).map( ($) => {
-        return $.toString()[0].toUpperCase() + $.toString().slice( 1 );
+        return $.toString()[ 0 ].toUpperCase() + $.toString().slice( 1 );
     } ).join( "-" ).split( "-" ).map( ($) => {
-        return $.toString()[0].toUpperCase() + $.toString().slice( 1 );
+        return $.toString()[ 0 ].toUpperCase() + $.toString().slice( 1 );
     } ).join( "-" ) ].join( "-" );
 }
 
@@ -69,17 +69,17 @@ class Lambda {
         } ]
     }, null, 4 );
 
-    public cloud: typeof Configuration.settings["Cloud"] = Configuration.settings["Cloud"];
+    public cloud: typeof Configuration.settings["Cloud"] = Configuration.settings[ "Cloud" ];
 
     /// public static Execution = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole";
     /// public static RO = "arn:aws:iam::aws:policy/service-role/AWSLambda_ReadOnlyAccess";
     /// public static XWO = "arn:aws:iam::aws:policy/service-role/AWSXrayWriteOnlyAccess";
     /*** Common-Name or Service Extension to be used when constructing the Lambda Function Name */
-    public service: string = Configuration.settings["Service"];
+    public service: string = Configuration.settings[ "Service" ];
 
-    public organization: string = Configuration.settings["Organization"];
+    public organization: string = Configuration.settings[ "Organization" ];
 
-    public environment: string = Configuration.settings["Environment"];
+    public environment: string = Configuration.settings[ "Environment" ];
 
     private readonly distribution: string = "distribution";
 
@@ -162,7 +162,7 @@ class SAM {
         /// --> To Generate a Distribution: factory cdfk initialize
         Assertion.strictEqual( FS.existsSync( Distribution ), true, "A CDK Distribution Target Doesn't Exist" );
         FS.readdirSync( Distribution ).forEach( ($) => {
-            ($ !== "library") && this.functions.push( Path.join( Distribution, $ ) );
+            ( $ !== "library" ) && this.functions.push( Path.join( Distribution, $ ) );
         } );
     }
 
@@ -190,7 +190,7 @@ class SAM {
 
     public static generateAPIGatewayCloudWatchAccessLog(stream: AWS.cloudwatch.CloudwatchLogStream | null = null,
         format: string | null = null) {
-        return (stream === null || format === null) ? null : {
+        return ( stream === null || format === null ) ? null : {
             destinationArn: String( stream.name ), format: String( format )
         };
     }
@@ -274,7 +274,7 @@ class Service extends TerraformStack {
 
         /*** Cloud Provider (AWS) */
         const provider = new AWS.AwsProvider( this, [ this.identifier, "AWS-Provider" ].join( "-" ).toLowerCase(), {
-            region: settings.cloud["Region"]
+            region: settings.cloud[ "Region" ]
         } );
 
         /*** Unique S3 Bucket Containing Lambda Artifact(s) */

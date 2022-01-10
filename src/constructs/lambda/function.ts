@@ -67,9 +67,9 @@ interface Configuration {
 
     timeout?: number | undefined;
 
-    environment?: { [p: string]: string | undefined } | object | undefined;
+    environment?: { [ p: string ]: string | undefined } | object | undefined;
 
-    tags?: { [p: string]: string | undefined } | object | undefined;
+    tags?: { [ p: string ]: string | undefined } | object | undefined;
 }
 
 interface Settings extends Configuration {
@@ -109,10 +109,10 @@ class Lambda extends Construct implements Settings {
     readonly timeout: number;
 
     /*** Environment variables that are accessible from function code during execution */
-    readonly environment: { [p: string]: string };
+    readonly environment: { [ p: string ]: string };
 
     /*** Environment variables that are accessible from function code during execution */
-    readonly tags?: { [p: string]: string } | undefined;
+    readonly tags?: { [ p: string ]: string } | undefined;
 
     /***
      * Lambda Function Constructor

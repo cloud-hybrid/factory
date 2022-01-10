@@ -11,6 +11,7 @@ const File = import.meta.url.replace( "file" + ":" + "//", "" );
 const Import = Module.createRequire( File );
 
 /***
+ *
  * Recursive Copy Function
  * -----------------------
  * *Note* - this will perform *actual, real copies*; symbolic links are resolved to their raw pointer location(s).
@@ -62,7 +63,7 @@ function Copy(source: string, target: string) {
  */
 
 const Subprocess = (command: string, directory: string = Process.cwd()) => {
-    const Binary = command.split( " " )[0];
+    const Binary = command.split( " " )[ 0 ];
     const Arguments = command.split( " " ).splice( 1 );
     return Spawn.spawnSync( Binary, [ ... Arguments ], {
         cwd: directory, env: Process.env, stdio: "inherit"

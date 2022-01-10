@@ -11,7 +11,7 @@ const Generate = () => {
     const Lines: string[] = [];
 
     /// Check if Local `run-script start` is interfacing `factory`
-    (process.env?.npm_lifecycle_event !== "start") && Lines.push( "" );
+    ( process.env?.npm_lifecycle_event !== "start" ) && Lines.push( "" );
 
     Lines.push( [ Colors.blue( "    //\\\\--/" ), "  ", Colors.magentaBright( " //\\\\--/" ) ].join( "" ) );
     Lines.push( [ Colors.blue( "   ╱╱__\\\\/" ), "  ", Colors.magentaBright( " //__\\\\/" ) ].join( "" ) + "   " + Title );

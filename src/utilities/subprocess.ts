@@ -4,7 +4,7 @@ import Process from "process";
 const Subprocess = async (command: string, directory: string = Process.cwd()) => {
     console.log( "[Log]", "Subprocess Command" + ":", command, directory );
 
-    const Binary = command.split( " " )[0];
+    const Binary = command.split( " " )[ 0 ];
     const Arguments = command.split( " " ).splice( 1 );
 
     const Awaitable = new Promise<Spawn.ChildProcessWithoutNullStreams>( (resolve, reject) => {
@@ -30,7 +30,7 @@ const Subprocess = async (command: string, directory: string = Process.cwd()) =>
 
             // Allocate --> Array Buffer of (n + 1) Bytes
             const Buffer = _;
-            Array( Buffer[Symbol.iterator] ).forEach( () => Allocation += 1 );
+            Array( Buffer[ Symbol.iterator ] ).forEach( () => Allocation += 1 );
 
             // Shift <-- Left to Release Empty Byte for String[0]
             const Output = Buffer.toString( "utf-8", Allocation - 1 );
@@ -45,7 +45,7 @@ const Subprocess = async (command: string, directory: string = Process.cwd()) =>
 
             // Allocate an Array Buffer of (n + 1) Bytes
             const Buffer = _;
-            Array( Buffer[Symbol.iterator] ).forEach( () => Allocation += 1 );
+            Array( Buffer[ Symbol.iterator ] ).forEach( () => Allocation += 1 );
 
             // Shift <-- Left to Release Empty Byte for String[0]
             const Output = Buffer.toString( "utf-8", Allocation - 1 );

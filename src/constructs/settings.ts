@@ -67,7 +67,7 @@ class Configuration {
     }
 }
 
-const PWD = (FS.existsSync( Overwrite )) ? Path.dirname( Overwrite ) : Target;
+const PWD = ( FS.existsSync( Overwrite ) ) ? Path.dirname( Overwrite ) : Target;
 
 export { CWD, PKG, Distribution, Settings, Configuration, Import, PWD };
 

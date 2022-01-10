@@ -11,7 +11,7 @@ class Implementation {
 
     constructor(name: string, type: Type | string, codes: Codes) {
         this.name = name;
-        this.sequence = new Sequence( codes[0], codes[1] );
+        this.sequence = new Sequence( codes[ 0 ], codes[ 1 ] );
         this.type = new Identifier( type ).valueOf();
 
         this.constructor = this.style;

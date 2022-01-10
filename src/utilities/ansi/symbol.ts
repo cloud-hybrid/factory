@@ -68,7 +68,7 @@ const other = Object.assign( {}, common, {
     warning: "⚠"
 } );
 
-const Exportable = (Windows && !Hyper) ? windows : other;
+const Exportable = ( Windows && !Hyper ) ? windows : other;
 
 Object.defineProperty( Exportable, "common", { enumerable: false, value: common } );
 Object.defineProperty( Exportable, "windows", { enumerable: false, value: windows } );

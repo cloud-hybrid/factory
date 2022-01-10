@@ -36,8 +36,8 @@ class Descriptor implements Type {
      */
 
     constructor(file: FS.Dirent | string) {
-        const $ = (typeof file === "string") ? FS.lstatSync( file, { throwIfNoEntry: true } ) : file;
-        this.name = (typeof file === "string") ? file : file.name;
+        const $ = ( typeof file === "string" ) ? FS.lstatSync( file, { throwIfNoEntry: true } ) : file;
+        this.name = ( typeof file === "string" ) ? file : file.name;
 
         this.volume = $.isBlockDevice();
         this.pipe = $.isFIFO();

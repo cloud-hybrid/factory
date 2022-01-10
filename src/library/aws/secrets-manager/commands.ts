@@ -1,24 +1,4 @@
-import {
-    CreateSecretCommand,
-    CreateSecretCommandInput,
-    CreateSecretCommandOutput,
-    GetRandomPasswordCommand,
-    GetRandomPasswordCommandInput,
-    GetRandomPasswordCommandOutput,
-    GetSecretValueCommand,
-    GetSecretValueCommandInput,
-    GetSecretValueCommandOutput,
-    ListSecretsCommandInput,
-    ListSecretsCommandOutput,
-    ListSecretVersionIdsCommandInput,
-    ListSecretVersionIdsCommandOutput,
-    paginateListSecrets,
-    paginateListSecretVersionIds,
-    PutSecretValueCommand,
-    PutSecretValueCommandInput,
-    PutSecretValueCommandOutput,
-    SecretsManagerPaginationConfiguration
-} from "@aws-sdk/client-secrets-manager";
+import { CreateSecretCommand, CreateSecretCommandInput, CreateSecretCommandOutput, GetRandomPasswordCommand, GetRandomPasswordCommandInput, GetRandomPasswordCommandOutput, GetSecretValueCommand, GetSecretValueCommandInput, GetSecretValueCommandOutput, ListSecretsCommandInput, ListSecretsCommandOutput, ListSecretVersionIdsCommandInput, ListSecretVersionIdsCommandOutput, paginateListSecrets, paginateListSecretVersionIds, PutSecretValueCommand, PutSecretValueCommandInput, PutSecretValueCommandOutput, SecretsManagerPaginationConfiguration } from "@aws-sdk/client-secrets-manager";
 import { Paginator } from "@aws-sdk/types";
 import { default as Service } from "./secrets-manager.js";
 

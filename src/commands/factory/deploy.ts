@@ -37,7 +37,7 @@ const Import = Module.createRequire( PKG );
 const Exclusions = [ ".git", ".idea", ".vscode", "cdktf.out", "templates", "documentation", "scripts" ];
 
 /*** Debug Console Utility String Generator */
-const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
+const Input = (input: ( string | number )[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
     ", " ).toUpperCase() + ")";
 
 /***
@@ -86,7 +86,7 @@ function Configuration(Arguments: Argv) {
 function Copy(source: string, target: string, debug: boolean = false) {
     FS.mkdirSync( target, { recursive: true } );
     FS.readdirSync( source,
-        { withFileTypes: true } ).filter( ($) => (!Exclusions.includes( $.name )) ).forEach( ($) => {
+        { withFileTypes: true } ).filter( ($) => ( !Exclusions.includes( $.name ) ) ).forEach( ($) => {
         const Directory = FS.lstatSync( Path.join( source, $.name ), { throwIfNoEntry: true } ).isDirectory();
         const File = FS.lstatSync( Path.join( source, $.name ), { throwIfNoEntry: true } ).isFile();
 
@@ -96,7 +96,7 @@ function Copy(source: string, target: string, debug: boolean = false) {
                     Path.join( target, $.name ),
                     FS.constants.COPYFILE_FICLONE );
 
-                (debug) && console.debug( "[Debug]" + ":", {
+                ( debug ) && console.debug( "[Debug]" + ":", {
                     Source: Path.join( source, $.name ), Target: Path.join( target, $.name )
                 }, "\n" );
             } catch ( error ) {
@@ -123,7 +123,7 @@ function Copy(source: string, target: string, debug: boolean = false) {
 function Dry(source: string, target: string) {
     FS.mkdirSync( target, { recursive: true } );
     FS.readdirSync( source,
-        { withFileTypes: true } ).filter( ($) => (!Exclusions.includes( $.name )) ).forEach( ($) => {
+        { withFileTypes: true } ).filter( ($) => ( !Exclusions.includes( $.name ) ) ).forEach( ($) => {
         const Directory = FS.lstatSync( Path.join( source, $.name ), { throwIfNoEntry: true } ).isDirectory();
         const File = FS.lstatSync( Path.join( source, $.name ), { throwIfNoEntry: true } ).isFile();
 
@@ -167,8 +167,8 @@ const Command = async ($: Argv) => {
             console.log( "[Log] Target Directory" + ":", PWD );
             console.log( "[Log] Source Directory" + ":", Repository );
 
-            ($?.debug) && console.log( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
-            ($?.debug) && console.debug( "Current Directory" + ":", Process.cwd(), "\n" );
+            ( $?.debug ) && console.log( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
+            ( $?.debug ) && console.debug( "Current Directory" + ":", Process.cwd(), "\n" );
 
             // const Continue = async () => await Prompt("Continue? (Y/N)" + ":" + " ");
             //

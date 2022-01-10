@@ -19,7 +19,7 @@ interface Global {
 }
 
 interface Map {
-    [key: string]: { Variable: string, Value: string };
+    [ key: string ]: { Variable: string, Value: string };
 }
 
 interface Variable {
@@ -36,7 +36,7 @@ interface Environment extends Runtime {
 }
 
 class Settings {
-    static readonly mapping: { [Key: string]: Variable } = {};
+    static readonly mapping: { [ Key: string ]: Variable } = {};
 
     /*** Global Prefix */
     prefix: object | null | undefined;
@@ -91,46 +91,46 @@ class Settings {
         Settings.initialize();
 
         this.prefix =
-            $?.Environment["NPM-Config-Global-Prefix"] ?? Settings?.mapping["NPM-Config-Global-Prefix"] ?? null;
+            $?.Environment[ "NPM-Config-Global-Prefix" ] ?? Settings?.mapping[ "NPM-Config-Global-Prefix" ] ?? null;
 
         this.metrics =
-            $?.Environment["NPM-Config-Metrics-Registry"] ?? Settings?.mapping["NPM-Config-Metrics-Registry"] ?? null;
+            $?.Environment[ "NPM-Config-Metrics-Registry" ] ?? Settings?.mapping[ "NPM-Config-Metrics-Registry" ] ?? null;
 
-        this.proxy = $?.Environment["NPM-Config-Noproxy"] ?? Settings?.mapping["NPM-Config-Noproxy"] ?? null;
+        this.proxy = $?.Environment[ "NPM-Config-Noproxy" ] ?? Settings?.mapping[ "NPM-Config-Noproxy" ] ?? null;
 
-        this.local = $?.Environment["NPM-Config-Local-Prefix"] ?? Settings?.mapping["NPM-Config-Local-Prefix"] ?? null;
+        this.local = $?.Environment[ "NPM-Config-Local-Prefix" ] ?? Settings?.mapping[ "NPM-Config-Local-Prefix" ] ?? null;
 
-        this.package = $?.Environment["NPM-Package-Json"] ?? Settings?.mapping["NPM-Package-Json"] ?? null;
+        this.package = $?.Environment[ "NPM-Package-Json" ] ?? Settings?.mapping[ "NPM-Package-Json" ] ?? null;
 
         this.configuration =
-            $?.Environment["NPM-Config-Globalconfig"] ?? Settings?.mapping["NPM-Config-Globalconfig"] ?? null;
+            $?.Environment[ "NPM-Config-Globalconfig" ] ?? Settings?.mapping[ "NPM-Config-Globalconfig" ] ?? null;
 
-        this.user = $?.Environment["NPM-Config-Userconfig"] ?? Settings?.mapping["NPM-Config-Userconfig"] ?? null;
+        this.user = $?.Environment[ "NPM-Config-Userconfig" ] ?? Settings?.mapping[ "NPM-Config-Userconfig" ] ?? null;
 
-        this.module = $?.Environment["NPM-Config-Init-Module"] ?? Settings?.mapping["NPM-Config-Init-Module"] ?? null;
+        this.module = $?.Environment[ "NPM-Config-Init-Module" ] ?? Settings?.mapping[ "NPM-Config-Init-Module" ] ?? null;
 
-        this.cache = $?.Environment["NPM-Config-Cache"] ?? Settings?.mapping["NPM-Config-Cache"] ?? null;
+        this.cache = $?.Environment[ "NPM-Config-Cache" ] ?? Settings?.mapping[ "NPM-Config-Cache" ] ?? null;
 
-        this.agent = $?.Environment["NPM-Config-User-Agent"] ?? Settings?.mapping["NPM-Config-User-Agent"] ?? null;
+        this.agent = $?.Environment[ "NPM-Config-User-Agent" ] ?? Settings?.mapping[ "NPM-Config-User-Agent" ] ?? null;
 
-        this.resolve = $?.Environment["NPM-Config-Init-Module"] ?? Settings?.mapping["NPM-Config-Init-Module"] ?? null;
+        this.resolve = $?.Environment[ "NPM-Config-Init-Module" ] ?? Settings?.mapping[ "NPM-Config-Init-Module" ] ?? null;
 
-        this.gyp = $?.Environment["NPM-Config-Node-Gyp"] ?? Settings?.mapping["NPM-Config-Node-Gyp"] ?? null;
+        this.gyp = $?.Environment[ "NPM-Config-Node-Gyp" ] ?? Settings?.mapping[ "NPM-Config-Node-Gyp" ] ?? null;
 
-        this.executable = $?.Environment["NPM-Node-Execpath"] ?? Settings?.mapping["NPM-Node-Execpath"] ?? null;
+        this.executable = $?.Environment[ "NPM-Node-Execpath" ] ?? Settings?.mapping[ "NPM-Node-Execpath" ] ?? null;
 
         this.injection.$ =
-            $?.Environment["NPM-Package-Config-Injection"] ?? Settings?.mapping["NPM-Package-Config-Injection"] ?? null;
+            $?.Environment[ "NPM-Package-Config-Injection" ] ?? Settings?.mapping[ "NPM-Package-Config-Injection" ] ?? null;
 
         this.environment = Process.env;
 
-        (dynamic) && Object.keys( this.environment ).forEach( ($) => {
+        ( dynamic ) && Object.keys( this.environment ).forEach( ($) => {
             Object.defineProperty( this, Settings.normalize( $ ), {
-                configurable: true, enumerable: true, writable: true, value: this.environment[$]
+                configurable: true, enumerable: true, writable: true, value: this.environment[ $ ]
             } );
         } );
 
-        (this.injection["$"] !== null) && this.inject();
+        ( this.injection[ "$" ] !== null ) && this.inject();
     }
 
     private static initialize() {
@@ -140,26 +140,26 @@ class Settings {
 
             const Normalization = Settings.normalize( $ );
 
-            Settings.mapping[Normalization] = { Key: "", Mapping: {}, Value: "" };
+            Settings.mapping[ Normalization ] = { Key: "", Mapping: {}, Value: "" };
 
-            Container[Normalization] = {
-                Variable: $, Value: Environment[$]
+            Container[ Normalization ] = {
+                Variable: $, Value: Environment[ $ ]
             };
 
-            Settings.mapping[Normalization]["Key"] = $;
-            Settings.mapping[Normalization]["Value"] = Environment[$];
-            Settings.mapping[Normalization]["Mapping"] = Container;
+            Settings.mapping[ Normalization ][ "Key" ] = $;
+            Settings.mapping[ Normalization ][ "Value" ] = Environment[ $ ];
+            Settings.mapping[ Normalization ][ "Mapping" ] = Container;
         } );
     }
 
     private static normalize(input: string) {
         const $: string = input.toLowerCase().replace( "npm", "NPM" );
         return [ $.split( " " ).map( ($) => {
-            return $.toString()[0]?.toUpperCase() + $.toString()?.slice( 1 ) ?? "";
+            return $.toString()[ 0 ]?.toUpperCase() + $.toString()?.slice( 1 ) ?? "";
         } ).join( "-" ).split( "_" ).map( ($) => {
-            return $.toString()[0]?.toUpperCase() + $.toString()?.slice( 1 ) ?? "";
+            return $.toString()[ 0 ]?.toUpperCase() + $.toString()?.slice( 1 ) ?? "";
         } ).join( "-" ).split( "-" ).map( ($) => {
-            return $.toString()[0]?.toUpperCase() + $.toString()?.slice( 1 ) ?? "";
+            return $.toString()[ 0 ]?.toUpperCase() + $.toString()?.slice( 1 ) ?? "";
         } ).join( "-" ) ].join( "-" );
     }
 
@@ -178,14 +178,14 @@ class Settings {
             this.injection.Buffer.split( "\n" ).forEach( ($: string) => {
                 if ( $.split( "=" ).length === 2 ) {
                     const Enumeration = $.split( "=" );
-                    const Value = Enumeration[1].trim().replace( "\"", "" ).replace( "'", "" );
+                    const Value = Enumeration[ 1 ].trim().replace( "\"", "" ).replace( "'", "" );
 
-                    Object.defineProperty( this.injection.$, Enumeration[0], {
+                    Object.defineProperty( this.injection.$, Enumeration[ 0 ], {
                         configurable: true, enumerable: true, writable: true, value: Value
                     } );
 
                     if ( Object.keys( this.injection.JSON ).length === 0 ) {
-                        Object.defineProperty( this.injection.JSON, Enumeration[0], {
+                        Object.defineProperty( this.injection.JSON, Enumeration[ 0 ], {
                             configurable: true, enumerable: true, writable: true, value: Value
                         } );
                     }
@@ -205,7 +205,7 @@ class Settings {
 }
 
 /*** Debug Console Utility String Generator */
-const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
+const Input = (input: ( string | number )[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
     ", " ).toUpperCase() + ")";
 
 /***
@@ -246,7 +246,7 @@ function Configuration(Arguments: Argv) {
  */
 
 function Write(data: Settings, target: string, debug = false) {
-    (debug) && console.debug( "[Debug] (Serialize) Input", JSON.stringify( {
+    ( debug ) && console.debug( "[Debug] (Serialize) Input", JSON.stringify( {
         Data: JSON.stringify( data, null, 4 ), Target: target, Debug: debug
     }, null, 4 ), "\n" );
 
@@ -274,7 +274,7 @@ function Write(data: Settings, target: string, debug = false) {
  */
 
 function Output(data: Settings, debug = false) {
-    (debug) && console.debug( "[Debug] (Output) Input", JSON.stringify( {
+    ( debug ) && console.debug( "[Debug] (Output) Input", JSON.stringify( {
         Data: data, Debug: debug
     }, null, 4 ), "\n" );
 
@@ -301,19 +301,19 @@ const Command = async ($: Argv) => {
     Configuration( Arguments );
 
     Arguments.check( async ($) => {
-        ($?.debug) && console.log( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
+        ( $?.debug ) && console.log( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
 
         const Instance = new Settings();
 
-        ($?.file) || Output( Instance, !!($?.debug) );
-        ($?.file) && Write( Instance,
+        ( $?.file ) || Output( Instance, !!( $?.debug ) );
+        ( $?.file ) && Write( Instance,
             String( $?.file ?? Path.join( Process.cwd(), "Configuration.json" ) ),
-            !!($?.debug) );
+            !!( $?.debug ) );
 
-        (Instance.package === null) && console.warn( "[Warning] NPM-Configuration is being ran from a global context." );
-        (Instance.package === null) && console.warn( "[Warning] ... Output will not reflect accurate NPM runtime" );
-        (Instance.package === null) && console.warn( "[Warning] ... configuration(s) or environment." );
-        (Instance.package === null) && console.warn( "" );
+        ( Instance.package === null ) && console.warn( "[Warning] NPM-Configuration is being ran from a global context." );
+        ( Instance.package === null ) && console.warn( "[Warning] ... Output will not reflect accurate NPM runtime" );
+        ( Instance.package === null ) && console.warn( "[Warning] ... configuration(s) or environment." );
+        ( Instance.package === null ) && console.warn( "" );
 
         return true;
     } ).strict();

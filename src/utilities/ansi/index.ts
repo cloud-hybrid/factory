@@ -10,6 +10,6 @@ export * from "./type.js";
 
 export * from "./color/index.js";
 
-const Colors = await import("./module.js").then(($) => new $.Module());
+const Colors = await import("./module.js").then( ($) => new $.Module() );
 
-export default (color: Type, content: string) => Colors.string(color, content);
+export default (color: Type, content: string) => Colors.string( color, content );

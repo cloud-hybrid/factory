@@ -44,7 +44,7 @@ const Schema = {
 };
 
 /*** Debug Console Utility String Generator */
-const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
+const Input = (input: ( string | number )[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
     ", " ).toUpperCase() + ")";
 
 /***
@@ -112,10 +112,10 @@ const Command = async ($: Argv) => {
     Configuration( Arguments );
 
     Arguments.check( async ($) => {
-        ($?.debug) && console.debug( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
+        ( $?.debug ) && console.debug( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
 
-        ($?.debug) && console.debug( "[Debug] User CWD" + ":", Process.cwd(), "\n" );
-        ($?.debug) && console.debug( "[Debug] Relative Runtime Path(s)" + ":", JSON.stringify( {
+        ( $?.debug ) && console.debug( "[Debug] User CWD" + ":", Process.cwd(), "\n" );
+        ( $?.debug ) && console.debug( "[Debug] Relative Runtime Path(s)" + ":", JSON.stringify( {
             Paths: {
                 Runtime: File, Directory: CWD
             }
@@ -139,9 +139,9 @@ const Command = async ($: Argv) => {
         };
 
         /*** Trigger Configuration Prompt(s) if settings.json isn't found relative to User's current-working-directory */
-        const Trigger = (!Files.Paths.includes( Target ));
+        const Trigger = ( !Files.Paths.includes( Target ) );
 
-        ($?.debug) && console.debug( "[Debug] Configuration Prompt(s) Trigger" + ":", Trigger, "\n" );
+        ( $?.debug ) && console.debug( "[Debug] Configuration Prompt(s) Trigger" + ":", Trigger, "\n" );
 
         if ( Trigger ) {
             Process.stdout.write( "A Configuration File (\"settings.json\") Couldn't be Found..." + "\n" );
