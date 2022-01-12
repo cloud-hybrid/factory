@@ -1,7 +1,7 @@
 {
     "name": "cloud-factory",
     "private": false,
-    "version": "0.4.59",
+    "version": "0.4.61",
     "type": "module",
     "main": "index.js",
     "description": "A CLI Utility to Manage Software-Defined State",
@@ -21,24 +21,33 @@
         "upgrade-next": "npm i cdktf@next cdktf-cli@next"
     },
     "peerDependencies": {
+        "@cdktf/provider-aws": "latest",
         "cdktf": "latest",
-        "cdktf-cli": "latest",
-        "@cdktf/provider-aws": "latest"
+        "cdktf-cli": "latest"
     },
     "dependencies": {
+        "@aws-cdk/cfnspec": "^2.7.0",
         "@aws-sdk/client-s3": "^3.45.0",
         "@aws-sdk/client-secrets-manager": "^3.45.0",
         "@aws-sdk/credential-providers": "^3.45.0",
+        "@cdktf/aws-cdk": "^0.2.21",
+        "@cdktf/provider-generator": "^0.8.6",
         "ajv": "^8.8.2",
         "ajv-formats": "^3.0.0-rc.0",
         "chalk": "^5.0.0",
-        "constructs": "^10.0.12",
+        "constructs": "^10.0.31",
         "uuid": "^8.3.2",
         "yargs": "^17.3.0"
     },
     "devDependencies": {
         "@aws-sdk/types": "latest",
         "@types/aws-lambda": "latest",
+        "@types/aws-regions": "latest",
+        "@types/bcryptjs": "latest",
+        "@types/events": "latest",
+        "@types/json-schema": "latest",
+        "@types/mime": "latest",
+        "@types/mime-types": "latest",
         "@types/node": "latest",
         "@types/uuid": "latest",
         "@types/yargs": "latest",
@@ -46,6 +55,7 @@
         "@typescript-eslint/experimental-utils": "latest",
         "@typescript-eslint/parser": "latest",
         "@typescript-eslint/scope-manager": "latest",
+        "@typescript-eslint/type-utils": "latest",
         "@typescript-eslint/typescript-estree": "latest",
         "typescript": "latest",
         "typescript-eslint-language-service": "latest"

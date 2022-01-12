@@ -13,6 +13,8 @@ In order to begin, open a `node.js` capable console and then run the following c
 
 ## Task Board ##
 
+- [ ] Examine https://github.com/hashicorp/docker-on-aws-ecs-with-terraform-cdk-using-typescript
+- [ ] Examine https://github.com/hashicorp/cdktf-repository-manager
 - [ ] Create a AWS Profile Switcher, displaying the currently set profile to use similar to that of `.venv`
 - [ ] **Extend** `@cloud-hybrid/delta`'s `api` Package to include:
   - [CDK ECS Fargate Service w/Local Image](https://github.com/aws-samples/aws-cdk-examples/tree/master/typescript/ecs/fargate-service-with-local-image)
