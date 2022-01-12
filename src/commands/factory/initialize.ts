@@ -153,12 +153,14 @@ const Command = async ($: Argv) => {
         /***
          * Configuration File Assertion
          * ----------------------------
-         * ***Note*** - the `factory.json` file is a hard requirement.
+         * ***Note*** - the `factory.json` file is a hard requirement
+         *
          */
 
         Assertion.strictEqual( FS.existsSync( Path.join( Process.cwd(), "factory.json" ) ),
             true,
-            "factory.json Configuration Not Found" );
+            "factory.json Configuration Not Found"
+        );
 
         const Factory: object = Import( Path.join( Process.cwd(), "factory.json" ) );
 
@@ -179,8 +181,7 @@ const Command = async ($: Argv) => {
         ( $?.debug ) && console.debug( "[Debug] Distribution + Package Data" + ":", Distributable.packages, "\n" );
         ( $?.debug ) && console.debug( "[Debug] Compiling Distribution(s) ..." + "\n" );
 
-        // @ts-ignore
-        await Distributable.distribute( $.debug );
+        await Distributable.distribute();
 
         ( $?.debug ) && console.debug( "[Debug] Writing factory.json Distribution ...", "\n" );
         FS.writeFileSync( Path.join( Process.cwd(), "distribution", "factory.json" ), JSON.stringify( Factory ) );

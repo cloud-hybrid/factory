@@ -145,14 +145,11 @@ class Distributable implements Type {
      *  and repackage the folder into a lambda-runtime. If the package is a lambda function, install dependencies, and move
      *  folder into distribution target folder.
      *
-     * @param data { Package[] }
-     * @param debug {boolean} Debug Output
-     *
      * @constructor
      *
      */
 
-    static async distribute(debug: boolean = false) {
+    static async distribute() {
         const Import = Module.createRequire( import.meta.url.replace( "file" + ":" + "//", "" ) );
 
         for ( const $ of Distributable.packages ) {
@@ -180,7 +177,7 @@ class Distributable implements Type {
                 const Dependencies = Import( $.definition )?.dependencies;
                 const Count: number = ( Dependencies ) ? Object.keys( Dependencies ).length : 0;
                 if ( Count > 0 ) { /// Install Lambda Layer Dependencies, if Applicable
-                    ( debug ) && console.debug( "[Debug] Layer Dependencies" + ":", Import( $.definition ), "\n" );
+                    /// ( debug ) && console.debug( "[Debug] Layer Dependencies" + ":", Import( $.definition ), "\n" );
 
                     /// Install Layer Dependencies, Relative to Original Source
                     await Subprocess( "npm install --production", $.directory );
@@ -206,7 +203,7 @@ class Distributable implements Type {
                 const Dependencies = Import( $.definition )?.dependencies;
                 const Count: number = ( Dependencies ) ? Object.keys( Dependencies ).length : 0;
                 if ( Count > 0 ) { /// Install Lambda Function Dependencies, if Applicable
-                    ( debug ) && console.debug( "[Debug] Dependencies" + ":", Import( $.definition ) );
+                    /// ( debug ) && console.debug( "[Debug] Dependencies" + ":", Import( $.definition ) );
 
                     await Subprocess( "npm install --production", $.distribution );
                 }
@@ -224,7 +221,7 @@ class Distributable implements Type {
             Process.chdir( OWD );
         }
 
-        await Distributable.strip( debug );
+        await Distributable.strip();
     }
 
     /***
@@ -304,8 +301,8 @@ class Distributable implements Type {
      *
      */
 
-    static async strip(debug: boolean = false) {
-        ( debug ) && console.debug( "[Debug] Cleaning Layers ...", "\n" );
+    static async strip() {
+        /// ( debug ) && console.debug( "[Debug] Cleaning Layers ...", "\n" );
 
         for ( const item of Distributable.packages.filter( ($) => $.layer ) ) {
             /// Remove (nodejs) Directories from Source
@@ -317,11 +314,11 @@ class Distributable implements Type {
             /// Filter Results
             const Targets: Descriptor[] = Structure.filter( ($) => ( $.name !== "nodejs" ) ).map( ($) => new Descriptor( $ ) );
 
-            ( debug ) && console.debug( "[Debug] Distribution Clean-Up Layer Target(s)" + ":", Targets, "\n" );
+            /// ( debug ) && console.debug( "[Debug] Distribution Clean-Up Layer Target(s)" + ":", Targets, "\n" );
 
             for ( const target of Targets ) {
                 await Distributable.remove( Path.join( item.distribution, target.name ), 5, false, true );
-                ( debug ) && console.debug( "[Debug] Successfully Removed" + ":", target.name, "\n" );
+                /// ( debug ) && console.debug( "[Debug] Successfully Removed" + ":", target.name, "\n" );
             }
         }
     }

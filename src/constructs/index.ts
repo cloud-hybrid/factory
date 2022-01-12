@@ -14,10 +14,61 @@ import { App, AssetType, TerraformAsset, TerraformOutput, TerraformStack } from 
 
 import { Construct } from "constructs";
 import FS from "fs";
+import Module from "module";
 import Path from "path";
-import { Configuration, Distribution, Import, Settings } from "./settings.js";
+import Process from "process";
+import * as UUID from "uuid";
+
+/*** ESM Compatability & JSON Importer */
+const Import: NodeRequire = Module.createRequire( import.meta.url );
+
+/// import { Configuration, Distribution, Import, Settings } from "./settings.js";
+
+interface Distributable {
+    name?: string;
+    organization?: string;
+    environment?: string;
+}
+
+const Factory: Distributable = await import(Path.join(Process.cwd(), "./factory.json")).catch(() => {
+    return {
+        name: "Factory",
+        organization: "Cloud-Technology",
+        environment: "Development"
+    };
+});
+
+/***
+ * Deployment Configuration & Settings
+ * -----------------------------------
+ *
+ * @externs {{@link Settings}}
+ *
+ */
+
+class Configuration {
+    static readonly stack: string = Factory?.name ?? UUID.v4();
+
+    static readonly environment: string = Factory?.environment ?? "Development";
+
+    static readonly organization: string = Factory?.organization ?? "Factory";
+
+    /*** @todo Abstract */
+    static readonly region: string = "us-east-2";
+
+    readonly settings?: Distributable | null;
+
+    static service: string = "Service";
+
+
+    constructor(settings?: Distributable) {
+        this.settings = (settings) ? settings : null;
+    }
+}
 
 type Policy = IAM.IamPolicy;
+
+// @ts-ignore
 
 /***
  * Cloud Resource Name Normalization
@@ -41,6 +92,14 @@ function normalize(prefix: string, name: string) {
     } ).join( "-" ) ].join( "-" );
 }
 
+enum Clouds {
+    AWS = "AWS",
+    Azure = "Azure",
+    GCP = "GCP"
+}
+
+type Providers = keyof typeof Clouds;
+
 /*** The {@link Lambda} Construct */
 class Lambda {
     public static Attachment = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole";
@@ -59,8 +118,6 @@ class Lambda {
 
     public readonly source: string;
 
-    public readonly settings: typeof Settings = Settings;
-
     public readonly policy: Policy | JSON | string = JSON.stringify( {
         Version: "2012-10-17", Statement: [ {
             Action: "sts:AssumeRole", Principal: {
@@ -69,26 +126,26 @@ class Lambda {
         } ]
     }, null, 4 );
 
-    public cloud: typeof Configuration.settings["Cloud"] = Configuration.settings[ "Cloud" ];
+    public cloud: Providers = "AWS";
 
     /// public static Execution = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole";
     /// public static RO = "arn:aws:iam::aws:policy/service-role/AWSLambda_ReadOnlyAccess";
     /// public static XWO = "arn:aws:iam::aws:policy/service-role/AWSXrayWriteOnlyAccess";
+
     /*** Common-Name or Service Extension to be used when constructing the Lambda Function Name */
-    public service: string = Configuration.settings[ "Service" ];
 
-    public organization: string = Configuration.settings[ "Organization" ];
+    public stack: string = Configuration.stack;
+    public service: string = Configuration.service;
+    public environment: string = Configuration.environment;
+    public organization: string = Configuration.organization;
 
-    public environment: string = Configuration.settings[ "Environment" ];
-
-    private readonly distribution: string = "distribution";
+    readonly distribution: string = Process.cwd();
 
     /***
      * Lambda Strict Configuration Constructor
      *
      * @param name {String} Lambda's Folder Name (**Note**: attribute *must match folder directory name*)
      *
-     * @param sam
      */
 
     constructor(name: string) {
@@ -97,7 +154,7 @@ class Lambda {
         Assertion.notStrictEqual( this.name, undefined );
         Assertion.notStrictEqual( this.service, undefined );
 
-        const Artifact = Path.join( Distribution, this.name );
+        const Artifact = Path.join( this.distribution, this.name );
         const Package = Path.join( Artifact, "package.json" );
         const Version = Import( Package )?.version || null;
 
@@ -139,31 +196,47 @@ class SAM {
     /*** Configuration, Read-Only Bucket Property - Requires Instantation for Access */
     public readonly directory?: string | undefined = undefined;
 
-    /*** Configuration Setting Specifiying List of Folder(s) that Contain Lambda(s) */
+    /*** Configuration Setting Specifying List of Folder(s) that Contain Lambda(s) */
     public readonly functions: string[] = [];
 
+    public readonly layers: string[] = [];
+
     /*** AWS Cloud Provider, Derived from Configuration (Settings) File */
-    public readonly cloud: typeof Settings.Cloud = Settings.Cloud;
+    public readonly cloud: Providers = "AWS"
+
+    /*** @todo Update Documentation  */
+    public readonly region: string = Configuration.region;
+
+    /*** @todo Update Documentation  */
+    public stack: string = Configuration.stack;
+
+    /*** @todo Update Documentation  */
+    public service: string = Configuration.service;
 
     /*** Cloud Environment Common-Name, Derived from Configuration (Settings) File */
-    public readonly environment: typeof Settings.Environment = Settings.Environment;
+    public readonly environment: string = Configuration.environment;
 
     /*** Cloud Organization Alias, Derived from Configuration (Settings) File */
-    public readonly organization: typeof Settings.Organization = Settings.Organization;
+    public readonly organization: string = Configuration.organization;
+
+    /*** @todo Update Documentation  */
+    readonly distribution: string = Process.cwd();
 
     /*** Construct Initializer */
-
     constructor() {
-        this.prefix = [ Settings.Organization, Settings.Environment ].join( "-" );
-        this.name = [ this.prefix, Settings.Service, "Stack" ].join( "-" );
+        this.prefix = [ this.organization, this.environment ].join( "-" );
+        this.name = [ this.prefix, this.service, "Stack" ].join( "-" );
         this.bucket = this.name.toLowerCase();
 
         /// Assertion to ensure a distribution target exists
-        /// --> To Generate a Distribution: factory cdfk initialize
-        Assertion.strictEqual( FS.existsSync( Distribution ), true, "A CDK Distribution Target Doesn't Exist" );
-        FS.readdirSync( Distribution ).forEach( ($) => {
-            ( $ !== "library" ) && this.functions.push( Path.join( Distribution, $ ) );
+        Assertion.strictEqual( FS.existsSync( this.distribution ), true, "A CDK Distribution Target Doesn't Exist" );
+        FS.readdirSync( this.distribution ).forEach( ($) => {
+            ( $ !== "library" ) && this.functions.push( Path.join( this.distribution, $ ) );
         } );
+
+        FS.readdirSync( Path.join(this.distribution, "library" )).forEach( ($) => {
+            this.layers.push(Path.join(this.distribution, "library", $));
+        });
     }
 
     /***
@@ -274,7 +347,7 @@ class Service extends TerraformStack {
 
         /*** Cloud Provider (AWS) */
         const provider = new AWS.AwsProvider( this, [ this.identifier, "AWS-Provider" ].join( "-" ).toLowerCase(), {
-            region: settings.cloud[ "Region" ]
+            region: settings.region
         } );
 
         /*** Unique S3 Bucket Containing Lambda Artifact(s) */
@@ -330,7 +403,7 @@ class Service extends TerraformStack {
             } );
 
         // const Lambdas: string[] = [];
-        FS.readdirSync( Path.join( Distribution ), { withFileTypes: true } ).forEach( ($) => {
+        FS.readdirSync( Path.join( settings.distribution ), { withFileTypes: true } ).forEach( ($) => {
             /// Exclude Lambda Layer Library
             if ( $.name !== "library" && $.isDirectory() && $.name !== ".gen" && $.name !== "src" && $.name !== "node_modules" && $.name !== "cdktf.out" ) {
                 const Function = new Lambda( $.name );
@@ -360,10 +433,10 @@ class Service extends TerraformStack {
 
                 /*** Lambda Layer (Dependencies) */
                 const Layers: string[] = [];
-                FS.readdirSync( Path.join( Distribution, "library" ), { withFileTypes: true } ).forEach( ($) => {
+                FS.readdirSync( Path.join( settings.distribution, "library" ), { withFileTypes: true } ).forEach( ($) => {
                     if ( $.isDirectory() ) {
                         const Name = normalize( this.identifier, $.name );
-                        const Directory = Path.join( Distribution, "library" );
+                        const Directory = Path.join( settings.distribution, "library" );
 
                         /*** Lambda-Layer Artifact(s) */
                         const asset = new TerraformAsset( this, [ Name, "Layer-Asset" ].join( "-" ).toLowerCase(), {
@@ -475,8 +548,9 @@ class Service extends TerraformStack {
 }
 
 const Deployment = () => {
+    console.debug("...")
     const Application = new App( {
-        skipValidation: false, outdir: "cdktf.out", stackTraces: true
+        skipValidation: false, stackTraces: true
     } );
 
     return new Promise( (resolve) => {
@@ -494,4 +568,16 @@ const Deployment = () => {
     } );
 };
 
-await Deployment();
+const Metadata = {
+    Package: Object.create(null)
+};
+
+try { Metadata.Package = (
+    await import("./../types/module.js")
+).Locality.initialize( import.meta.url ); }
+
+catch (e) { Metadata.Package = await Deployment(); }
+
+export { Metadata };
+
+export default Metadata.Package;

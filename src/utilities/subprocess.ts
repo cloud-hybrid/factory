@@ -2,18 +2,19 @@ import Spawn from "child_process";
 import Process from "process";
 
 const Subprocess = async (command: string, directory: string = Process.cwd()) => {
-    console.log( "[Log]", "Subprocess Command" + ":", command, directory );
+    console.log( "[Log]", "Subprocess Command" + ":", command, "\n" );
+    console.debug( "[Debug]", "Current Working Directory" + ":", directory, "\n" );
 
     const Binary = command.split( " " )[ 0 ];
     const Arguments = command.split( " " ).splice( 1 );
 
-    const Awaitable = new Promise<Spawn.ChildProcessWithoutNullStreams>( (resolve, reject) => {
+    const Awaitable = new Promise<Spawn.ChildProcessWithoutNullStreams>( (resolve) => {
         const Stream = {
             PID: -1, Status: "", Signal: ""
         };
 
         const Command = Spawn.spawn( Binary, [ ... Arguments ], {
-            cwd: directory, env: Process.env, stdio: "pipe"
+            cwd: directory, env: Process.env, stdio: "pipe", shell: false
         } );
 
         const Data = {
@@ -54,7 +55,7 @@ const Subprocess = async (command: string, directory: string = Process.cwd()) =>
 
             Process.stderr.write( Output );
 
-            reject( Output );
+            resolve( Output );
         } );
 
         Command.on( "error", ($) => {
@@ -102,7 +103,7 @@ const Subprocess = async (command: string, directory: string = Process.cwd()) =>
             Data.Status = Stream.Status;
             Data.Signal = Stream.Signal;
 
-            resolve( Command ); // ? resolve(Command);
+            resolve( Command );
         } );
     } );
 

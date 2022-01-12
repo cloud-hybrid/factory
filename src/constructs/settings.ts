@@ -12,6 +12,8 @@ import Module from "module";
 import Path from "path";
 import Process from "process";
 
+import * as UUID from "uuid";
+
 /*** ESM Resolver for *Current-Working-Directory* */
 const CWD: string = Path.dirname( import.meta.url.replace( "file" + ":" + "//", "" ) );
 
@@ -35,13 +37,21 @@ const Import: NodeRequire = Module.createRequire( import.meta.url );
  *
  */
 
-const Settings: typeof import("../schema/settings.schema.json") = Import( Path.join( Distribution,
-    "src",
-    "schema",
-    "settings.json" ) );
-const Overwrite: string = Path.join( Process.cwd(), "factory.json" );
+const Settings: typeof import("../schema/settings.schema.json") = Import(
+    Path.join(
+        Distribution,
+        "src", "schema", "settings.json"
+    )
+) ?? null;
 
-/// FS.existsSync(Overwrite) && console.debug("[Debug] Target Overwrite Object" + ":", JSON.parse(FS.readFileSync(Overwrite, { encoding: "utf-8" }).toString().trim()));
+interface Distributable {
+    name?: string;
+    organization?: string;
+    environment?: string;
+}
+
+const Factory: Distributable = Import(Path.join( Process.cwd(), "factory.json" ));
+
 
 /***
  * Deployment Configuration & Settings
@@ -52,23 +62,19 @@ const Overwrite: string = Path.join( Process.cwd(), "factory.json" );
  */
 
 class Configuration {
-    public static settings: typeof Settings = Settings;
+    readonly name: string = Factory?.name ?? UUID.v4();
 
-    public environment: string = Settings.Environment;
+    readonly environment: string = Factory?.environment ?? "Development";
 
-    public organization: string = Settings.Organization;
+    readonly organization: string = Factory?.organization ?? "Factory";
 
-    public cloud: typeof Settings.Cloud = Settings.Cloud;
-
-    constructor(settings: { organization: string, environment: string, cloud: typeof Settings.Cloud }) {
-        this.environment = settings.environment;
-        this.organization = settings.organization;
-        this.cloud = settings.cloud;
+    constructor(settings?: Distributable) {
+        this.name = settings?.name ?? this.name;
+        this.environment = settings?.environment ?? this.environment;
+        this.organization = settings?.organization ?? this.organization;
     }
 }
 
-const PWD = ( FS.existsSync( Overwrite ) ) ? Path.dirname( Overwrite ) : Target;
+export { CWD, PKG, Distribution, Settings, Configuration };
 
-export { CWD, PKG, Distribution, Settings, Configuration, Import, PWD };
-
-export default { CWD, PKG, Distribution, Settings, Configuration, Import, PWD };
+export default { CWD, PKG, Distribution, Settings, Configuration };

@@ -7,7 +7,6 @@ import Utility from "util";
 
 import { Argv } from "../../cli/arguments.js";
 
-import { PWD } from "../../constructs/settings.js";
 import { Subprocess } from "../../utilities/subprocess.js";
 
 const Remove = Utility.promisify( FS.rm );
@@ -164,7 +163,6 @@ const Command = async ($: Argv) => {
 
     Arguments.check( async ($) => {
         try {
-            console.log( "[Log] Target Directory" + ":", PWD );
             console.log( "[Log] Source Directory" + ":", Repository );
 
             ( $?.debug ) && console.log( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );

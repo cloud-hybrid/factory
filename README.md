@@ -165,14 +165,18 @@ Lambda **Layer**, too.
    ```
     - Feel free to omit the `--debug` flag. It's only included for verbosity and understanding
 6. Verify that a `distribution` folder was created.
-7. Deploy the lambda function + layer:
+7. Synthesize the state + source code:
+   ```
+   npx --yes cloud-factory@latest ci-cd synthesize --debug
+   ```
+8. Deploy the lambda function + layer:
     ```
     npx --yes cloud-factory@latest ci-cd deploy --debug
     ```
-8. Type `"y"` (without quotes) when prompted to confirm the deployment
-9. A hyperlink will be provided upon successful completion. With reference to the example, navigating
-   to `https://v41dkt0ik0.execute-api.us-east-2.amazonaws.com/development/test-function` will then provide a JSON
-   response body containing information about the package, and the lambda function's layer
+9. Type `"y"` (without quotes) when prompted to confirm the deployment
+10. A hyperlink will be provided upon successful completion. With reference to the example, navigating
+    to `https://v41dkt0ik0.execute-api.us-east-2.amazonaws.com/development/test-function` will then provide a JSON
+    response body containing information about the package, and the lambda function's layer
 
 **Synopsis**
 
@@ -190,11 +194,14 @@ cat << "EOF" > factory.json
     "environment": "Development"
 }
 EOF
-cloud-factory ci-cd initialize
-cloud-factory ci-cd deploy
 
-# npx --yes cloud-factory@latest ci-cd initialize
-# npx --yes cloud-factory@latest ci-cd deploy
+npx --yes cloud-factory@latest --version
+
+npx cloud-factory ci-cd initialize  --debug
+npx cloud-factory ci-cd synthesize  --debug
+npx cloud-factory ci-cd deploy      --debug
+
+[[ "${?}" == "0" ]] && echo "Successfully Deployed"
 ```
 
 ### Overwrites ###

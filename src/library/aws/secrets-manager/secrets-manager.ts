@@ -8,7 +8,6 @@ import { Commands } from "./commands.js";
 
 interface Credentials {
     accessKeyId: string;
-
     secretAccessKey: string;
 }
 

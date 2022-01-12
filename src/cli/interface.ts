@@ -25,6 +25,7 @@ const Main = async () => {
 
             factory: {
                 deploy: async (input: Argv) => await Factory.Deploy( input ),
+                synthesize: async (input: Argv) => await Factory.Synthesize( input ),
                 initialize: async (input: Argv) => await Factory.Initialize( input ),
                 "build-layer": async (input: Argv) => await Factory.Layer( input )
             },
@@ -115,16 +116,20 @@ const Main = async () => {
             /*** CDFK Configuration */
             .command( "ci-cd", Colors( "Yellow", "(Under Development) CI-CD Utilities" ), (
                 async ($: Argv) => {
-                    $.command( "initialize", "Package Initialization", (
+                    $.command( "build-layer", "Build a Lambda Layer", (
+                        async ($: Argv) => await Commands.factory[ "build-layer" ]( $ ) )
+                    );
+
+                    $.command( "initialize", "Create Distribution", (
                         async ($: Argv) => await Commands.factory.initialize( $ ) )
                     );
 
-                    $.command( "deploy", "Stack Deployment", (
-                        async ($: Argv) => await Commands.factory.deploy( $ ) )
+                    $.command( "synthesize", "Stack Synthesis", (
+                        async ($: Argv) => await Commands.factory.synthesize( $ ) )
                     );
 
-                    $.command( "build-layer", "Build a Lambda Layer", (
-                        async ($: Argv) => await Commands.factory[ "build-layer" ]( $ ) )
+                    $.command( "deploy", "Deploy Cloud Resource(s)", (
+                        async ($: Argv) => await Commands.factory.deploy( $ ) )
                     );
                 } )
             )

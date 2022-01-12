@@ -1,0 +1,129 @@
+{
+  "_from": "cloud-factory@latest",
+  "_id": "cloud-factory@0.3.58",
+  "_inBundle": false,
+  "_integrity": "sha512-M+/iCX8gb1hFFliP6IuNuSUyolIBpaNIWlOc0eY1L6RqnrJ0L0ddH4ffSNW76EjWru6aEnH6sOBFpSZfnVZF2Q==",
+  "_location": "/cloud-factory",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "cloud-factory@latest",
+    "name": "cloud-factory",
+    "escapedName": "cloud-factory",
+    "rawSpec": "latest",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/cloud-factory/-/cloud-factory-0.3.58.tgz",
+  "_shasum": "146d652ea8ad179b5b77d3b57bc6584bf520d959",
+  "_spec": "cloud-factory@latest",
+  "_where": "/Users/jsanders/Development/capstone-global/Buncee/Server-Update-Tool/src",
+  "author": {
+    "name": "Jacob B. Sanders"
+  },
+  "bin": {
+    "cloud-factory": "index.js"
+  },
+  "bugs": {
+    "url": "https://github.com/cloud-hybrid/factory/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.45.0",
+    "@aws-sdk/client-secrets-manager": "^3.45.0",
+    "@aws-sdk/credential-providers": "^3.45.0",
+    "@aws-sdk/node-config-provider": "^3.40.0",
+    "ajv": "^8.8.2",
+    "ajv-formats": "^3.0.0-rc.0",
+    "aws-cdk-lib": "latest",
+    "cdktf": "^0.8.4",
+    "cdktf-cli": "^0.8.4",
+    "chalk": "^5.0.0",
+    "constructs": "^10.0.12",
+    "uuid": "^8.3.2",
+    "ws": "^8.4.0",
+    "yargs": "^17.3.0"
+  },
+  "deprecated": false,
+  "description": "A CLI Utility to Manage Software-Defined State",
+  "devDependencies": {
+    "@aws-sdk/types": "^3.40.0",
+    "@cdktf/provider-aws": "^3.0.1",
+    "@types/aws-lambda": "^8.10.89",
+    "@types/node": "^17.0.8",
+    "@types/uuid": "^8.3.4",
+    "@types/ws": "^8.2.2",
+    "@types/yargs": "^17.0.8",
+    "@typescript-eslint/eslint-plugin": "^5.7.0",
+    "@typescript-eslint/experimental-utils": "^5.7.0",
+    "@typescript-eslint/parser": "^5.8.0",
+    "@typescript-eslint/scope-manager": "^5.7.0",
+    "@typescript-eslint/typescript-estree": "^5.7.0",
+    "aws-cdk": "*",
+    "typescript": "latest",
+    "typescript-eslint-language-service": "^5.0.0",
+    "wscat": "^5.1.0"
+  },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended"
+    ],
+    "rules": {
+      "no-case-declarations": 0,
+      "@typescript-eslint/no-explicit-any": 0,
+      "@typescript-eslint/explicit-function-return-type": 0,
+      "@typescript-eslint/no-use-before-define": 0,
+      "@typescript-eslint/no-empty-interface": 0,
+      "@typescript-eslint/explicit-module-boundary-types": 0,
+      "@typescript-eslint/no-empty-function": 0,
+      "@typescript-eslint/no-unused-vars": 0,
+      "@typescript-eslint/no-inferrable-types": 0,
+      "@typescript-eslint/ban-types": 0,
+      "@typescript-eslint/ban-ts-comment": 0,
+      "no-sequences": "error"
+    },
+    "ignorePatterns": [
+      "ci",
+      "dist",
+      "coverage",
+      "distribution",
+      "node_modules"
+    ]
+  },
+  "exports": {
+    ".": "./index.js"
+  },
+  "homepage": "https://github.com/cloud-hybrid/factory#readme",
+  "license": "BSD 1-Clause License",
+  "main": "index.js",
+  "name": "cloud-factory",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cloud-hybrid/factory.git"
+  },
+  "scripts": {
+    "build": "tsc --pretty",
+    "constructs": "cdktf get --language typescript --output .constructs",
+    "prepublishOnly": "npm install",
+    "reinstall": "npm update && npm install --global --force",
+    "start": "node --experimental-specifier-resolution node index.js",
+    "upgrade": "npm i cdktf@latest cdktf-cli@latest",
+    "upgrade-next": "npm i cdktf@next cdktf-cli@next",
+    "upload": "npm publish --access public",
+    "watch": "tsc --watch"
+  },
+  "type": "module",
+  "types": "distribution",
+  "version": "0.3.58"
+}

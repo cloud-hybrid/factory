@@ -1,43 +1,13 @@
 import FS from "fs";
-import Module from "module";
 import Path from "path";
 import Process from "process";
 
-import Utility from "util";
-
 import { Argv } from "../../cli/arguments.js";
 
-import { PWD } from "../../constructs/settings.js";
 import { Subprocess } from "../../utilities/subprocess.js";
 
-const Remove = Utility.promisify( FS.rm );
-
-/*** *Current Module Path* */
-const File: string = import.meta.url.replace( "file" + ":" + "//", "" );
-
-/*** *Current Working Directory* */
-const CWD: string = Path.dirname( File );
-
-/*** *Package Directory* */
-const PKG: string = Path.dirname( CWD );
-
-/*** Repository */
-const Repository: string = Path.resolve( CWD, "..", "..", "..", ".." );
-
-/***
- *  JSON Capable Importer
- *
- *  @type {NodeRequire}
- *
- */
-
-const Import = Module.createRequire( PKG );
-
-/*** Exclusions to Avoid Recursive Parsing; i.e. libraries, lambda-layers, or otherwise bundled requirements */
-const Exclusions = [ ".git", ".idea", ".vscode", "cdktf.out", "templates", "documentation", "scripts" ];
-
 /*** Debug Console Utility String Generator */
-const Input = (input: ( string | number )[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
+const Input = (input: (string | number)[]) => "[Debug] CLI Input" + " " + "(" + input.toString().replace( ",",
     ", " ).toUpperCase() + ")";
 
 /***
@@ -59,87 +29,6 @@ function Configuration(Arguments: Argv) {
 
     Arguments.option( "debug", { type: "boolean" } ).alias( "debug", "d" ).default( "debug", false );
     Arguments.describe( "debug", "Enable Debug Logging" );
-
-    Arguments.example( "Global", Syntax( "npx cli factory main" ) );
-    Arguments.example( "Node", Syntax( "node cli factory main" ) );
-    Arguments.example( "NPM", Syntax( "npm run cli -- factory main" ) );
-
-    Arguments.usage( [ "Usage" + ":", "  >>> npm run cli -- factory main", "  >>> npm run cli -- factory main --help", "  >>> npm run cli -- factory main --debug" ].join(
-        "\n" ) );
-}
-
-/***
- * Recursive Copy Function
- * -----------------------
- * *Note* - this will perform *actual, real copies*; symbolic links are resolved to their raw pointer location(s).
- *
- * These are important considerations especially when building for reproducible distributions.
- *
- * @param source {string} Original Source Path
- * @param target {string} Target Copy Destination
- *
- * @param debug {boolean}
- * @constructor
- *
- */
-
-function Copy(source: string, target: string, debug: boolean = false) {
-    FS.mkdirSync( target, { recursive: true } );
-    FS.readdirSync( source,
-        { withFileTypes: true } ).filter( ($) => ( !Exclusions.includes( $.name ) ) ).forEach( ($) => {
-        const Directory = FS.lstatSync( Path.join( source, $.name ), { throwIfNoEntry: true } ).isDirectory();
-        const File = FS.lstatSync( Path.join( source, $.name ), { throwIfNoEntry: true } ).isFile();
-
-        if ( File ) {
-            try {
-                FS.copyFileSync( Path.join( source, $.name ),
-                    Path.join( target, $.name ),
-                    FS.constants.COPYFILE_FICLONE );
-
-                ( debug ) && console.debug( "[Debug]" + ":", {
-                    Source: Path.join( source, $.name ), Target: Path.join( target, $.name )
-                }, "\n" );
-            } catch ( error ) {
-                // ...
-            }
-        } else {
-            if ( Directory ) {
-                Copy( Path.join( source, $.name ), Path.join( target, $.name ) );
-            }
-        }
-    } );
-}
-
-/***
- * Recursive Copy Function (Dry-Run)
- * ---------------------------------
- * @param source {string} Original Source Path
- * @param target {string} Target Copy Destination
- *
- * @constructor
- *
- */
-
-function Dry(source: string, target: string) {
-    FS.mkdirSync( target, { recursive: true } );
-    FS.readdirSync( source,
-        { withFileTypes: true } ).filter( ($) => ( !Exclusions.includes( $.name ) ) ).forEach( ($) => {
-        const Directory = FS.lstatSync( Path.join( source, $.name ), { throwIfNoEntry: true } ).isDirectory();
-        const File = FS.lstatSync( Path.join( source, $.name ), { throwIfNoEntry: true } ).isFile();
-
-        if ( File ) {
-            try {
-                console.log( " - " + "Source" + ":" + " " + Path.join( source, $.name ) );
-                console.log( " - " + "Target" + ":" + " " + Path.join( target, $.name ) );
-            } catch ( error ) {
-                // ...
-            }
-        } else {
-            if ( Directory ) {
-                Dry( Path.join( source, $.name ), Path.join( target, $.name ) );
-            }
-        }
-    } );
 }
 
 /***
@@ -164,50 +53,23 @@ const Command = async ($: Argv) => {
 
     Arguments.check( async ($) => {
         try {
-            console.log( "[Log] Target Directory" + ":", PWD );
-            console.log( "[Log] Source Directory" + ":", Repository );
+            ($?.debug) && console.log( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
+            ($?.debug) && console.debug( "Current Directory" + ":", Process.cwd(), "\n" );
 
-            ( $?.debug ) && console.log( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
-            ( $?.debug ) && console.debug( "Current Directory" + ":", Process.cwd(), "\n" );
+            Process.chdir( Path.join( Process.cwd(), "distribution" ) );
 
-            // const Continue = async () => await Prompt("Continue? (Y/N)" + ":" + " ");
-            //
-            // let trigger: string = await Continue().then(( $ ) => $.toUpperCase());
-            //
-            // while (trigger !== "Y" && trigger !== "N") trigger = await Continue().then(( $ ) => $.toUpperCase());
+            const Binaries = FS.readdirSync( Path.join( Process.cwd(), "node_modules", ".bin" ), { withFileTypes: true } )
+                .map( ($) => Path.join( Process.cwd(), "node_modules", ".bin", $.name ) );
 
-            //( trigger === "Y" ) &&
-            console.log( "\n" + "[Log] Writing File Structure ...", "\n" );
+            Binaries.forEach( ($) => Process.env["PATH"] += ":" + $ );
 
-            // ( trigger === "Y" ) &&
-            await Remove( Path.join( Process.cwd(), "factory" ), { maxRetries: 5, force: true, recursive: true } );
+            console.debug( "[Debug] Local Callable Path(s)" + ":", JSON.stringify( Binaries, null, 4 ), "\n" );
 
-            // ( trigger === "Y" ) && ( $?.debug ) &&
-            Dry( Repository, Path.join( Process.cwd(), "factory" ) );
+            const CDK = Binaries.indexOf( Path.join( Process.cwd(), "node_modules", ".bin", "cdktf" ) );
 
-            Process.stdout.write( "\n" );
+            console.log( "[Log] Deploying Stack ...", "\n" );
 
-            // ( trigger === "Y" ) && Copy(Repository, Path.join(Process.cwd(), "factory"), $?.debug);
-
-            // @ts-ignore
-            Copy( Repository, Path.join( Process.cwd(), "factory" ), $?.debug );
-
-            /// Install Dependencies
-            // ( trigger === "Y" ) && await Subprocess("npm install --global", Path.join(Process.cwd(), "factory"));
-            // ( trigger === "Y" ) && await Subprocess("npm install typescript --global", Path.join(Process.cwd(), "factory"));
-            // ( trigger === "Y" ) && await Subprocess("npm install cdktf@latest --global", Path.join(Process.cwd(), "factory"));
-            // ( trigger === "Y" ) && Copy(Path.join(Process.cwd(), "distribution"), Path.join(Process.cwd(), "factory", "distribution"));
-            // ( trigger === "Y" ) && await Subprocess("cdktf get", Path.join(Process.cwd(), "factory", "distribution"));
-            // ( trigger === "Y" ) && await Subprocess("cdktf synth", Path.join(Process.cwd(), "factory", "distribution"));
-            // ( trigger === "Y" ) && await Subprocess("cdktf deploy --auto-approve", Path.join(Process.cwd(), "factory", "distribution"));
-
-            await Subprocess( "npm install --global", Path.join( Process.cwd(), "factory" ) );
-            await Subprocess( "npm install typescript --global", Path.join( Process.cwd(), "factory" ) );
-            await Subprocess( "npm install cdktf@latest --global", Path.join( Process.cwd(), "factory" ) );
-            Copy( Path.join( Process.cwd(), "distribution" ), Path.join( Process.cwd(), "factory", "distribution" ) );
-            await Subprocess( "cdktf get", Path.join( Process.cwd(), "factory", "distribution" ) );
-            await Subprocess( "cdktf synth", Path.join( Process.cwd(), "factory", "distribution" ) );
-            await Subprocess( "cdktf deploy --auto-approve", Path.join( Process.cwd(), "factory", "distribution" ) );
+            await Subprocess( Binaries[CDK] + " " + "deploy --auto-approve", Process.cwd() );
 
             return true;
         } catch ( error ) {
