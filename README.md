@@ -175,10 +175,9 @@ Lambda **Layer**, too.
     ```
     npx --yes cloud-factory@latest ci-cd deploy --debug
     ```
-9. Type `"y"` (without quotes) when prompted to confirm the deployment
-10. A hyperlink will be provided upon successful completion. With reference to the example, navigating
+9. A hyperlink will be provided upon successful completion. With reference to the example, navigating
     to `https://v41dkt0ik0.execute-api.us-east-2.amazonaws.com/development/test-function` will then provide a JSON
-    response body containing information about the package, and the lambda function's layer
+    response body containing information about the package, and the lambda function's layer.
 
 **Synopsis**
 
