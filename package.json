@@ -1,7 +1,7 @@
 {
     "name": "cloud-factory",
     "private": false,
-    "version": "0.4.61",
+    "version": "0.4.64",
     "type": "module",
     "main": "index.js",
     "description": "A CLI Utility to Manage Software-Defined State",
@@ -20,20 +20,20 @@
         "upgrade": "npm i cdktf@latest cdktf-cli@latest",
         "upgrade-next": "npm i cdktf@next cdktf-cli@next"
     },
-    "peerDependencies": {
-        "@cdktf/provider-aws": "latest",
-        "cdktf": "latest",
-        "cdktf-cli": "latest"
-    },
     "dependencies": {
         "@aws-cdk/cfnspec": "^2.7.0",
+        "@aws-cdk/region-info": "^2.7.0",
         "@aws-sdk/client-s3": "^3.45.0",
-        "@aws-sdk/client-secrets-manager": "^3.45.0",
-        "@aws-sdk/credential-providers": "^3.45.0",
+        "@aws-sdk/client-secrets-manager": "^3.46.0",
+        "@aws-sdk/credential-providers": "^3.46.0",
         "@cdktf/aws-cdk": "^0.2.21",
+        "@cdktf/provider-aws": "^4.0.4",
         "@cdktf/provider-generator": "^0.8.6",
         "ajv": "^8.8.2",
-        "ajv-formats": "^3.0.0-rc.0",
+        "ajv-formats": "^2.1.1",
+        "aws-cdk-lib": "^2.7.0",
+        "cdktf": "^0.8.6",
+        "cdktf-cli": "^0.8.6",
         "chalk": "^5.0.0",
         "constructs": "^10.0.31",
         "uuid": "^8.3.2",
@@ -42,7 +42,6 @@
     "devDependencies": {
         "@aws-sdk/types": "latest",
         "@types/aws-lambda": "latest",
-        "@types/aws-regions": "latest",
         "@types/bcryptjs": "latest",
         "@types/events": "latest",
         "@types/json-schema": "latest",
