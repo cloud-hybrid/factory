@@ -97,6 +97,6 @@ class Endpoint {
     }
 }
 
-const endpoint = await Endpoint.response("https://google.com/", "GET");
+const endpoint = await Endpoint.response("https://gitlab.mycapstone.com/", "GET");
 
 console.log(endpoint);
