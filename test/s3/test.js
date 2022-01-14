@@ -99,8 +99,8 @@ class Endpoint {
     }
 }
 
-const endpoint = await Endpoint.response("https://google.com/", "GET");
+const request = await Endpoint.response("https://google.com/", "GET");
 
-console.log(endpoint);
+console.log(request);
 
 await Remove(buffer.path, { force: true });
