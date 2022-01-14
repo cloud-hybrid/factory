@@ -13,6 +13,7 @@ In order to begin, open a `node.js` capable console and then run the following c
 
 ## Task Board ##
 
+- [ ] Examine https://github.com/aws-samples/aws-lambda-sample-applications
 - [ ] Examine https://github.com/hashicorp/docker-on-aws-ecs-with-terraform-cdk-using-typescript
 - [ ] Examine https://github.com/hashicorp/cdktf-repository-manager
 - [ ] Create a AWS Profile Switcher, displaying the currently set profile to use similar to that of `.venv`
