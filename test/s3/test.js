@@ -1,12 +1,14 @@
 import fs from "fs";
 import HTTPs from "https";
 import URI from "url";
+import Utility from "util";
 
 const stream = ($) => fs.createWriteStream($);
+const buffer = stream("buffer");
+
+const Remove = Utility.promisify(fs.rm);
 
 const Query = (configuration) => {
-    const buffer = stream("buffer");
-
     const $ = new Promise((resolve, reject) => {
         const request = HTTPs.request(configuration, (response) => {
             if ( response.statusCode === 301 || response.statusCode === 302 ) {
@@ -21,7 +23,7 @@ const Query = (configuration) => {
         });
 
         buffer.on("close", () => {
-            buffer.close(resolve);
+            resolve(fs.readFileSync(buffer.path, { encoding: "utf-8"}).toString());
         })
 
         request.on("error", (error) => {
@@ -31,7 +33,7 @@ const Query = (configuration) => {
         request.end();
     });
 
-    return fs.readFileSync(buffer.path).toString();
+    return $;
 };
 
 class Endpoint {
@@ -97,6 +99,8 @@ class Endpoint {
     }
 }
 
-const endpoint = await Endpoint.response("https://gitlab.mycapstone.com/", "GET");
+const endpoint = await Endpoint.response("https://google.com/", "GET");
 
 console.log(endpoint);
+
+await Remove(buffer.path, { force: true });
