@@ -11,6 +11,7 @@ In order to begin, open a `node.js` capable console and then run the following c
 
 ---
 
+- [AWS Regional Services](https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/?p=ngi&loc=4)
 ## Task Board ##
 
 - [ ] Examine https://github.com/aws-samples/aws-lambda-sample-applications
