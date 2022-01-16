@@ -2,7 +2,8 @@ import Module from "module";
 import Path from "path";
 import Process from "process";
 
-import { Argv } from "../../cli/arguments.js";
+import { Argv } from "yargs";
+
 import { Main } from "../../utilities/build-layer.js";
 import { Prompt } from "../../utilities/prompt.js";
 

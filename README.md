@@ -14,6 +14,7 @@ In order to begin, open a `node.js` capable console and then run the following c
 - [AWS Regional Services](https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/?p=ngi&loc=4)
 ## Task Board ##
 
+- [ ] Examine https://github.com/Pocket/terraform-modules/tree/main/src/pocket
 - [ ] Examine https://github.com/aws-samples/aws-lambda-sample-applications
 - [ ] Examine https://github.com/hashicorp/docker-on-aws-ecs-with-terraform-cdk-using-typescript
 - [ ] Examine https://github.com/hashicorp/cdktf-repository-manager

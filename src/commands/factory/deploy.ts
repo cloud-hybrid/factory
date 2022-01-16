@@ -2,7 +2,7 @@ import FS from "fs";
 import Path from "path";
 import Process from "process";
 
-import { Argv } from "../../cli/arguments.js";
+import { Argv } from "yargs";
 
 import { Subprocess } from "../../utilities/subprocess.js";
 

@@ -68,20 +68,12 @@
         ]
     },
     "exclude": [
-        ".git",
-        ".tf",
-        "./distribution",
-        "./templates",
-        "./templates/*",
-        "./templates/**",
         "**/*.d.ts",
-        "*/**/unit-testing",
-        "./scripts/*.js",
-        "./artifacts",
-        "./test"
+        "testing",
+        "templates",
+        "unit-testing"
     ],
     "include": [
-        "package.json",
         "cdktf.json",
         ".constructs",
         "**/*.ts",
