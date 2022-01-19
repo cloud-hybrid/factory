@@ -21,6 +21,23 @@ import Utility from "util";
  *
  * @constructor
  *
+ * @example
+ *
+ * const Command = async ($: Argv) => {
+ *     Configuration( $ );
+ *     $.check( async ($) => {
+ *         ( $?.debug ) && ( TTY ) && console.log( Input( $._ ), JSON.stringify( $, null, 4 ), "\n" );
+ *
+ *         const Continue = async () => await Prompt( "Continue? (Y/N)" + ":" + " " );
+ *
+ *         let trigger: string = await Continue().then( ($) => $.toUpperCase() );
+ *
+ *         while ( trigger !== "Y" && trigger !== "N" ) trigger = await Continue().then( ($) => $.toUpperCase() );
+ *
+ *         return true;
+ *     } ).strict();
+ * };
+ *
  */
 
 const Prompt = (query: string) => {

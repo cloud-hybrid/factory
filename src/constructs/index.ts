@@ -573,7 +573,7 @@ const Metadata = {
 };
 
 try { Metadata.Package = (
-    await import("./../types/module.js")
+    await import("./../library/types/module.js")
 ).Locality.initialize( import.meta.url ); }
 
 catch (e) { Metadata.Package = await Deployment(); }

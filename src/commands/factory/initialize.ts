@@ -7,7 +7,7 @@ import Utility from "util";
 
 import { Argv } from "yargs";
 
-import { Distributable } from "../../types/distributable.js";
+import { Distributable } from "../../library/types/distributable.js";
 
 const Remove = Utility.promisify( FS.rm );
 

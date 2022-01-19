@@ -66,6 +66,7 @@
         "@typescript-eslint/scope-manager": "latest",
         "@typescript-eslint/type-utils": "latest",
         "@typescript-eslint/typescript-estree": "latest",
+        "bcryptjs": "^2.4.3",
         "eslint": "latest",
         "jest": "^27.4.7",
         "ts-jest": "latest",

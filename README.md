@@ -14,6 +14,14 @@ In order to begin, open a `node.js` capable console and then run the following c
 - [AWS Regional Services](https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/?p=ngi&loc=4)
 ## Task Board ##
 
+- [ ] Examine https://github.com/Chan9390/aws-mfa-enforce
+- [ ] Examine Pattern https://github.com/serverless/examples/tree/master/aws-node-env-variables
+- [ ] Examine https://github.com/serverless/examples/tree/master/aws-node-github-webhook-listener
+- [ ] [Implement Custom Authorizer](https://github.com/serverlessbuch/jwtAuthorizr) 
+- [ ] Test Database via Pattern:
+  - [ ] https://github.com/serverless/examples/tree/master/aws-node-mongodb-atlas
+  - [ ] https://github.com/serverless/examples/tree/v2/aws-node-http-api-mongodb
+- [ ] Examine https://github.com/SCPR/pfs-email-serverless/blob/master/handler.js
 - [ ] Examine https://github.com/Pocket/terraform-modules/tree/main/src/pocket
 - [ ] Examine https://github.com/aws-samples/aws-lambda-sample-applications
 - [ ] Examine https://github.com/hashicorp/docker-on-aws-ecs-with-terraform-cdk-using-typescript
@@ -24,8 +32,7 @@ In order to begin, open a `node.js` capable console and then run the following c
   - [CDK ECS Fargate Service w/Local Image](https://github.com/aws-samples/aws-cdk-examples/tree/master/typescript/ecs/fargate-service-with-local-image)
 - [ ] **Test Web-Socket(s)** via `ws` & Development-Dependency `wscat`
 - [ ] **Integrate Remote State**
-    - Example:
-     ```javascript
+     ```node
      // S3 Backend - https://www.terraform.io/docs/backends/types/s3.html
      new S3Backend(this, {
         bucket: "mybucket",
@@ -45,7 +52,6 @@ In order to begin, open a `node.js` capable console and then run the following c
         key: otherState.get("bucket_key"),
      });
      ```
-
 ---
 
 ## Usage ##

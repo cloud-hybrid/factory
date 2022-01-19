@@ -71,20 +71,15 @@
         "**/*.d.ts",
         "testing",
         "templates",
-        "unit-testing"
+        "unit-testing",
+        "development",
+        "distribution",
+        "declarations"
     ],
     "include": [
         "cdktf.json",
         ".constructs",
         "**/*.ts",
-        "./src/schema",
-        "./src/schema/lambda",
-        "./src/schema/configuration",
-        "./src/schema/*.json",
-        "./src/schema/lambda/*.json",
-        "./src/schema/configuration/*.json",
-        "./unit-testing/**/*.json",
-        "./scripts",
-        "./templates"
+        "**/*.json"
     ]
 }
