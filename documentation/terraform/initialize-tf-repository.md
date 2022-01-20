@@ -25,19 +25,9 @@ In the GitLab project, go to **Settings > CI / CD**. Set the following as
 - Access Key ID
 - Secret Access Key
 
-| Env. variable name      | Value                  |
-|:------------------------|:-----------------------|
-| `AWS_ACCESS_KEY_ID`     | CI-CD Account User's Access Key ID |
+| Env. variable name      | Value                                    |
+|:------------------------|:-----------------------------------------|
+| `AWS_ACCESS_KEY_ID`     | CI-CD Account User's Access Key ID       |
 | `AWS_SECRET_ACCESS_KEY` | CI-CD Account User's Secret Access Token |
 
-
----
-
-## Important Notes ##
-
-*Accessing TF State on Local Machine During Repository Initialization*
-
-- **Note**: special handling of state is only required when establishing state the *first time*
-
-**Do not perform a `terraform init`** *for a new project*. While not breaking, the local machine relative to the user is going to have a 
-***drift*** between what is on local and what is on the remote. There's an easy way around drift; see [Infrastructure as code with Terraform and GitLab](https://docs.gitlab.com/ee/user/infrastructure/)
+... ***WIP***

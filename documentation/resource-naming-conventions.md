@@ -24,10 +24,12 @@
 |   **Resource**   |          Descriptive Identifier           | `Log-Results`. `Artifacts`  |
 |  **Identifier**  |        Additional, Optional String        |   `VPC-ID`, `Private-Key`   |
 
-Example: `IBM-Production-Financial-Audit-Service-S3-Artifacts`
-Example: `IBM-Staging-Bastion-Host-EC2-SSH-Private-Key`
+### Examples ###
 
-Example: `IBM/Production/Financial-Audit-Service/S3/Artifacts`
-Example: `IBM/Staging/Bastion-Host/EC2/SSH/Private-Key`
+- `IBM-Production-Financial-Audit-Service-S3-Artifacts`
+    - `IBM/Production/Financial-Audit-Service/S3/Artifacts`
+
+- `IBM-Staging-Bastion-Host-EC2-SSH-Private-Key`
+    - `IBM/Staging/Bastion-Host/EC2/SSH/Private-Key`
 
 

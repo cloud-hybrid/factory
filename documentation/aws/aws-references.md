@@ -66,20 +66,12 @@ const run = async () => {
     
     return secret;
 };
+
 run();
 ```
-
-## Reading List ##
-
-### Slack Lambda Monitoring ###
-
-- [ ] https://github.com/aws-samples/aws-lambda-failures-logging-slack.git
-
-### IAM Access Key Auto-Rotation ###
-
-- [ ] https://github.com/aws-samples/aws-iam-access-key-auto-rotation.git
 
 ## References ##
 
 - [IAM Kitchen Sink](https://github.com/aws/serverless-application-model/blob/develop/tests/translator/input/all_policy_templates.yaml)
 - [Lambda IAM Policies](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-policy-template-list.html)
+- [IAM Access-Keys Rotation](https://github.com/aws-samples/aws-iam-access-key-auto-rotation.git)
