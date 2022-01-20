@@ -10,6 +10,7 @@
     "license": "BSD 1-Clause License",
     "author": "Jacob B. Sanders",
     "scripts": {
+        "test-env": "node test.js",
         "start": "node index.js",
         "build": "tsc --pretty",
         "watch": "tsc --watch",
@@ -43,6 +44,7 @@
         "cdktf-cli": "^0.8.6",
         "chalk": "^5.0.0",
         "constructs": "^10.0.31",
+        "dotenv": "^14.2.0",
         "uuid": "^8.3.2",
         "yargs": "^17.3.0"
     },

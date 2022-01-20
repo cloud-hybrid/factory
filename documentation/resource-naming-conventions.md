@@ -15,11 +15,19 @@
 
 ## Personal Naming Pattern ##
 
-|      Key       |                                                Description                                                |                         Example(s)                          |
-|:--------------:|:---------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------:|
-| `Organization` |                                                    ...                                                    |                            *IBM*                            |
-| `Environment`  |                                    VPC-Isolated Aliases or Common-Name                                    |        *Development*, *Staging*, *UAT*, *Production*        |
-| `Application`  |                    The Associated Resources' Stack, Functional Purpose, or Common-Name                    |                       *Cloud-Factory*                       |
-|   `Service`    |                            Established Service(s) either Consumed or Provided                             |                     *S3*, *EC2*, *CFN*                      |
-|   `Resource`   |                        Provisioned, Referenced, or otherwise Aliased Resource Name                        |     ***EC2**-Log-Results*, *Release-Version-**Bucket***     |
-|  `Identifier`  | Further Derived Key(s), Additional Identifier or Common-Name (Useful for Global Parameters or References) | *SSH-Public-Key*, *Default-AWS-Deployment-Region*, *VPC-ID* |
+|       Key        |                Description                |         Example(s)          |
+|:----------------:|:-----------------------------------------:|:---------------------------:|
+| **Organization** |                    ...                    |            `IBM`            |
+| **Environment**  |       Network (L2) Seperated Alias        | `Development`, `Production` |
+| **Application**  | Stack, Functional Purpose, or Common-Name |  `Financial-Audit-Service`  |
+|   **Provider**   |  Service(s) either Consumed or Provided   |     `S3`, `EC2`, `CFN`      |
+|   **Resource**   |          Descriptive Identifier           | `Log-Results`. `Artifacts`  |
+|  **Identifier**  |        Additional, Optional String        |   `VPC-ID`, `Private-Key`   |
+
+Example: `IBM-Production-Financial-Audit-Service-S3-Artifacts`
+Example: `IBM-Staging-Bastion-Host-EC2-SSH-Private-Key`
+
+Example: `IBM/Production/Financial-Audit-Service/S3/Artifacts`
+Example: `IBM/Staging/Bastion-Host/EC2/SSH/Private-Key`
+
+

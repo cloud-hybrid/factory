@@ -38,6 +38,8 @@ const Factory: Distributable = await import(Path.join(Process.cwd(), "./factory.
     };
 });
 
+const Dot = await import("dotenv");
+
 /***
  * Deployment Configuration & Settings
  * -----------------------------------
@@ -468,6 +470,9 @@ class Service extends TerraformStack {
                     functionName: [ ID, "Lambda" ].join( "-" ),
                     handler: Function.handler,
                     runtime: Function.runtime,
+                    /// environment: {
+                    ///     variables: { Object. ... Dot.parse(Path.join(Process.cwd(), ".env"), ... {  } }
+                    /// },
                     s3Bucket: bucket.bucket,
                     s3Key: archive.key,
                     layers: Layers,
