@@ -1,3 +1,4 @@
 export * from "./index.js";
-export * from "./secrets-manager.js";
+export * from "./get-secret.js";
+export * from "./create-secret.js";
 

@@ -33,17 +33,6 @@ interface Credentials {
  */
 
 class Credential {
-    /***
-     * Returns information about the currently effective user. On POSIX platforms, this is typically a subset of the
-     * password file. The returned object includes the username, uid, gid, shell, and homedir. On Windows, the uid
-     * andgid fields are -1, and shell is null. The value of homedir returned by os.userInfo() is provided by the
-     * operating system. This differs from the result of os.homedir(), which queries environment variables for the home
-     * directory before falling back to the operating system response.
-     *
-     * Throws a SystemError if a user has no username or homedir.
-     *
-     */
-
     static readonly user = OS.userInfo();
 
     /*** `AWS_PROFILE` environment variable or a default of `default`. */
@@ -106,14 +95,13 @@ class Credential {
 
 class Client extends Credential {
     /*** AWS Secrets Manager API Client */
-    service?: SecretsManagerClient;
-
-    commands?: Commands;
+    public service: SecretsManagerClient = new SecretsManagerClient({});
+    public commands?: Commands;
 
     /*** Given AWS-V3 Change(s), `await Client.instantiate()` must be called after constructor Instantiation */
 
     constructor() {
-        super();
+        super("default");
     }
 
     /***
@@ -123,21 +111,23 @@ class Client extends Credential {
      *
      */
 
-    async instantiate(): Promise<SecretsManagerClient> {
-        const $ = await this.initialize();
+    public async instantiate(): Promise<Client> {
+        await this.initialize();
 
-        const service = new SecretsManagerClient( { credentials: $ } );
+        this.commands = Commands(this.service);
 
-        this.service = service;
-
-        this.commands = Commands( service );
-
-        return this.service;
+        return this;
     }
 }
 
-type Service = SecretsManagerClient;
+type Manager = SecretsManagerClient;
 
-export { Credential, Client };
+const Service = new Client();
 
-export default Service;
+await Service.instantiate();
+
+export { Service };
+
+export type { Manager };
+
+export default Client;

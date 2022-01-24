@@ -1,23 +1,39 @@
-import { CreateSecretCommand, CreateSecretCommandInput, CreateSecretCommandOutput, GetRandomPasswordCommand, GetRandomPasswordCommandInput, GetRandomPasswordCommandOutput, GetSecretValueCommand, GetSecretValueCommandInput, GetSecretValueCommandOutput, ListSecretsCommandInput, ListSecretsCommandOutput, ListSecretVersionIdsCommandInput, ListSecretVersionIdsCommandOutput, paginateListSecrets, paginateListSecretVersionIds, PutSecretValueCommand, PutSecretValueCommandInput, PutSecretValueCommandOutput, SecretsManagerPaginationConfiguration } from "@aws-sdk/client-secrets-manager";
+import {
+    CreateSecretCommand,
+    CreateSecretCommandInput,
+    CreateSecretCommandOutput,
+    GetRandomPasswordCommand,
+    GetRandomPasswordCommandInput,
+    GetRandomPasswordCommandOutput,
+    GetSecretValueCommand,
+    GetSecretValueCommandInput,
+    GetSecretValueCommandOutput,
+    ListSecretsCommandInput,
+    ListSecretsCommandOutput,
+    ListSecretVersionIdsCommandInput,
+    ListSecretVersionIdsCommandOutput,
+    paginateListSecrets,
+    paginateListSecretVersionIds,
+    PutSecretValueCommand,
+    PutSecretValueCommandInput,
+    PutSecretValueCommandOutput,
+    SecretsManagerPaginationConfiguration
+} from "@aws-sdk/client-secrets-manager";
 import { Paginator } from "@aws-sdk/types";
-import { default as Service } from "./secrets-manager.js";
+import { Manager } from "./secrets-manager.js";
 
-type Commands = {
+interface Commands {
     getSecretValue: (input: GetSecretValueCommandInput) => Promise<GetSecretValueCommandOutput>;
     putSecretValue: (input: PutSecretValueCommandInput) => Promise<PutSecretValueCommandOutput>;
 
     Pager: {
-        versions: (config: SecretsManagerPaginationConfiguration,
-            input: ListSecretVersionIdsCommandInput,
-            ... additionalArguments: any) => Paginator<ListSecretVersionIdsCommandOutput>;
-        secrets: (config: SecretsManagerPaginationConfiguration,
-            input: ListSecretsCommandInput,
-            ... additionalArguments: any) => Paginator<ListSecretsCommandOutput>;
+        versions: (config: SecretsManagerPaginationConfiguration, input: ListSecretVersionIdsCommandInput, ... additionalArguments: any) => Paginator<ListSecretVersionIdsCommandOutput>;
+        secrets: (config: SecretsManagerPaginationConfiguration, input: ListSecretsCommandInput, ... additionalArguments: any) => Paginator<ListSecretsCommandOutput>;
     };
 
     createSecret: (input: CreateSecretCommandInput) => Promise<CreateSecretCommandOutput>;
     getRandomPassword: (input: GetRandomPasswordCommandInput) => Promise<GetRandomPasswordCommandOutput>;
-};
+}
 
 interface Request {
     /**
@@ -49,6 +65,9 @@ interface Request {
 
 /***
  *
+ * Secrets Manager Commands
+ * ---
+ *
  * @param {Service} instance
  *
  * @returns {Commands}
@@ -57,7 +76,7 @@ interface Request {
  *
  */
 
-const Commands: (instance: Service) => Commands = (instance: Service): Commands => {
+const Commands = (instance: Manager) => {
     return {
         createSecret: async (input: CreateSecretCommandInput) => {
             return await instance.send( new CreateSecretCommand( input ) );
@@ -90,6 +109,6 @@ const Commands: (instance: Service) => Commands = (instance: Service): Commands 
 
 export { Commands };
 
-export * from "@aws-sdk/client-secrets-manager";
+export type { Request };
 
 export default Commands;

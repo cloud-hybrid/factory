@@ -1,13 +1,13 @@
 {
     "name": "cloud-factory",
     "private": false,
-    "version": "0.4.64",
+    "version": "0.4.66",
     "type": "module",
     "main": "index.js",
     "description": "A CLI Utility to Manage Software-Defined State",
     "types": "distribution",
     "repository": "git+https://github.com/cloud-hybrid/factory.git",
-    "license": "BSD 1-Clause License",
+    "license": "BSD-2-Clause",
     "author": "Jacob B. Sanders",
     "scripts": {
         "test-env": "node test.js",
@@ -37,6 +37,7 @@
         "@cdktf/aws-cdk": "^0.2.21",
         "@cdktf/provider-aws": "^4.0.4",
         "@cdktf/provider-generator": "^0.8.6",
+        "@cloud-technology/parameter": "^0.4.118",
         "ajv": "^8.8.2",
         "ajv-formats": "^2.1.1",
         "aws-cdk-lib": "^2.8.0",

@@ -36,7 +36,8 @@ const Main = async () => {
                 "hydrate": async (input: Argv) => await Template.Render( input )
             },
             secrets: {
-                "get-secret": async (input: Argv) => await API.Get( input )
+                "get-secret": async (input: Argv) => await API.Get( input ),
+                "create-secret": async (input: Argv) => await API.Create( input )
             }
         };
 
@@ -75,7 +76,8 @@ const Main = async () => {
             .command( "secrets-manager", Colors( "Blue", "AWS Secrets Management API" ), (async ($: Argv) => {
                 const name = "secrets-manager";
                 const commands = [
-                    "get"
+                    "get",
+                    "create"
                 ];
 
                 $.strict().strictOptions().strictCommands();
@@ -86,20 +88,35 @@ const Main = async () => {
                 $.usage( "Usage:" + " " + script + " " + name + " " + "[--help] Sub-Command ? [--Flag(s)]" );
 
                 /*** Namespace'd Example(s) */
-                $.example( "Get Secret (Prompt)", name + " " + commands[0] + " " + "? [--help] ? [--Flag(s)]" );
+                $.example( "Get Secret (Prompt)", script + " " + name + " " + commands[0] + " " + "? [--help] ? [--Flag(s)]" );
+                $.example( "Create Secret (Prompt)", script + " " + name + " " + commands[1] + " " + "? [--help] ? [--Flag(s)]" );
 
-                $.command( commands[0], "Index AWS Secret from Secrets-Manager Service", (
+                $.command( commands[0], "Retrieve AWS Secret", (
                     async ($: Argv) => {
                         /*** Namespace'd Example(s) */
-                        $.example( "API Response (Prompt)", name + " " + commands[0] );
-                        $.example( "Print Secret (Prompt)", name + " " + commands[0] + " " + "--value-only" );
-                        $.example( "Create Secret File (No-Prompt)", name + " " + commands[0] + " " + "--name \"Organization-Secret\" --file \"Output.json\" --value-only" );
+                        $.example( "API Response (Prompt)", script + " " + name + " " + commands[0] );
+                        $.example( "Print Secret (Prompt)", script + " " + name + " " + commands[0] + " " + "--value-only" );
+                        $.example( "Create Secret File (No-Prompt)", script + " " + name + " " + commands[0] + " " + "--name \"Organization-Secret\" --file \"Output.json\" --value-only" );
 
                         $.option( "name", { type: "string" } ).alias( "name", "n" ).describe( "name", Colors( "Bright-White", "Secret Resource Name (Required, Prompt)" ) ).default( "name", null );
                         $.option( "file", { type: "string" } ).alias( "file", "f" ).describe( "file", Colors( "Bright-White", "Write Output to File Handler" ) ).default( "file", null );
                         $.option( "value-only", { type: "boolean" } ).alias( "value-only", "x" ).describe( "value-only", Colors( "Bright-White", "Retrieve Only the Secret-Value - No API Response" ) ).default( "value-only", false );
 
                         await Commands.secrets["get-secret"]( $ );
+                    })
+                );
+
+                $.command( commands[1], "Create AWS Secret", (
+                    async ($: Argv) => {
+                        /*** Namespace'd Example(s) */
+                        $.example( "Create Secret", script + " " + name + " " + commands[1] + " " + "--name \"IBM/Production/Audit-Service/Storage/Watson-AI/Credentials\" --description \"IBM Watson Storage Login Credentials\" --secret \"input.json\"" );
+
+                        $.option( "name", { type: "string" } ).alias( "name", "n" ).describe( "name", Colors( "Bright-White", "Resource Name" ) ).default( "name", null );
+                        $.option( "description", { type: "string" } ).alias( "description", "d" ).describe( "description", Colors( "Bright-White", "Usage Description" ) ).default( "description", null );
+                        $.option( "input", { type: "string" } ).alias( "input", "i" ).describe( "input", Colors( "Bright-White", "Pipe'd JSON Serializable String from Standard-Input" ) ).default( "input", null );
+                        $.option( "secret", { type: "string" } ).alias( "secret", "f" ).describe( "secret", Colors( "Bright-White", "JSON File-System Path Containing Secret's Content" ) ).default( "secret", null );
+
+                        await Commands.secrets["create-secret"]( $ );
                     })
                 );
             }) )
