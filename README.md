@@ -12,7 +12,52 @@ In order to begin, open a `node.js` capable console and then run the following c
 ---
 
 - [AWS Regional Services](https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/?p=ngi&loc=4)
+
 ## Task Board ##
+
+- [ ] Anything of potential default attribution, ensure users can update settings via a `json` file.
+    ```ts
+    const CWD: string = Path.dirname( import.meta.url.replace( "file" + ":" + "//", "" ) );
+    
+    /*** ESM Compatability & JSON Importer */
+    const Import: NodeRequire = Module.createRequire( import.meta.url );
+    
+    /***
+     * JSON Configuration
+     * ==================
+     *
+     *  @type {typeof await import("../configuration/settings.json")}
+     *
+     */
+    
+    const Settings: typeof import("../schema/settings.schema.json") = Import(
+        Path.join(
+            Distribution,
+            "src", "schema", "settings.json"
+        )
+    ) ?? null;
+    
+    interface Distributable {
+        name?: string;
+        organization?: string;
+        environment?: string;
+    }
+    
+    const Factory: Distributable = Import(Path.join( Process.cwd(), "factory.json" ));
+    
+    /*** @externs {{@link Settings}} */
+    class Configuration {
+        readonly name: string = Factory?.name ?? UUID.v4();
+        readonly environment: string = Factory?.environment ?? "Development";
+        readonly organization: string = Factory?.organization ?? "Factory";
+    
+        constructor(settings?: Distributable) {
+            this.name = settings?.name ?? this.name;
+            this.environment = settings?.environment ?? this.environment;
+            this.organization = settings?.organization ?? this.organization;
+        }
+    }
+    ```
 
 - [ ] Examine https://github.com/Chan9390/aws-mfa-enforce
 - [ ] Examine Pattern https://github.com/serverless/examples/tree/master/aws-node-env-variables
